@@ -4,12 +4,20 @@
 
 ## NOW
 
-今回の依頼に従い、GitHub Pagesへ公開する。
+今回依頼されたGitHub Pagesへの公開は完了。現在の実装対象はない。
 
-- [ ] GitHub Actionsのビルド・検査・公開設定
-- [ ] 公開先パスでのビルドと画面・リンク・ダウンロード確認
-- [ ] Git初期化・GitHubへのpush・Pages公開
-- [ ] 公開URLでの確認と検証記録の更新
+## DONE / GitHub Pages公開（2026-10-05）
+
+- [x] GitHub Actionsのビルド・検査・公開設定
+- [x] 公開先パスでのビルドと画面・リンク・ダウンロード確認
+- [x] Git初期化・GitHubへのpush・Pages公開
+- [x] 公開URLでの確認と検証記録の更新
+
+公開先は[GitHub Pages](https://tetoriapot.github.io/municipal-local-toolbox/)、リポジトリは[Tetoriapot/municipal-local-toolbox](https://github.com/Tetoriapot/municipal-local-toolbox)。`main`へのpushで型検査・単体テスト・ビルド・配布物検査を実行し、成功したサイトを自動公開する。[初回公開の実行記録](https://github.com/Tetoriapot/municipal-local-toolbox/actions/runs/37305635117)でbuild・deployの成功を確認した。
+
+単体テスト31件と型検査61ファイルは成功。公開先のパスでproduction buildを実行し、37 HTML・943参照と8組の配布ファイルを検証した。公開URLでは49ファイルの取得、全8組のTXT/HTMLのバイト数・SHA-256一致、検索、更新情報、Help、配色の保存、2ツールのサンプルとダウンロード操作、独自404画面を確認した。320 / 390 / 768 / 1280 / 1440pxで横はみ出しはなく、通常画面の確認中にJavaScriptエラー・HTTPエラーはなかった。画面と検証記録は`.local-review/pages-live/`に保存した。
+
+README・TASKS・検証項目はyomiyasuで確認した。手順とチェック項目の箇条書き、自然な説明文の文末は維持した。アプリの機能・保存形式・依存は変更していない。元仕様と配布ファイルのバイト列をGitの改行変換から保護し、ローカル検証結果と認証情報は公開対象に含めていない。
 
 ## DONE / 右上の操作と優先改善（2026-10-05）
 
@@ -74,7 +82,7 @@ Phase 1では8種類の配布確認版を作成した。現在は異動引継ぎ
 - [ ] 残り6種類の各業務ツール本体（仕様 §14、§27–31）をNEXTの順序で実装・検証。異動引継ぎノートと備品管理台帳は実装済み
 - [ ] Phase 2: 残り6ツールのサンプルデータ付きデモ、実画面のスクリーンショット、新着・人気順、更新通知、GitHub連携
 - [ ] Phase 3: 自治体・部署・項目・テーマを設定するツールメーカー
-- [ ] 公開前: 正式ライセンス、運営者・問い合わせ先、公開URLの確定
+- [ ] 正式ライセンス、運営者・問い合わせ先の確定。公開URLは上記のGitHub Pagesに確定済み
 - [x] このPCの Edge / Chrome でPhase 1の操作を自動検証
 - [ ] 庁内PCの管理ポリシー下での保存・紙印刷、スクリーンリーダー、Firefox、Lighthouse 4指標90以上を確認
 

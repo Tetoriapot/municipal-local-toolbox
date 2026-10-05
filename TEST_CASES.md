@@ -67,6 +67,12 @@ pnpm test:e2e
 
 主要ページは320 / 390 / 768 / 900 / 1440pxで横はみ出しを検査します。メニュー・FAQのキーボード操作、外部要求・console error、axeの主要ルールを検査します。静的ファイルは内部リンク・アンカー、HTMLとTXTの同一性、SHA-256、単一HTML内のスクリプト構文と外部依存の有無を検査します。
 
+## GitHub Pages公開
+
+公開先の`BASE_PATH`と`SITE_URL`でproduction buildと配布物検査を実行する。GitHub Actionsのbuild・deployが成功した後、公開URLからページ・CSS・JavaScript・配布ファイルを取得し、配布物のバイト数とSHA-256をmanifestと比較する。
+
+公開URLで検索、更新情報、Help、配色切替と再読込み、TXT/HTMLのダウンロード、2ツールのサンプル、スマートフォンのメニュー、独自404画面を確認する。320 / 390 / 768 / 1280 / 1440pxで横はみ出しがないこと、通常画面でJavaScriptエラーとHTTPエラーがないことを確認する。実行結果は[TASKS.md](TASKS.md)に記録する。
+
 ## 実環境で残る確認
 
 自動検査だけでは完全なWCAG適合を確認できません。スクリーンリーダー、実際の紙への出力、庁内PCの管理ポリシー、Firefox、Lighthouseの4指標90以上は別途確認が必要です。ブラウザと自動テストの実行結果は[TASKS.md](TASKS.md)に記録します。
