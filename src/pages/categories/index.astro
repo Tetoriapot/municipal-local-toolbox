@@ -1,0 +1,8 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { categories } from '../../data/categories';
+import { tools } from '../../data/tools';
+import { url } from '../../lib/paths';
+---
+<BaseLayout title="カテゴリ一覧"><div class="container"><nav class="breadcrumb" aria-label="パンくず"><a href={url('/')}>ホーム</a><Icon name="chevron" size={12} /><span aria-current="page">カテゴリ一覧</span></nav><div class="page-heading"><span class="eyebrow">CATEGORIES</span><h1>業務の種類から探す</h1><p>カテゴリを選ぶと、該当するツールと実装状況を確認できます。</p></div><div class="category-index">{categories.map(category => { const count = tools.filter(tool => tool.category === category.id).length; return <a href={url(`/categories/${category.id}/`)}><Icon name={category.icon} size={29} /><h2>{category.name}</h2><p>{category.description}</p><small>{count ? `${count} 件のツール` : 'ツールの追加を予定しています'} <Icon name="arrow" size={16} /></small></a>; })}</div></div></BaseLayout>

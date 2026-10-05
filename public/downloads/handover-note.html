@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>異動引継ぎノート</title>
+<style>:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Yu Gothic UI', 'Yu Gothic', Meiryo, sans-serif;
+  color: #202938; background: #f5f7fa; font-size: 16px; line-height: 1.8;
+  --primary: #2457a6; --border: #cfd6df; --muted: #53647a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+h1, h2, h3, h4 { line-height: 1.5; margin-top: 0; }
+h1 { font-size: 26px; margin: 3px 0 0; }
+h1 small { font-size: 13px; font-weight: 400; color: var(--muted); }
+h2 { font-size: 25px; margin-bottom: 12px; }
+h3 { font-size: 19px; margin-bottom: 12px; }
+h4 { font-size: 17px; }
+p { margin: 0 0 16px; }
+button, input, select, textarea { font: inherit; }
+input:not([type=checkbox]), select, textarea { width: 100%; min-height: 46px; border: 1px solid #aab9cd; border-radius: 5px; padding: 9px 12px; color: #202938; background: white; }
+textarea { resize: vertical; min-height: 110px; }
+input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--primary); flex-shrink: 0; }
+label { display: block; font-size: 15px; font-weight: 600; }
+label > input, label > select, label > textarea { margin-top: 6px; }
+button { min-height: 44px; border: 1px solid var(--primary); border-radius: 5px; background: var(--primary); padding: 9px 16px; color: white; cursor: pointer; line-height: 1.6; }
+button:hover { background: #173d78; color: white; }
+button:active { background: #102d5d; }
+button:disabled { cursor: not-allowed; background: #e7ebf0; border-color: #cfd6df; color: #586679; }
+.secondary { background: white; color: #2457a6; border-color: #aabbd1; }
+.danger { background: white; color: #b42318; border-color: #bc6e67; }
+.danger:hover { background: #b42318; color: white; }
+:focus-visible { outline: 3px solid #a66b00; outline-offset: 3px; }
+.skip { position: absolute; top: -100px; left: 20px; background: white; padding: 12px; z-index: 5; }
+.skip:focus { top: 8px; }
+.app-header { background: white; border-bottom: 2px solid var(--border); padding: 21px 32px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.brand { color: var(--muted); font-size: 12px; }
+.header-actions { display: flex; align-items: center; gap: 14px; }
+#save-status { border: 1px solid var(--border); padding: 7px 12px; border-radius: 4px; font-size: 13px; }
+#save-status.unsaved { background: #fff3ef; color: #a92217; border-color: #bf796e; }
+.workspace { display: grid; grid-template-columns: 224px minmax(0, 1fr); max-width: 1440px; margin: auto; }
+#navigation { padding: 25px 16px; display: flex; flex-direction: column; gap: 7px; align-self: start; }
+#navigation button { background: transparent; border-color: transparent; color: #3b506e; text-align: left; font-size: 15px; }
+#navigation button:hover { background: #e8eff9; }
+#navigation button[aria-current=page] { background: #e5edfa; color: #173d78; border-color: #becfea; font-weight: 700; }
+main { padding: 30px 34px 45px; background: white; min-width: 0; min-height: 70vh; }
+main:focus { outline: none; }
+.muted { color: var(--muted); font-size: 14px; }
+.eyebrow { color: var(--muted); font-size: 12px; font-weight: 650; }
+.section-title { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+.section-title > div { min-width: 0; }
+.section-title button { flex-shrink: 0; }
+.section-title h2 { margin-bottom: 7px; }
+.local-label { font-size: 12px; border: 1px solid #c6dacf; background: #f1f8f4; color: #28613f; padding: 5px 10px; border-radius: 4px; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px; }
+.summary-grid button { background: #f6f8fc; border-color: #cbd7e6; color: #29486f; text-align: left; padding: 17px 20px; }
+.summary-grid strong { display: block; font-size: 27px; line-height: 1.5; }
+.summary-grid span { font-size: 13px; }
+.summary-grid button:hover { background: #e8effa; }
+.progress-panel, .content-panel { padding: 23px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 22px; }
+.progress-panel > div:first-child { display: flex; align-items: center; gap: 15px; justify-content: space-between; }
+.progress-panel h3 { margin-bottom: 0; }
+.progress-panel strong { color: #2457a6; }
+progress { width: 100%; accent-color: #2457a6; height: 13px; margin: 18px 0 9px; }
+.progress-panel p { font-size: 13px; color: var(--muted); }
+.completion-sections { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 13px; color: #465c78; }
+.field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
+.field-grid .wide { grid-column: 1 / -1; }
+.required { font-size: 12px; color: #a4271d; margin-left: 8px; }
+.list-toolbar { display: flex; align-items: end; gap: 16px; margin-bottom: 18px; }
+.list-toolbar label:first-child { flex: 1; }
+.record-card { padding: 21px; border: 1px solid #cbd7e4; border-radius: 6px; margin-bottom: 14px; break-inside: avoid; }
+.record-top { display: flex; align-items: start; justify-content: space-between; gap: 20px; }
+.record-top h3 { margin: 0 0 8px; overflow-wrap: anywhere; }
+.record-category { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.record-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.record-actions button { font-size: 13px; min-height: 44px; padding: 7px 12px; }
+.check-field { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; font-weight: 400; cursor: pointer; }
+.check-field input { margin: 0; }
+.record-card dl { display: grid; grid-template-columns: 155px minmax(0, 1fr); margin: 15px 0; font-size: 14px; gap: 8px 15px; }
+dt { color: #53647a; }
+dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.empty { border: 1px dashed #b3c4d9; border-radius: 5px; padding: 26px 22px; background: #f8fafd; color: #4f617b; }
+.month-heading { padding: 10px 15px; background: #edf2f9; color: #274c7a; border-left: 3px solid #2457a6; margin: 25px 0 14px; font-size: 18px; }
+.warning { padding: 17px 20px; border: 1px solid #cebb93; border-left: 4px solid #a37b26; background: #fffbef; color: #6e5422; margin-bottom: 20px; font-size: 14px; }
+.feedback { color: #244f70; overflow-wrap: anywhere; font-size: 14px; }
+.feedback:empty { display: none; }
+.feedback.error, #form-error, #clear-error { color: #a92217; }
+.danger-panel { border-color: #d3aba5; }
+.action-bar { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; background: #edf2f7; padding: 18px 24px; border-top: 1px solid var(--border); }
+.action-bar button { font-size: 14px; }
+dialog { width: min(760px, calc(100% - 28px)); max-height: calc(100dvh - 36px); overflow: auto; border: 1px solid #aebed1; border-radius: 8px; padding: 27px; color: #202938; }
+dialog::backdrop { background: #14263f90; }
+.dialog-heading { display: flex; justify-content: space-between; align-items: start; gap: 15px; }
+.dialog-heading h2 { font-size: 23px; }
+.dialog-actions { display: flex; gap: 10px; margin-top: 22px; }
+#edit-fields { margin-bottom: 22px; }
+#form-error, #clear-error { margin-top: 12px; }
+#print-area { display: none; }
+@media (max-width: 1000px) {
+  .workspace { grid-template-columns: 190px minmax(0, 1fr); }
+  main { padding: 24px; }
+  .app-header { padding: 20px 24px; }
+  .header-actions { flex-wrap: wrap; justify-content: flex-end; }
+  .record-top { flex-wrap: wrap; gap: 8px; }
+  .record-card dl { grid-template-columns: 125px minmax(0, 1fr); }
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .section-title { flex-wrap: wrap; }
+}
+@media (max-width: 700px) {
+  .app-header { display: block; padding: 18px; }
+  h1 { font-size: 23px; }
+  .header-actions { margin-top: 15px; justify-content: space-between; }
+  .workspace { display: block; }
+  #navigation { display: grid; grid-template-columns: repeat(2, 1fr); padding: 13px; gap: 5px; }
+  #navigation button { font-size: 14px; }
+  main { padding: 23px 18px; }
+  .field-grid, .completion-sections { grid-template-columns: 1fr; }
+  .list-toolbar { flex-wrap: wrap; }
+  .list-toolbar label:first-child { flex-basis: 100%; }
+  .record-card { padding: 17px; }
+  .record-card dl { display: block; }
+  dt { margin: 12px 0 3px; font-weight: 600; }
+  .progress-panel, .content-panel { padding: 18px; }
+  .progress-panel > div:first-child { display: block; }
+  .progress-panel strong { display: block; margin-top: 8px; }
+  .action-bar { display: grid; grid-template-columns: 1fr; padding: 18px; }
+  dialog { padding: 20px; }
+  .dialog-actions { flex-wrap: wrap; }
+}
+@media print {
+  body { background: white; color: black; font-size: 11pt; }
+  .app-header, .workspace, .action-bar, .skip, dialog { display: none !important; }
+  #print-area { display: block; }
+  #print-area h1 { font-size: 19pt; }
+  #print-area h2 { margin-top: 25px; font-size: 15pt; border-bottom: 1px solid #aaa; padding-bottom: 8px; }
+  #print-area h3 { font-size: 13pt; }
+  #print-area .record-card { border: 1px solid #aaa; padding: 12px; }
+  #print-area .print-memo { white-space: pre-wrap; overflow-wrap: anywhere; }
+  #print-area .record-card dl { display: block; font-size: 10pt; }
+  #print-area dt { margin-top: 7px; font-weight: bold; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+:root { color-scheme: light; }
+.header-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px; }
+.header-actions button, .shell-help { width:auto; font-size:13px; padding:8px 12px; min-height:44px; }
+.shell-help { display:inline-flex; align-items:center; border:1px solid #aabbd1; border-radius:5px; text-decoration:none; }
+.storage-strip { margin:0 auto; padding:12px 24px; max-width:1440px; font-size:13px; border-bottom:1px solid #cfd6df; }
+.storage-strip p { margin:0 0 5px; }
+.storage-strip details { margin:0; border:0; }
+.storage-strip summary { padding:0; min-height:32px; cursor:pointer; }
+.storage-strip details p { padding:0; }
+[data-theme-notice]:empty { display:none; }
+dialog { width:min(760px,calc(100% - 28px)); max-height:calc(100dvh - 36px); overflow:auto; border:1px solid #aebed1; border-radius:8px; padding:24px; background:white; color:#202938; }
+dialog::backdrop { background:#14263f90; }
+@media (max-width:700px) { .header-actions { justify-content:flex-end; margin-top:12px; } #save-status { flex-basis:100%; white-space:normal; text-align:right; } .storage-strip { padding:12px 18px; } }
+@media screen {
+html[data-theme=dark] { color-scheme:dark; background:#101824; color:#e4edf8; --primary:#8fbcff; --border:#53647b; --muted:#b9c8dc; }
+html[data-theme=dark] :is(body,main,header,dialog,.secondary,.danger,.shell-help,input:not([type=checkbox]),select,textarea) { background:#182334; color:#e4edf8; border-color:#53647b; }
+html[data-theme=dark] :is(.workspace,.layout,#navigation,.action-bar,.storage-strip,footer) { background:#101824; color:#c5d4e8; }
+html[data-theme=dark] :is(.summary-grid button,.equipment-filters,.empty,.month-heading,.record-card,.content-panel,.progress-panel,.status-tag,#equipment-table th,#equipment-table tbody tr:nth-child(even)) { background:#23334a; color:#e4edf8; border-color:#53647b; }
+html[data-theme=dark] :is(.brand,.muted,.eyebrow,dt,.completion-sections,h1 small,#navigation button,nav a,.feedback,.progress-panel strong,#equipment-table summary,#equipment-table td::before) { color:#bfd5f3; }
+html[data-theme=dark] button:not(.secondary):not(.danger):not(:disabled) { background:#315d96; color:#fff; border-color:#8fbcff; }
+html[data-theme=dark] :is(button:hover,nav a:hover,#navigation button[aria-current=page]) { background:#375175; color:white; }
+html[data-theme=dark] button:disabled { background:#283449; color:#b1c0d2; border-color:#53647b; }
+html[data-theme=dark] :is(.warning,.notice,.local-label) { background:#332d1e; color:#ffdfa2; border-color:#a18a58; }
+html[data-theme=dark] :is(.required,.danger,#form-error,#clear-error,.feedback.error,#save-status.unsaved) { color:#ffb8ac; background:#3a2227; }
+html[data-theme=dark] .status-tag[data-status=repair] { color:#ffdfa2; background:#3b3120; }
+html[data-theme=dark] .status-tag[data-status=disposed] { color:#d2dceb; background:#343d49; }
+html[data-theme=dark] :focus-visible { outline-color:#ffd37b; }
+html[data-theme=dark] :is(nav>span,label>span) { color:#bfd1e8; }
+html[data-theme=dark] #equipment-table td::before { color:#bfd5f3; }
+html[data-theme=dark] input::placeholder { color:#b9c8dc; }
+}
+@media print { .storage-strip,.header-actions,.sample-banner,.draft-panel,dialog { display:none!important; } }
+</style>
+<script>(() => {
+  const key = 'municipal-toolbox:theme:v1';
+  const media = matchMedia('(prefers-color-scheme: dark)');
+  let choice = null;
+  try { choice = localStorage.getItem(key); } catch {}
+  if (!['light', 'dark'].includes(choice)) choice = null;
+  function render() {
+    const dark = (choice || (media.matches ? 'dark' : 'light')) === 'dark';
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    document.querySelectorAll('[data-theme-toggle]').forEach(button => {
+      button.textContent = dark ? 'ライトモード' : 'ダークモード';
+      button.setAttribute('aria-label', dark ? 'ライトモードに切り替える' : 'ダークモードに切り替える');
+      button.disabled = false;
+    });
+  }
+  render();
+  document.addEventListener('DOMContentLoaded', () => {
+    render();
+    document.querySelectorAll('[data-theme-toggle]').forEach(button => button.addEventListener('click', () => {
+      choice = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      render();
+      try { localStorage.setItem(key, choice); }
+      catch { document.querySelectorAll('[data-theme-notice]').forEach(node => { node.textContent = '配色はこの画面に適用しました。設定は保存できません。'; }); }
+    }));
+  });
+  media.addEventListener('change', () => { if (!choice) render(); });
+  addEventListener('storage', event => {
+    if (event.key === key || event.key === null) { choice = ['light','dark'].includes(event.newValue) ? event.newValue : null; render(); }
+  });
+})();
+</script></head>
+<body><span id="sample" hidden></span>
+<a class="skip" href="#main">本文へ移動</a>
+<header class="app-header">
+  <div><span class="brand">自治体ローカルツール箱</span><h1>異動引継ぎノート <small>v1.1.0</small></h1></div>
+  <div class="header-actions"><span id="save-status" role="status" aria-live="polite">保存状態を確認中</span><button type="button" class="secondary" data-view="help">ヘルプ</button></div>
+</header>
+<div class="workspace">
+  <nav id="navigation" aria-label="ツールメニュー">
+    <button type="button" data-view="home" aria-current="page">ホーム</button>
+    <button type="button" data-view="duties">担当業務</button>
+    <button type="button" data-view="schedule">年間予定</button>
+    <button type="button" data-view="contacts">関係者</button>
+    <button type="button" data-view="files">資料の保存場所</button>
+    <button type="button" data-view="notes">申し送り事項</button>
+    <button type="button" data-view="checklist">チェックリスト</button>
+    <button type="button" data-view="search">全文検索</button>
+    <button type="button" data-view="data">データ管理</button>
+  </nav>
+  <main id="main" tabindex="-1">
+    <noscript><p class="warning">JavaScriptが無効なため、記録・保存・読込みを利用できません。ブラウザの設定を確認してください。</p></noscript>
+    <div id="storage-warning" class="warning" hidden><p id="storage-message"></p><button type="button" class="secondary" id="reload-data">保存済みデータを読み直す</button></div>
+    <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+
+    <section data-panel="home">
+      <div class="section-title"><div><span class="eyebrow">引継ぎ状況</span><h2>ホーム</h2></div><span class="local-label">外部通信なし・ブラウザ内保存</span></div>
+      <div class="summary-grid" id="summary"></div>
+      <div class="progress-panel"><div><h3>完成度チェック</h3><strong id="completion-label"></strong></div><progress id="completion-progress" max="100" value="0" aria-label="引継ぎの完成度"></progress><p>登録した6分類の記録のうち「確認済み」にした割合です。内容の正確さや、必要な項目がすべて揃っていることを保証するものではありません。</p><div id="completion-sections" class="completion-sections"></div></div>
+      <section class="content-panel"><h3>基本情報</h3><p class="muted">入力内容は自動保存されます。</p><div class="field-grid" id="profile-fields"></div></section>
+      <section class="content-panel"><h3>メモ</h3><p class="muted">配布確認版のメモもここに引き継ぎます。</p><label for="memo">メモ（50,000文字まで）</label><textarea id="memo" maxlength="50000" rows="5"></textarea><p id="count" class="muted">0 / 50,000文字</p></section>
+    </section>
+
+    <section data-panel="records" hidden>
+      <div class="section-title"><div><span class="eyebrow">記録一覧</span><h2 id="section-heading"></h2><p id="section-description" class="muted"></p></div><button type="button" id="add-record">新規登録</button></div>
+      <div class="list-toolbar"><label for="record-query">この分類を検索<input id="record-query" type="search" maxlength="200" placeholder="登録した内容を検索"></label><label for="completion-filter">確認状態<select id="completion-filter"><option value="all">すべて</option><option value="pending">未確認</option><option value="done">確認済み</option></select></label></div>
+      <p id="record-count" role="status" class="muted"></p><div id="record-list"></div>
+    </section>
+
+    <section data-panel="search" hidden>
+      <h2>全文検索</h2><p>すべての分類、基本情報、メモを検索します。複数のキーワードはスペースで区切ります。</p>
+      <label for="global-query">検索キーワード</label><input id="global-query" type="search" maxlength="200" placeholder="業務名、担当者、資料の場所など">
+      <p id="search-count" role="status" aria-live="polite" class="muted"></p><div id="search-results"></div>
+    </section>
+
+    <section data-panel="data" hidden>
+      <h2>データ管理</h2><p>すべての記録、基本情報、メモをJSONファイルに保存・復元します。</p>
+      <div class="content-panel"><h3>バックアップ</h3><p>読込みは現在のデータ全体を置き換えます。必要な内容を先に書き出してください。10MB以下の、このツールのJSONファイルを読み込めます。配布確認版のJSONにも対応しています。</p><p>ファイルの移動・改名、ブラウザの変更、閲覧データの削除に備え、定期的にJSONを書き出してください。</p><p class="muted" id="data-count"></p></div>
+      <div class="content-panel"><h3>印刷</h3><p>「すべての記録を印刷」は全分類、基本情報、メモを印刷します。検索・絞り込みの影響を受けません。「表示中の一覧を印刷」は現在の分類や検索結果だけを印刷します。</p></div>
+      <div class="content-panel danger-panel"><h3>すべてのデータを削除</h3><p>削除するのはこのバージョンの確定済みデータです。下書きは「下書きを削除」で別に削除してください。旧版の保存領域と、書き出したJSONファイルは削除しません。</p><button type="button" class="danger" id="clear">すべてのデータを削除</button></div>
+    </section>
+
+    <section data-panel="help" hidden>
+      <h2>使い方</h2>
+      <ol><li>担当業務などの分類を選び「新規登録」を押します。</li><li>必要な情報を入力し「登録する」を押します。保存された記録は「編集」で変更できます。</li><li>引継ぎ内容を確認したら「確認済み」にチェックします。ホームで確認の進捗を見られます。</li><li>作業後は「バックアップを書き出す」でJSONを保存してください。</li></ol>
+      <h3>年間予定</h3><p>4月から翌年3月の順で月別に表示します。「実施時期・締切」に日付や上旬・月末などを記録してください。日付の自動計算や通知はありません。</p>
+      <h3>保存と編集</h3><p>基本情報とメモは入力時に自動保存します。各分類の編集はダイアログの「登録する」「変更を保存」で確定します。未確定の内容はバックアップに含まれません。</p><p>ブラウザ内の保存に失敗した場合は、画面上に「未保存」と表示します。画面を閉じる前にJSONを書き出してください。同じツールを複数のタブで編集すると、他のタブの変更を検出して保存を止めます。現在の内容を書き出してから、保存済みデータを読み直してください。</p>
+      <h3>旧版からの移行</h3><p>同じ保存場所で旧版のメモを見つけた場合は、新しい保存領域に複製します。旧版の領域は変更しません。自動で見つからない場合は、旧版でJSONを書き出して読み込んでください。</p>
+      <h3>ファイルの場所・連絡先</h3><p>パス、URL、メールアドレスは文字として記録します。リンクを自動で開いたり、外部へ接続したりしません。ファイルそのものは添付・保存しません。</p>
+      <h3>下書きとサンプル</h3><p>編集の下書きはツールごとに1件保存します。「下書きを残して閉じる」で中断し、「下書きを再開」で続けられます。登録・保存するまで通常のJSON・印刷には含みません。下書きの書出しは内容の保管用で、通常のバックアップ読込みには使えません。</p><p>「サンプルで試す」は架空データを別画面で開きます。通常のデータや下書きは読み書きしません。変更は再読込みで消え、初期サンプルに戻ります。</p><h3>情報の取り扱い</h3><p>個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。保存内容とJSONは暗号化されません。</p>
+      <p class="muted">Microsoft Edge / Google Chromeを主要な対応対象としています。Internet Explorerには対応しません。記録は合計3,000件、JSONは10MBまでです。ブラウザの保存可能容量は設定や環境により異なります。</p>
+    </section>
+  </main>
+</div>
+<footer class="action-bar"><button type="button" class="secondary" id="save-now">保存する</button><button type="button" id="export">バックアップを書き出す</button><button type="button" class="secondary" id="import">バックアップを読み込む</button><button type="button" class="secondary" id="print">すべての記録を印刷</button><button type="button" class="secondary" id="print-current">表示中の一覧を印刷</button><input id="import-file" type="file" accept=".json,application/json" hidden></footer>
+<dialog id="edit-dialog" aria-labelledby="edit-title">
+  <form id="record-form"><div class="dialog-heading"><h2 id="edit-title">新規登録</h2><button type="button" class="secondary" id="close-edit">閉じる</button></div><p class="muted">「必須」とある項目を入力してください。登録・保存するまで一覧には反映されません。</p><p id="draft-save-status" role="status"></p><div id="edit-fields" class="field-grid"></div><label class="check-field"><input type="checkbox" id="entry-completed">この記録を確認済みにする</label><p id="form-error" role="alert"></p><div class="dialog-actions"><button type="submit" id="submit-record">登録する</button><button type="button" id="suspend-edit" class="secondary">下書きを残して閉じる</button><button type="button" class="secondary" id="cancel-edit">キャンセル</button></div></form>
+</dialog>
+<dialog id="clear-dialog" aria-labelledby="clear-title"><h2 id="clear-title">全データの削除を確認</h2><p>すべての記録、基本情報、メモを削除します。取り消せません。必要な内容を先にJSONへ書き出してください。下書きは残るため、専用の削除操作で別に削除してください。</p><label for="clear-confirm">確認のため「すべて削除」と入力してください</label><input id="clear-confirm" autocomplete="off"><p id="clear-error" role="alert"></p><div class="dialog-actions"><button type="button" class="danger" id="confirm-clear" disabled>削除を実行</button><button type="button" class="secondary" id="cancel-clear">キャンセル</button></div></dialog>
+<section id="print-area" aria-label="印刷内容"></section>
+<script>(() => {
+    const sample = { "schemaVersion": 2, "toolId": "handover-note", "sampleData": true, "text": "操作練習用の架空データです。実際の業務情報ではありません。", "profile": { "department": "サンプル市 総務課", "predecessor": "前任担当（例）", "successor": "後任担当（例）", "handoverDate": "2026-04-01" }, "sections": { "duties": [{ "id": "sample-duty", "title": "月末の備品確認（例）", "procedure": "備品一覧と現物を照合し、変更点を記録する。", "frequency": "毎月", "completed": false }], "schedule": [{ "id": "sample-schedule", "title": "年度初めの台帳確認（例）", "month": "4", "timing": "4月上旬", "completed": false }], "contacts": [{ "id": "sample-contact", "title": "庶務担当窓口（例）", "organization": "サンプル市 総務課", "completed": true }], "files": [{ "id": "sample-file", "title": "備品台帳（例）", "location": "組織で許可された共有フォルダーに保存", "completed": false }], "notes": [{ "id": "sample-note", "title": "プリンターの点検（例）", "priority": "通常", "details": "点検予定を確認する。", "completed": false }], "checklist": [{ "id": "sample-check", "title": "資料の保存場所を確認（例）", "completed": false }] } };
+    const MAX_TEXT_LENGTH = 50000;
+    const MAX_FILE_BYTES = 1024 * 1024;
+    function validateBackup(data, toolId) {
+        if (!data || typeof data !== 'object' || Array.isArray(data) || data.schemaVersion !== 1 || data.toolId !== toolId || typeof data.text !== 'string' || data.text.length > MAX_TEXT_LENGTH) {
+            throw new Error('同じツールの有効なバックアップを選択してください。メモは50,000文字までです。');
+        }
+        return data.text;
+    }
+    function makeBackup(toolId, text, exportedAt = new Date().toISOString(), original = {}) {
+        return { ...original, schemaVersion: 1, toolId, exportedAt, text };
+    }
+    function serializeBackup(data) {
+        const text = JSON.stringify(data, null, 2);
+        if (new TextEncoder().encode(text).length > MAX_FILE_BYTES) {
+            throw new Error('バックアップが1MBを超えるため反映できません。必要な内容を書き出し、メモを短くしてください。');
+        }
+        return text;
+    }
+    function isObject(value) {
+        return value !== null && typeof value === 'object' && !Array.isArray(value);
+    }
+    function textValue(value) {
+        return typeof value === 'string' ? value : '';
+    }
+    function validDate(value) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value))
+            return false;
+        const parsed = new Date(value + 'T00:00:00Z');
+        return Number.isFinite(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
+    }
+    function readField(value, field) {
+        if (value === undefined && !field.required)
+            return field.type === 'select' ? field.options[0] : '';
+        if (typeof value !== 'string')
+            throw new Error(field.label + 'の形式が正しくありません。');
+        const limit = field.maxLength ?? (field.type === 'textarea' ? 20000 : 500);
+        if (value.length > limit)
+            throw new Error(field.label + 'は' + limit.toLocaleString('ja-JP') + '文字以内で入力してください。');
+        if (field.required && !value.trim())
+            throw new Error(field.label + 'を入力してください。');
+        if (field.type === 'select' && !field.options.includes(value))
+            throw new Error(field.label + 'を選択肢から選んでください。');
+        if (field.type === 'date' && value && !validDate(value))
+            throw new Error(field.label + 'に有効な日付を入力してください。');
+        return value;
+    }
+    function el(id) {
+        const found = document.getElementById(id);
+        if (!found)
+            throw new Error('Missing element: ' + id);
+        return found;
+    }
+    function node(tag, text = '', className = '') {
+        const result = document.createElement(tag);
+        result.textContent = text;
+        if (className)
+            result.className = className;
+        return result;
+    }
+    function action(text, handler, className = 'secondary') {
+        const button = node('button', text, className);
+        button.type = 'button';
+        button.addEventListener('click', handler);
+        return button;
+    }
+    function trapDialogFocus(modal) {
+        modal.addEventListener('keydown', event => {
+            if (event.key !== 'Tab')
+                return;
+            const controls = [...modal.querySelectorAll('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href]')].filter(control => control.getClientRects().length > 0);
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last?.focus();
+            }
+            else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first?.focus();
+            }
+        });
+    }
+    function createLocalStore(options) {
+        let data = options.fresh();
+        let lastRaw = null;
+        let blocked = null;
+        let dirty = false;
+        function notify(status, message) { options.onNotice({ status, message, dirty }); }
+        function conflict() {
+            blocked = 'conflict';
+            notify('conflict', '別の画面で保存データが変更されました。この画面の内容をJSONに書き出し、保存済みデータを読み直してください。');
+            return false;
+        }
+        function save() {
+            if (options.memoryOnly) {
+                dirty = false;
+                notify('saved', 'サンプル：変更はこの画面内だけに保持します。');
+                return true;
+            }
+            if (blocked) {
+                notify(blocked, blocked === 'corrupt' ? '保存データは上書きしません。有効なJSONを読み込むか、データ管理で初期化してください。' : '別の画面で変更されています。この画面の内容をJSONに書き出し、保存済みデータを読み直してください。');
+                return false;
+            }
+            try {
+                if (localStorage.getItem(options.key) !== lastRaw)
+                    return conflict();
+                const raw = options.serialize(data);
+                localStorage.setItem(options.key, raw);
+                lastRaw = raw;
+                dirty = false;
+                notify('saved', '自動保存済み');
+                return true;
+            }
+            catch {
+                dirty = true;
+                notify('unavailable', 'ブラウザ内に保存できません。容量不足や保存制限を確認し、画面を閉じる前にJSONを書き出してください。');
+                return false;
+            }
+        }
+        function load() {
+            data = options.fresh();
+            dirty = false;
+            blocked = null;
+            if (options.memoryOnly) {
+                notify('empty', 'サンプル');
+                return;
+            }
+            try {
+                lastRaw = localStorage.getItem(options.key);
+                const raw = lastRaw ?? localStorage.getItem(options.legacyKey);
+                if (raw === null) {
+                    notify('empty', '未入力');
+                    return;
+                }
+                try {
+                    data = options.parse(raw);
+                    options.serialize(data);
+                }
+                catch (error) {
+                    data = options.fresh();
+                    blocked = 'corrupt';
+                    notify('corrupt', '保存データを読めません。既存データは保護しています。' + (error instanceof Error ? error.message : '有効なJSONを読み込んでください。'));
+                    return;
+                }
+                if (lastRaw === null) {
+                    dirty = true;
+                    if (save())
+                        notify('saved', '旧版のメモを移行しました。旧版の保存領域は変更していません。');
+                }
+                else
+                    notify('saved', '自動保存済み');
+            }
+            catch {
+                dirty = true;
+                notify('unavailable', 'ブラウザの保存機能を利用できません。入力後はJSONを書き出してください。');
+            }
+        }
+        function replace(next, replaceCorrupt = false) {
+            options.serialize(next);
+            data = next;
+            dirty = true;
+            if (replaceCorrupt && blocked === 'corrupt')
+                blocked = null;
+            return save();
+        }
+        function clear() {
+            if (options.memoryOnly) {
+                data = options.fresh();
+                dirty = false;
+                notify('empty', 'サンプル');
+                return;
+            }
+            let currentRaw;
+            try {
+                currentRaw = localStorage.getItem(options.key);
+            }
+            catch {
+                throw new Error('保存領域を読み取れません。ブラウザの保存制限を確認してください。');
+            }
+            if (blocked === 'conflict' || currentRaw !== lastRaw)
+                throw new Error('別の画面でデータが変更されています。保存済みデータを読み直してから削除してください。');
+            const empty = options.fresh();
+            const raw = options.serialize(empty);
+            try {
+                localStorage.setItem(options.key, raw);
+            }
+            catch {
+                throw new Error('保存領域を更新できません。ブラウザの保存容量や保存制限を確認してください。');
+            }
+            lastRaw = raw;
+            data = empty;
+            blocked = null;
+            dirty = false;
+            notify('saved', '自動保存済み');
+        }
+        addEventListener('storage', event => {
+            if (options.memoryOnly)
+                return;
+            if ((event.key === options.key || event.key === null) && event.newValue !== lastRaw)
+                conflict();
+        });
+        return { get data() { return data; }, get dirty() { return dirty; }, load, replace, save, clear };
+    }
+    function draftFormValues(form) {
+        return Object.fromEntries([...form.querySelectorAll('input,textarea,select')].map(input => [input.name || input.id, input instanceof HTMLInputElement && input.type === 'checkbox' ? input.checked : input.value]));
+    }
+    function restoreDraftValues(form, values) {
+        for (const input of form.querySelectorAll('input,textarea,select')) {
+            const value = values[input.name || input.id];
+            if (input instanceof HTMLInputElement && input.type === 'checkbox' && typeof value === 'boolean')
+                input.checked = value;
+            else if (typeof value === 'string')
+                input.value = value;
+        }
+    }
+    function parseEditDraft(raw, toolId) {
+        if (raw.length > 600000)
+            throw new Error('下書きの容量が上限を超えています。');
+        const data = JSON.parse(raw);
+        if (!isObject(data) || data.schemaVersion !== 1 || data.toolId !== toolId || typeof data.section !== 'string' || (data.id !== null && typeof data.id !== 'string') || (data.base !== null && typeof data.base !== 'string') || !isObject(data.values) || typeof data.updatedAt !== 'string' || !Number.isFinite(Date.parse(data.updatedAt)))
+            throw new Error('下書きの形式が正しくありません。');
+        if (Object.keys(data.values).length > 40 || Object.values(data.values).some(value => typeof value !== 'boolean' && (typeof value !== 'string' || value.length > 50000)))
+            throw new Error('下書きの項目が正しくありません。');
+        return data;
+    }
+    function createEditDraft(toolId, restore, memoryOnly = false) {
+        const key = 'municipal-toolbox:draft:v1:' + toolId;
+        let raw = null;
+        let active = null;
+        const panel = node('section', '', 'draft-panel content-panel');
+        panel.id = 'draft-panel';
+        panel.setAttribute('aria-label', '編集中の下書き');
+        const title = node('h2', '編集中の下書き');
+        const message = node('p');
+        message.id = 'draft-message';
+        message.setAttribute('role', 'status');
+        const resume = action('下書きを再開', () => {
+            try {
+                if (raw)
+                    restore(parseEditDraft(raw, toolId));
+            }
+            catch {
+                message.textContent = '下書きを復元できません。下書きを書き出して内容を保管してください。';
+            }
+        });
+        resume.id = 'resume-draft';
+        const discard = action('下書きを削除', () => { if (confirm('編集中の下書きを削除しますか？確定済みの記録は削除しません。'))
+            clear(); }, 'danger');
+        discard.id = 'discard-draft';
+        const exportDraft = action('下書きを書き出す', () => {
+            if (!raw)
+                return;
+            const url = URL.createObjectURL(new Blob([raw], { type: 'application/json;charset=utf-8' }));
+            const link = node('a');
+            link.href = url;
+            link.download = (memoryOnly ? 'sample-' : '') + toolId + '-draft.json';
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            message.textContent = '下書きのJSONを書き出しました。内容の保管用です。通常のバックアップ読込みには使用できません。';
+        });
+        panel.append(title, message, resume, discard, exportDraft);
+        document.getElementById('feedback').after(panel);
+        function render() {
+            panel.hidden = raw === null;
+            exportDraft.disabled = raw === null;
+            if (!raw)
+                return;
+            try {
+                const draft = parseEditDraft(raw, toolId);
+                resume.disabled = false;
+                message.textContent = '未確定の下書き1件があります。' + (memoryOnly ? 'この画面内での保持日時：' : '保存日時：') + new Date(draft.updatedAt).toLocaleString('ja-JP') + '。確定済みの記録・通常のJSONバックアップ・印刷には含まれません。';
+            }
+            catch {
+                resume.disabled = true;
+                message.textContent = '下書きの形式を読めません。元の内容は保持しています。「下書きを書き出す」で保管できます。';
+            }
+        }
+        try {
+            raw = memoryOnly ? null : localStorage.getItem(key);
+            render();
+        }
+        catch {
+            panel.hidden = false;
+            resume.disabled = true;
+            discard.disabled = true;
+            exportDraft.disabled = true;
+            message.textContent = '下書きの保存領域を利用できません。入力後は登録・保存で確定し、JSONを書き出してください。';
+        }
+        function clear() {
+            try {
+                if (!memoryOnly && localStorage.getItem(key) !== raw)
+                    throw new Error('別の画面で下書きが変更されています。再読込みして確認してください。');
+                if (!memoryOnly)
+                    localStorage.removeItem(key);
+                raw = null;
+                active = null;
+                render();
+                return true;
+            }
+            catch (error) {
+                panel.hidden = false;
+                message.textContent = error instanceof Error ? error.message : '下書きを削除できません。';
+                return false;
+            }
+        }
+        function start(section, id, base, restoring = false) {
+            if (raw && !restoring) {
+                panel.hidden = false;
+                message.textContent = '保存済みの下書きがあります。先に再開するか、内容を確認して下書きを削除してください。';
+                resume.focus();
+                return false;
+            }
+            active = { section, id, base };
+            return true;
+        }
+        function save(values) {
+            if (!active)
+                return false;
+            const next = JSON.stringify({ schemaVersion: 1, toolId, ...active, values, updatedAt: new Date().toISOString() });
+            try {
+                parseEditDraft(next, toolId);
+                if (!memoryOnly && localStorage.getItem(key) !== raw)
+                    throw new Error('別の画面で下書きが変更されています。上書きしていません。編集中の内容を登録するか、手元に控えてください。');
+                if (!memoryOnly)
+                    localStorage.setItem(key, next);
+                raw = next;
+                render();
+                return true;
+            }
+            catch (error) {
+                panel.hidden = false;
+                message.textContent = '下書きは未保存です。' + (error instanceof Error && error.message.includes('別の画面') ? error.message : 'ブラウザの容量や保存制限を確認し、画面を閉じる前に登録・保存してください。');
+                return false;
+            }
+        }
+        return { start, save, clear, get exists() { return raw !== null; } };
+    }
+    const practiceMode = location.hash === '#sample';
+    function backupComparison(name, fileName, before, after, exportedAt, sample = false) {
+        const date = typeof exportedAt === 'string' && Number.isFinite(Date.parse(exportedAt)) ? new Date(exportedAt).toLocaleString('ja-JP') : '未記録または不明';
+        const lines = ['JSON読込み前の確認', '対象ツール：' + name, 'ファイル：' + fileName, '書出し日時（JSONの記録）：' + date, '', '項目：現在 → 読込み後'];
+        for (const label of Object.keys(before))
+            lines.push(label + '：' + before[label].toLocaleString('ja-JP') + ' → ' + after[label].toLocaleString('ja-JP'));
+        if (sample)
+            lines.push('', 'このJSONにはサンプルデータの印が付いています。');
+        lines.push('', '確定済みのデータを、読込み後の内容ですべて置き換えます。追加や結合ではありません。', '下書きは別に保持します。必要な確定済みデータはキャンセルして先にJSONへ書き出してください。', '', 'この内容で置き換えますか？');
+        return lines.join('\n');
+    }
+    const HANDOVER_ID = 'handover-note';
+    const HANDOVER_KEY = 'municipal-toolbox:data:v2:handover-note';
+    const LEGACY_KEY = 'municipal-toolbox:preview:v1:handover-note';
+    const HANDOVER_MAX_BYTES = 10 * 1024 * 1024;
+    const MAX_RECORDS = 3000;
+    const MONTHS = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3].map(String);
+    const PROFILE_FIELDS = [
+        { key: 'department', label: '自治体・部署名' },
+        { key: 'predecessor', label: '前任者' },
+        { key: 'successor', label: '後任者' },
+        { key: 'handoverDate', label: '引継ぎ日', type: 'date' },
+    ];
+    const SECTIONS = [
+        { id: 'duties', label: '担当業務', description: '業務内容、手順、頻度、期限、連絡先を登録します。', fields: [
+                { key: 'title', label: '業務名', required: true },
+                { key: 'overview', label: '業務の概要', type: 'textarea' },
+                { key: 'procedure', label: '作業手順', type: 'textarea' },
+                { key: 'frequency', label: '実施頻度' },
+                { key: 'deadline', label: '期限・実施時期' },
+                { key: 'owner', label: '担当者' },
+                { key: 'contact', label: '関係者・連絡先' },
+                { key: 'location', label: '資料の保存場所', type: 'textarea' },
+                { key: 'remarks', label: '注意点', type: 'textarea' },
+            ] },
+        { id: 'schedule', label: '年間予定', description: '毎年の業務を月ごとに整理します。予定のない月も確認できます。', fields: [
+                { key: 'title', label: '予定名', required: true },
+                { key: 'month', label: '実施月', type: 'select', options: MONTHS, required: true },
+                { key: 'timing', label: '実施時期・締切' },
+                { key: 'owner', label: '担当者' },
+                { key: 'details', label: '内容・準備するもの', type: 'textarea' },
+            ] },
+        { id: 'contacts', label: '関係者', description: '関係する部署・団体の担当者、連絡先、連絡時の注意点を登録します。', fields: [
+                { key: 'title', label: '氏名・窓口名', required: true },
+                { key: 'organization', label: '所属・団体名' },
+                { key: 'role', label: '担当・関係する業務' },
+                { key: 'phone', label: '電話・内線' },
+                { key: 'email', label: 'メールアドレス' },
+                { key: 'remarks', label: '連絡時の注意点', type: 'textarea' },
+            ] },
+        { id: 'files', label: '資料の保存場所', description: '資料名、フォルダーの場所、利用権限、管理担当者を記録します。', fields: [
+                { key: 'title', label: '資料名', required: true },
+                { key: 'location', label: 'ファイル・フォルダーの場所', type: 'textarea' },
+                { key: 'owner', label: '管理担当者' },
+                { key: 'access', label: '利用権限・申請方法', type: 'textarea' },
+                { key: 'remarks', label: '内容・注意点', type: 'textarea' },
+            ] },
+        { id: 'notes', label: '申し送り事項', description: '未解決の課題、注意点、対応期限を記録します。', fields: [
+                { key: 'title', label: '件名', required: true },
+                { key: 'priority', label: '優先度', type: 'select', options: ['通常', '高', '低'] },
+                { key: 'dueDate', label: '対応期限', type: 'date' },
+                { key: 'owner', label: '対応者' },
+                { key: 'details', label: '内容・対応方法', type: 'textarea' },
+            ] },
+        { id: 'checklist', label: 'チェックリスト', description: '引継ぎ時に確認する項目を登録し、確認が済んだらチェックします。', fields: [
+                { key: 'title', label: '確認項目', required: true },
+                { key: 'owner', label: '確認担当者' },
+                { key: 'dueDate', label: '確認期限', type: 'date' },
+                { key: 'details', label: '確認方法・補足', type: 'textarea' },
+            ] },
+    ];
+    function freshData() {
+        return {
+            schemaVersion: 2, toolId: HANDOVER_ID, text: '',
+            profile: { department: '', predecessor: '', successor: '', handoverDate: '' },
+            sections: { duties: [], schedule: [], contacts: [], files: [], notes: [], checklist: [] },
+        };
+    }
+    function validateEntry(value, section) {
+        if (!isObject(value) || typeof value.id !== 'string' || !/^[a-zA-Z0-9_-]{1,100}$/.test(value.id))
+            throw new Error('レコードIDが正しくありません。');
+        if (value.completed !== undefined && typeof value.completed !== 'boolean')
+            throw new Error('完了状態の形式が正しくありません。');
+        const fields = {};
+        for (const field of section.fields)
+            fields[field.key] = readField(value[field.key], field);
+        return { ...value, ...fields, id: value.id, title: fields.title, completed: value.completed ?? false };
+    }
+    function parseHandover(value) {
+        if (!isObject(value) || value.toolId !== HANDOVER_ID)
+            throw new Error('異動引継ぎノートのJSONバックアップを選択してください。');
+        if (value.schemaVersion === 1) {
+            const text = validateBackup(value, HANDOVER_ID);
+            // Retain all legacy extension keys, including names reserved by the newer schema.
+            return { ...value, ...freshData(), text, legacyBackup: structuredClone(value) };
+        }
+        if (value.schemaVersion !== 2)
+            throw new Error('対応していない保存形式です。対応するバージョンのツールを使用してください。');
+        if (typeof value.text !== 'string' || value.text.length > MAX_TEXT_LENGTH)
+            throw new Error('メモの形式が正しくありません。');
+        if (!isObject(value.profile) || !isObject(value.sections))
+            throw new Error('基本情報または記録データがありません。');
+        const profile = { ...value.profile };
+        for (const field of PROFILE_FIELDS)
+            profile[field.key] = readField(value.profile[field.key], field);
+        const sections = { ...value.sections };
+        let total = 0;
+        for (const section of SECTIONS) {
+            const rows = value.sections[section.id];
+            if (!Array.isArray(rows))
+                throw new Error(section.label + 'の一覧がありません。');
+            total += rows.length;
+            if (total > MAX_RECORDS)
+                throw new Error('記録は合計3,000件まで読み込めます。');
+            const ids = new Set();
+            sections[section.id] = rows.map(row => {
+                const entry = validateEntry(row, section);
+                if (ids.has(entry.id))
+                    throw new Error(section.label + 'のIDが重複しています。');
+                ids.add(entry.id);
+                return entry;
+            });
+        }
+        return { ...value, schemaVersion: 2, toolId: HANDOVER_ID, text: value.text, profile: profile, sections: sections };
+    }
+    function parseHandoverText(text) {
+        if (new TextEncoder().encode(text).length > HANDOVER_MAX_BYTES)
+            throw new Error('10MB以下のJSONファイルを選択してください。');
+        try {
+            return parseHandover(JSON.parse(text.replace(/^\uFEFF/, '')));
+        }
+        catch (error) {
+            if (error instanceof SyntaxError)
+                throw new Error('JSONの形式が正しくありません。元のバックアップファイルを選択してください。');
+            throw error;
+        }
+    }
+    function serializeHandover(data, date = new Date().toISOString()) {
+        const value = JSON.stringify({ ...data, exportedAt: date }, null, 2);
+        if (new TextEncoder().encode(value).length > HANDOVER_MAX_BYTES)
+            throw new Error('データが10MBを超えています。記録を整理してから保存してください。');
+        return value;
+    }
+    function checkHandoverFile(file) {
+        if (!/\.json$/i.test(file.name))
+            throw new Error('拡張子が.jsonのバックアップを選択してください。');
+        if (!file.size)
+            throw new Error('ファイルが空です。内容のあるJSONバックアップを選択してください。');
+        if (file.size > HANDOVER_MAX_BYTES)
+            throw new Error('10MB以下のJSONファイルを選択してください。');
+        if (file.type && !['application/json', 'text/json', 'text/plain', 'application/octet-stream'].includes(file.type))
+            throw new Error('JSONファイルとして認識できません。元のバックアップを選択してください。');
+    }
+    function completion(data) {
+        const rows = SECTIONS.flatMap(section => data.sections[section.id]);
+        const done = rows.filter(row => row.completed).length;
+        return { total: rows.length, done, percent: rows.length ? Math.round(done / rows.length * 100) : 0 };
+    }
+    function searchEntries(data, query) {
+        const normalize = (value) => value.normalize('NFKC').toLocaleLowerCase('ja');
+        const words = normalize(query).trim().split(/\s+/).filter(Boolean);
+        return SECTIONS.flatMap(section => data.sections[section.id]
+            .filter(entry => {
+            const content = normalize([section.label, ...section.fields.map(field => textValue(entry[field.key]))].join(' '));
+            return words.every(word => content.includes(word));
+        }).map(entry => ({ section, entry })));
+    }
+    const memo = el('memo');
+    const statusNode = el('save-status');
+    const feedback = el('feedback');
+    const dialog = el('edit-dialog');
+    const clearDialog = el('clear-dialog');
+    trapDialogFocus(dialog);
+    trapDialogFocus(clearDialog);
+    const form = el('record-form');
+    const sectionById = (id) => SECTIONS.find(section => section.id === id);
+    let state = freshData();
+    let lastRaw = null;
+    let blocked = null;
+    let unsaved = false;
+    let currentView = 'home';
+    let recordQuery = '';
+    let recordFilter = 'all';
+    let editing = null;
+    let editStart = '';
+    let importBusy = false;
+    let returnFocus = null;
+    const drafts = createEditDraft('handover-note', draft => {
+        const section = sectionById(draft.section);
+        if (!section)
+            throw new Error('分類がありません。');
+        const original = draft.id ? state.sections[section.id].find(row => row.id === draft.id) : undefined;
+        const matches = draft.id === null || (original && JSON.stringify(original) === draft.base);
+        if (!matches && !confirm('元の記録が変更または削除されています。元の記録を上書きせず、新規記録として下書きを再開しますか？'))
+            return;
+        navigate(section.id);
+        openEditor(section, matches ? original : undefined, true);
+        restoreDraftValues(form, draft.values);
+        el('draft-save-status').textContent = '下書きを復元しました。登録・保存するまで確定済みの記録は変わりません。';
+        savedLabel('下書きを編集中：登録・保存で確定', true);
+    }, practiceMode);
+    function message(text, error = false) {
+        feedback.textContent = text;
+        feedback.classList.toggle('error', error);
+    }
+    function savedLabel(text, error = false) {
+        statusNode.textContent = practiceMode && (text.includes('自動保存済み') || text === '未入力') ? 'サンプル：この画面内のみ' : text;
+        statusNode.classList.toggle('unsaved', error);
+    }
+    function storageWarning(text) {
+        el('storage-warning').hidden = false;
+        el('storage-message').textContent = text;
+    }
+    function reportStorageError(error) {
+        unsaved = true;
+        savedLabel('未保存：JSONを書き出してください', true);
+        storageWarning(error instanceof Error ? error.message : 'ブラウザ内に保存できません。JSONバックアップを書き出してください。');
+    }
+    function writeState() {
+        if (practiceMode) {
+            unsaved = false;
+            savedLabel('サンプル：この画面内のみ');
+            return true;
+        }
+        if (blocked) {
+            unsaved = true;
+            savedLabel(blocked === 'conflict' ? '未保存：別の画面で変更されています' : '未保存：既存データを保護中', true);
+            return false;
+        }
+        try {
+            if (!practiceMode && localStorage.getItem(HANDOVER_KEY) !== lastRaw) {
+                blocked = 'conflict';
+                storageWarning('別の画面で保存データが変更されました。この画面の内容をJSONに書き出し、保存済みデータを読み直してください。');
+                unsaved = true;
+                savedLabel('未保存：別の画面で変更されています', true);
+                return false;
+            }
+            const raw = serializeHandover(state);
+            if (!practiceMode)
+                localStorage.setItem(HANDOVER_KEY, raw);
+            lastRaw = raw;
+            unsaved = false;
+            el('storage-warning').hidden = true;
+            savedLabel('このブラウザ内に自動保存済み');
+            return true;
+        }
+        catch (error) {
+            reportStorageError(error instanceof Error && error.message.includes('10MB') ? error : new Error('ブラウザ内に保存できません。容量不足や保存制限を確認し、画面を閉じる前にJSONを書き出してください。'));
+            return false;
+        }
+    }
+    function loadState() {
+        if (practiceMode) {
+            state = parseHandoverText(JSON.stringify(sample));
+            unsaved = false;
+            savedLabel('サンプル：この画面内のみ');
+            return;
+        }
+        blocked = null;
+        unsaved = false;
+        state = freshData();
+        try {
+            lastRaw = localStorage.getItem(HANDOVER_KEY);
+            const source = lastRaw ?? localStorage.getItem(LEGACY_KEY);
+            if (source !== null) {
+                try {
+                    state = parseHandoverText(source);
+                    if (lastRaw === null) {
+                        writeState();
+                        message('旧版のメモを読み込みました。旧版の保存領域は変更していません。');
+                    }
+                    else
+                        savedLabel('このブラウザ内に自動保存済み');
+                }
+                catch (error) {
+                    blocked = 'corrupt';
+                    savedLabel('保存データを読めません：未保存', true);
+                    storageWarning('保存データは上書きしません。有効なJSONを読み込むか、データ管理で初期化してください。' + (error instanceof Error ? error.message : ''));
+                }
+            }
+            else
+                savedLabel('未入力');
+        }
+        catch {
+            reportStorageError(new Error('ブラウザの保存機能を利用できません。入力後はJSONバックアップを書き出してください。'));
+        }
+    }
+    function commit(next) {
+        try {
+            // Validate capacity before mutating state so an accepted dataset can always be exported.
+            serializeHandover(next);
+            state = next;
+            unsaved = true;
+            writeState();
+            render();
+            return true;
+        }
+        catch (error) {
+            message(error instanceof Error ? error.message : '変更を反映できませんでした。入力内容を確認してください。', true);
+            return false;
+        }
+    }
+    function inputField(field, value, prefix) {
+        const wrapper = node('label', field.label, field.type === 'textarea' ? 'wide' : '');
+        const id = prefix + field.key;
+        wrapper.htmlFor = id;
+        if (field.required)
+            wrapper.append(node('span', '必須', 'required'));
+        const input = field.type === 'textarea' ? node('textarea') : field.type === 'select' ? node('select') : node('input');
+        input.id = id;
+        input.name = field.key;
+        if (input instanceof HTMLInputElement)
+            input.type = field.type === 'date' ? 'date' : 'text';
+        if (input instanceof HTMLSelectElement) {
+            for (const option of field.options) {
+                const item = node('option', field.key === 'month' ? option + '月' : option);
+                item.value = option;
+                input.append(item);
+            }
+        }
+        else
+            input.maxLength = field.maxLength ?? (field.type === 'textarea' ? 20000 : 500);
+        input.required = field.required ?? false;
+        input.value = typeof value === 'string' ? value : field.options?.[0] ?? '';
+        wrapper.append(input);
+        return { wrapper, input };
+    }
+    function renderProfile() {
+        const root = el('profile-fields');
+        root.replaceChildren();
+        for (const field of PROFILE_FIELDS) {
+            const { wrapper, input } = inputField(field, state.profile[field.key], 'profile-');
+            input.addEventListener('input', () => {
+                try {
+                    const value = readField(input.value, field);
+                    const next = { ...state, profile: { ...state.profile, [field.key]: value } };
+                    serializeHandover(next);
+                    state = next;
+                    writeState();
+                    input.setCustomValidity('');
+                }
+                catch (error) {
+                    input.setCustomValidity(error instanceof Error ? error.message : '入力を確認してください。');
+                    unsaved = true;
+                    savedLabel('未保存：入力内容を確認してください', true);
+                }
+            });
+            root.append(wrapper);
+        }
+    }
+    function renderHome() {
+        const summary = el('summary');
+        summary.replaceChildren();
+        for (const section of SECTIONS) {
+            const button = action('', () => navigate(section.id));
+            button.append(node('span', section.label), node('strong', state.sections[section.id].length + '件'));
+            summary.append(button);
+        }
+        const counts = completion(state);
+        el('completion-label').textContent = counts.total ? counts.percent + '%（' + counts.done + ' / ' + counts.total + '件）' : '記録が未登録です';
+        el('completion-progress').value = counts.percent;
+        el('completion-sections').replaceChildren(...SECTIONS.map(section => {
+            const rows = state.sections[section.id];
+            return node('span', section.label + '：' + rows.filter(row => row.completed).length + ' / ' + rows.length + '件');
+        }));
+        memo.value = state.text;
+        el('count').textContent = state.text.length.toLocaleString('ja-JP') + ' / 50,000文字';
+        el('data-count').textContent = '現在の記録数：' + counts.total + '件';
+    }
+    function editSnapshot() {
+        const values = [...form.querySelectorAll('input,textarea,select')].map(input => input instanceof HTMLInputElement && input.type === 'checkbox' ? input.checked : input.value);
+        return JSON.stringify(values);
+    }
+    function editDirty() { return dialog.open && editSnapshot() !== editStart; }
+    function closeEdit(force = false) {
+        if (!force && editDirty() && !confirm('登録していない変更を破棄して閉じますか？'))
+            return;
+        if (!force || !unsaved)
+            drafts.clear();
+        dialog.close();
+        editing = null;
+        if (unsaved)
+            savedLabel('未保存：JSONを書き出してください', true);
+        else
+            savedLabel(lastRaw === null ? '未入力' : 'このブラウザ内に自動保存済み');
+        if (returnFocus?.isConnected)
+            returnFocus.focus();
+        else
+            el('add-record').focus();
+    }
+    function openEditor(section, entry, restoring = false) {
+        if (!drafts.start(section.id, entry?.id ?? null, entry ? JSON.stringify(entry) : null, restoring))
+            return;
+        returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        editing = { section, id: entry?.id ?? null };
+        el('edit-title').textContent = section.label + (entry ? 'を編集' : 'を登録');
+        el('submit-record').textContent = entry ? '変更を保存' : '登録する';
+        el('form-error').textContent = '';
+        el('draft-save-status').textContent = '入力中の内容は下書きとして保存します。確定済みの記録とは別です。';
+        const fields = el('edit-fields');
+        fields.replaceChildren();
+        for (const field of section.fields)
+            fields.append(inputField(field, entry?.[field.key], 'field-').wrapper);
+        el('entry-completed').checked = entry?.completed ?? false;
+        editStart = editSnapshot();
+        dialog.showModal();
+        fields.querySelector('input')?.focus();
+    }
+    function deleteEntry(section, entry) {
+        if (!confirm('「' + entry.title + '」を削除しますか？この操作は取り消せません。'))
+            return;
+        if (commit({ ...state, sections: { ...state.sections, [section.id]: state.sections[section.id].filter(row => row.id !== entry.id) } })) {
+            message('記録を削除しました。');
+            el('add-record').focus();
+        }
+    }
+    function entryCard(section, entry, print = false) {
+        const card = node('article', '', 'record-card');
+        const top = node('div', '', 'record-top');
+        const heading = node('div');
+        heading.append(node('p', section.label, 'record-category'), node('h3', entry.title));
+        top.append(heading);
+        if (!print) {
+            const actions = node('div', '', 'record-actions');
+            actions.append(action('編集', () => openEditor(section, entry)), action('削除', () => deleteEntry(section, entry), 'danger'));
+            top.append(actions);
+        }
+        card.append(top);
+        const details = node('dl');
+        for (const field of section.fields.filter(field => field.key !== 'title')) {
+            const value = textValue(entry[field.key]);
+            if (value)
+                details.append(node('dt', field.label), node('dd', field.key === 'month' ? value + '月' : value));
+        }
+        if (details.childElementCount)
+            card.append(details);
+        if (print)
+            card.append(node('p', entry.completed ? '確認済み' : '未確認'));
+        else {
+            const label = node('label', '確認済み', 'check-field');
+            const checkbox = node('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = entry.completed;
+            checkbox.setAttribute('aria-label', entry.title + 'を確認済みにする');
+            checkbox.addEventListener('change', () => {
+                const next = { ...entry, completed: checkbox.checked };
+                if (commit({ ...state, sections: { ...state.sections, [section.id]: state.sections[section.id].map(row => row.id === entry.id ? next : row) } })) {
+                    message(next.completed ? '確認済みにしました。' : '未確認に戻しました。');
+                    const candidates = [...document.querySelectorAll('.record-card input[type=checkbox]')];
+                    candidates.find(item => item.getAttribute('aria-label') === checkbox.getAttribute('aria-label'))?.focus();
+                }
+            });
+            label.prepend(checkbox);
+            card.append(label);
+        }
+        return card;
+    }
+    function visibleRecords(section) {
+        return searchEntries(state, recordQuery).filter(item => item.section.id === section.id && (recordFilter === 'all' || item.entry.completed === (recordFilter === 'done'))).map(item => item.entry);
+    }
+    function renderRecords() {
+        const section = sectionById(currentView);
+        if (!section)
+            return;
+        const rows = visibleRecords(section);
+        el('section-heading').textContent = section.label;
+        el('section-description').textContent = section.description;
+        el('record-count').textContent = rows.length + '件表示 / 登録' + state.sections[section.id].length + '件';
+        const root = el('record-list');
+        root.replaceChildren();
+        if (section.id === 'schedule') {
+            for (const month of MONTHS) {
+                root.append(node('h3', month + '月', 'month-heading'));
+                const matches = rows.filter(row => row.month === month);
+                if (!matches.length)
+                    root.append(node('p', '該当する予定はありません。', 'muted'));
+                for (const row of matches)
+                    root.append(entryCard(section, row));
+            }
+        }
+        else if (!rows.length) {
+            root.append(node('p', state.sections[section.id].length ? '条件に一致する記録はありません。検索や確認状態を変更してください。' : '記録がありません。「新規登録」から追加してください。', 'empty'));
+        }
+        else
+            for (const row of rows)
+                root.append(entryCard(section, row));
+    }
+    function generalMatches(query) {
+        const words = query.normalize('NFKC').toLocaleLowerCase('ja').trim().split(/\s+/).filter(Boolean);
+        const matches = (text) => words.every(word => text.normalize('NFKC').toLocaleLowerCase('ja').includes(word));
+        return {
+            profile: matches(PROFILE_FIELDS.map(field => textValue(state.profile[field.key])).join(' ')),
+            memo: matches(state.text),
+        };
+    }
+    function renderSearch() {
+        const query = el('global-query').value.trim();
+        const root = el('search-results');
+        root.replaceChildren();
+        if (!query) {
+            el('search-count').textContent = '検索キーワードを入力してください。';
+            return;
+        }
+        const matches = searchEntries(state, query);
+        const general = generalMatches(query);
+        el('search-count').textContent = matches.length + Number(general.profile) + Number(general.memo) + '件見つかりました。';
+        for (const [key, label] of [['profile', '基本情報'], ['memo', 'メモ']]) {
+            if (general[key]) {
+                const result = node('article', '', 'record-card');
+                result.append(node('h3', label), node('p', key === 'memo' ? state.text.slice(0, 250) : PROFILE_FIELDS.map(field => textValue(state.profile[field.key])).filter(Boolean).join(' / ')));
+                result.append(action('ホームで確認', () => { navigate('home'); (key === 'memo' ? memo : el('profile-department')).focus(); }));
+                root.append(result);
+            }
+        }
+        for (const match of matches)
+            root.append(entryCard(match.section, match.entry));
+        if (!root.childElementCount)
+            root.append(node('p', '一致する記録はありません。キーワードを変更してください。', 'empty'));
+    }
+    function render() {
+        renderHome();
+        renderRecords();
+        if (currentView === 'search')
+            renderSearch();
+    }
+    function navigate(view) {
+        if (!['home', 'data', 'help', 'search'].includes(view) && !sectionById(view))
+            return;
+        currentView = view;
+        recordQuery = '';
+        recordFilter = 'all';
+        el('record-query').value = '';
+        el('completion-filter').value = 'all';
+        document.querySelectorAll('#navigation [data-view]').forEach(button => {
+            if (button.dataset.view === view)
+                button.setAttribute('aria-current', 'page');
+            else
+                button.removeAttribute('aria-current');
+        });
+        document.querySelectorAll('[data-panel]').forEach(panel => { panel.hidden = panel.dataset.panel !== (sectionById(view) ? 'records' : view); });
+        render();
+        el('main').focus();
+    }
+    function buildPrint(all) {
+        const target = el('print-area');
+        target.replaceChildren(node('h1', '異動引継ぎノート'));
+        const counts = completion(state);
+        target.append(node('p', '確認済み ' + counts.done + ' / ' + counts.total + '件'));
+        const includeHome = all || currentView === 'home' || currentView === 'data' || currentView === 'help';
+        const searchQuery = el('global-query').value.trim();
+        const matches = currentView === 'search' && searchQuery ? generalMatches(searchQuery) : { profile: false, memo: false };
+        if (includeHome || matches.profile) {
+            target.append(node('h2', '基本情報'));
+            for (const field of PROFILE_FIELDS)
+                target.append(node('p', field.label + '：' + (textValue(state.profile[field.key]) || '未入力')));
+        }
+        if (includeHome || matches.memo) {
+            target.append(node('h2', 'メモ'), node('p', state.text || '未入力', 'print-memo'));
+            target.lastElementChild.id = 'print-text';
+        }
+        const items = all ? SECTIONS.flatMap(section => state.sections[section.id].map(entry => ({ section, entry }))) : currentView === 'search' ? (searchQuery ? searchEntries(state, searchQuery) : []) : sectionById(currentView) ? visibleRecords(sectionById(currentView)).map(entry => ({ section: sectionById(currentView), entry })) : [];
+        for (const section of SECTIONS) {
+            let rows = items.filter(item => item.section.id === section.id);
+            if (!all && !rows.length)
+                continue;
+            target.append(node('h2', section.label));
+            if (section.id === 'schedule')
+                rows = rows.sort((a, b) => MONTHS.indexOf(textValue(a.entry.month)) - MONTHS.indexOf(textValue(b.entry.month)));
+            if (!rows.length)
+                target.append(node('p', '登録なし'));
+            for (const row of rows)
+                target.append(entryCard(section, row.entry, true));
+        }
+    }
+    document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => navigate(button.dataset.view)));
+    el('add-record').addEventListener('click', () => { const section = sectionById(currentView); if (section)
+        openEditor(section); });
+    el('close-edit').addEventListener('click', () => closeEdit());
+    el('cancel-edit').addEventListener('click', () => closeEdit());
+    dialog.addEventListener('cancel', event => { event.preventDefault(); closeEdit(); });
+    form.addEventListener('input', () => {
+        if (dialog.open) {
+            savedLabel('編集中：登録・保存で確定', true);
+            el('draft-save-status').textContent = drafts.save(draftFormValues(form)) ? (practiceMode ? '下書きをこの画面内に保持しました。再読込みすると消えます。' : '下書きをこのブラウザ内に保存しました。登録・保存で確定します。') : '下書きは未保存です。容量・保存制限や別画面での変更を確認し、閉じる前に登録・保存してください。';
+        }
+    });
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!editing)
+            return;
+        try {
+            const { section, id } = editing;
+            if (!id && completion(state).total >= MAX_RECORDS)
+                throw new Error('記録は合計3,000件までです。必要なデータを書き出し、記録を整理してください。');
+            const values = {};
+            for (const field of section.fields)
+                values[field.key] = el('field-' + field.key).value;
+            const old = id ? state.sections[section.id].find(row => row.id === id) : undefined;
+            const entry = validateEntry({ ...old, ...values, id: id ?? crypto.randomUUID(), completed: el('entry-completed').checked }, section);
+            const rows = id ? state.sections[section.id].map(row => row.id === id ? entry : row) : [...state.sections[section.id], entry];
+            const next = { ...state, sections: { ...state.sections, [section.id]: rows } };
+            serializeHandover(next);
+            if (commit(next)) {
+                closeEdit(true);
+                message(unsaved ? '画面に反映しましたが、ブラウザ内に保存できていません。JSONを書き出してください。' : id ? '変更を保存しました。' : '記録を登録しました。', unsaved);
+            }
+        }
+        catch (error) {
+            el('form-error').textContent = error instanceof Error ? error.message : '登録できませんでした。入力内容を確認してください。';
+        }
+    });
+    memo.addEventListener('input', () => {
+        try {
+            const next = { ...state, text: memo.value };
+            serializeHandover(next);
+            state = next;
+            writeState();
+            el('count').textContent = memo.value.length.toLocaleString('ja-JP') + ' / 50,000文字';
+        }
+        catch (error) {
+            memo.value = state.text;
+            message(error instanceof Error ? error.message : 'メモを保存できませんでした。', true);
+        }
+    });
+    el('record-query').addEventListener('input', () => { recordQuery = el('record-query').value; renderRecords(); });
+    el('completion-filter').addEventListener('change', () => { recordFilter = el('completion-filter').value; renderRecords(); });
+    el('global-query').addEventListener('input', renderSearch);
+    el('save-now').addEventListener('click', () => { if (writeState())
+        message('現在のデータを保存しました。'); });
+    el('export').addEventListener('click', () => {
+        try {
+            const blob = new Blob([serializeHandover(practiceMode ? { ...state, sampleData: true } : state)], { type: 'application/json;charset=utf-8' });
+            const link = node('a');
+            const url = URL.createObjectURL(blob);
+            const now = new Date();
+            const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('');
+            link.href = url;
+            link.download = 'handover-note-backup-' + date + '.json';
+            if (practiceMode)
+                link.download = 'sample-' + link.download;
+            document.body.append(link);
+            link.click();
+            link.remove();
+            dispatchEvent(new Event('tool-backup-export'));
+            // Delay revocation only for the browser's download handoff; never used for app state.
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            message('バックアップのダウンロードを開始しました。保存先を確認してください。');
+        }
+        catch (error) {
+            message(error instanceof Error ? error.message : 'バックアップを書き出せませんでした。', true);
+        }
+    });
+    el('import').addEventListener('click', () => el('import-file').click());
+    el('import-file').addEventListener('change', async () => {
+        const picker = el('import-file');
+        const file = picker.files?.[0];
+        picker.value = '';
+        if (!file || importBusy)
+            return;
+        importBusy = true;
+        el('import').disabled = true;
+        try {
+            checkHandoverFile(file);
+            message('バックアップを確認しています。');
+            const incoming = parseHandoverText(await file.text());
+            const describe = (data) => Object.fromEntries([...SECTIONS.map(section => [section.label + '件数', data.sections[section.id].length]), ['メモ文字数', data.text.length]]);
+            if (!confirm(backupComparison('異動引継ぎノート', file.name, describe(state), describe(incoming), incoming.exportedAt, incoming.sampleData === true))) {
+                message('読込みをキャンセルしました。');
+                return;
+            }
+            if (blocked === 'corrupt')
+                blocked = null;
+            if (commit(incoming)) {
+                renderProfile();
+                message(unsaved ? '読込みましたが、未保存です。JSONを書き出してください。' : 'バックアップを読み込みました。', unsaved);
+            }
+        }
+        catch (error) {
+            message((error instanceof Error ? error.message : 'ファイルを読み込めませんでした。') + '現在のデータは変更していません。', true);
+        }
+        finally {
+            importBusy = false;
+            el('import').disabled = false;
+        }
+    });
+    el('reload-data').addEventListener('click', () => {
+        if (!confirm('この画面の内容を破棄して、保存済みデータを読み直しますか？必要な内容は先にJSONへ書き出してください。'))
+            return;
+        el('storage-warning').hidden = true;
+        loadState();
+        renderProfile();
+        render();
+    });
+    el('clear').addEventListener('click', () => {
+        el('clear-confirm').value = '';
+        el('confirm-clear').disabled = true;
+        el('clear-error').textContent = '';
+        clearDialog.showModal();
+        el('clear-confirm').focus();
+    });
+    el('clear-confirm').addEventListener('input', () => { el('confirm-clear').disabled = el('clear-confirm').value !== 'すべて削除'; });
+    el('cancel-clear').addEventListener('click', () => clearDialog.close());
+    el('confirm-clear').addEventListener('click', () => {
+        if (el('clear-confirm').value !== 'すべて削除')
+            return;
+        try {
+            if (!practiceMode && localStorage.getItem(HANDOVER_KEY) !== lastRaw)
+                throw new Error('別の画面でデータが変更されています。保存済みデータを読み直してから削除してください。');
+            // Store an empty valid document to prevent an old preview memo from reappearing.
+            const empty = freshData();
+            const raw = serializeHandover(empty);
+            if (!practiceMode)
+                localStorage.setItem(HANDOVER_KEY, raw);
+            lastRaw = raw;
+            state = empty;
+            blocked = null;
+            unsaved = false;
+            el('storage-warning').hidden = true;
+            savedLabel('このブラウザ内に自動保存済み');
+            clearDialog.close();
+            renderProfile();
+            render();
+            message('このバージョンのデータを削除しました。旧版の保存領域とJSONファイルは残っています。');
+        }
+        catch (error) {
+            el('clear-error').textContent = (error instanceof Error ? error.message : '保存領域を更新できませんでした。') + '現在のデータは変更していません。';
+        }
+    });
+    el('print').addEventListener('click', () => { buildPrint(true); window.print(); });
+    el('print-current').addEventListener('click', () => { buildPrint(false); window.print(); });
+    addEventListener('beforeprint', () => { if (!el('print-area').childElementCount)
+        buildPrint(true); });
+    addEventListener('afterprint', () => el('print-area').replaceChildren());
+    addEventListener('storage', event => {
+        if (practiceMode)
+            return;
+        if ((event.key === HANDOVER_KEY || event.key === null) && event.newValue !== lastRaw) {
+            blocked = 'conflict';
+            savedLabel('別の画面で変更：保存を停止中', true);
+            storageWarning('別の画面で保存データが変更されました。この画面の内容は保持しています。JSONに書き出すか、保存済みデータを読み直してください。');
+        }
+    });
+    addEventListener('beforeunload', event => {
+        if (unsaved || editDirty())
+            event.preventDefault();
+    });
+    loadState();
+    renderProfile();
+    render();
+    el('suspend-edit').addEventListener('click', () => {
+        if (drafts.save(draftFormValues(form))) {
+            dialog.close();
+            el('resume-draft').focus();
+        }
+        else
+            el('draft-save-status').textContent = '下書きを保存できません。編集中の内容を登録・保存するか、手元に控えてください。';
+    });
+})();
+(() => {
+    function el(id) {
+        const found = document.getElementById(id);
+        if (!found)
+            throw new Error('Missing element: ' + id);
+        return found;
+    }
+    function node(tag, text = '', className = '') {
+        const result = document.createElement(tag);
+        result.textContent = text;
+        if (className)
+            result.className = className;
+        return result;
+    }
+    function action(text, handler, className = 'secondary') {
+        const button = node('button', text, className);
+        button.type = 'button';
+        button.addEventListener('click', handler);
+        return button;
+    }
+    function trapDialogFocus(modal) {
+        modal.addEventListener('keydown', event => {
+            if (event.key !== 'Tab')
+                return;
+            const controls = [...modal.querySelectorAll('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href]')].filter(control => control.getClientRects().length > 0);
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last?.focus();
+            }
+            else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first?.focus();
+            }
+        });
+    }
+    function setupToolShell(config) {
+        const sampleMode = config.ready && location.hash === '#sample';
+        const header = document.querySelector('body > header');
+        let controls = header.querySelector('.header-actions');
+        if (!controls) {
+            controls = node('div', '', 'header-actions');
+            controls.append(document.getElementById('save-status'));
+            header.append(controls);
+        }
+        const help = controls.querySelector('[data-view="help"]');
+        if (help) {
+            help.textContent = 'Help';
+            help.setAttribute('aria-label', 'Help（使い方）');
+        }
+        const updates = node('dialog');
+        updates.id = 'updates-dialog';
+        updates.setAttribute('aria-labelledby', 'updates-title');
+        const title = node('h2', '更新情報');
+        title.id = 'updates-title';
+        updates.append(title, node('p', config.name + ' v' + config.version), node('p', '2026-10-05：右上の更新情報・配色切替・Helpと、保存先・バックアップの案内を追加しました。'));
+        updates.append(node('p', 'JSONを読み込む前に、対象ツール・ファイル・書出し日時・件数を確認できます。'));
+        if (config.ready)
+            updates.append(node('p', '編集中の下書き保存・再開と、架空データで操作を試せるサンプルを追加しました。'));
+        if (config.id === 'equipment-manager')
+            updates.append(node('p', 'CSVから備品を追加できます。列の対応・重複・入力内容を検証し、プレビューで確認してから取り込みます。'));
+        updates.append(node('p', config.ready ? '業務機能を実装済みです。更新情報はこのファイルに含まれる内容を表示します。更新の自動取得は行いません。' : '配布確認版です。メモの保存・JSON・印刷を確認できます。業務機能は未実装です。'));
+        const close = action('閉じる', () => updates.close());
+        close.id = 'close-updates';
+        updates.append(close);
+        document.body.append(updates);
+        trapDialogFocus(updates);
+        const open = action('更新情報', () => { updates.showModal(); close.focus(); });
+        open.id = 'open-updates';
+        const theme = action('ダークモード', () => { });
+        theme.dataset.themeToggle = '';
+        theme.disabled = true;
+        controls.insertBefore(open, help);
+        controls.insertBefore(theme, help);
+        if (!help) {
+            const link = node('a', 'Help', 'secondary shell-help');
+            link.href = '#help';
+            link.setAttribute('aria-label', 'Help（使い方）');
+            controls.append(link);
+        }
+        const strip = node('aside', '', 'storage-strip');
+        strip.setAttribute('aria-label', '保存先とバックアップ');
+        strip.append(node('p', '保存先はこのブラウザ内です。HTMLファイルには入力データを保存しません。'));
+        const details = node('details');
+        details.append(node('summary', 'バックアップとPC移行の手順'));
+        details.append(node('p', '作業後は「バックアップを書き出す」でJSONを保存し、保存先でファイルを確認してください。ブラウザ内の自動保存とは別の操作です。'));
+        details.append(node('p', 'PC・ブラウザ・ファイルの場所を変える前にJSONを書き出します。移行先で同じツールを開き、JSONを読み込んで内容を確認してください。HTMLだけをコピーしても入力データは移りません。'));
+        details.append(node('p', '共有PCでは同じブラウザを使う人が保存内容を閲覧できる場合があります。組織で許可された保存先を使ってください。'));
+        const stamp = node('p');
+        stamp.id = 'backup-operation';
+        const metaKey = 'municipal-toolbox:export-operation:v1:' + config.id;
+        function showDate(value) {
+            const date = value ? new Date(value) : null;
+            stamp.textContent = date && Number.isFinite(date.valueOf()) ? '最終書出し操作：' + date.toLocaleString('ja-JP') + '。ファイルの保存完了は保存先で確認してください。' : 'このブラウザでの書出し操作は未記録です。';
+        }
+        try {
+            showDate(sampleMode ? null : localStorage.getItem(metaKey));
+        }
+        catch {
+            showDate(null);
+        }
+        details.append(stamp);
+        strip.append(details);
+        const themeNotice = node('p');
+        themeNotice.dataset.themeNotice = '';
+        themeNotice.setAttribute('role', 'status');
+        strip.append(themeNotice);
+        header.after(strip);
+        if (config.ready) {
+            const banner = node('aside', '', sampleMode ? 'sample-banner warning' : 'sample-banner storage-strip');
+            banner.id = 'sample-banner';
+            if (sampleMode) {
+                banner.append(node('strong', 'サンプル体験中'), node('p', '架空データで操作を試せます。通常の保存データと下書きは読み書きしません。変更はこの画面内だけに保持し、再読込みすると初期のサンプルへ戻ります。'));
+                banner.append(action('サンプルを終了', () => { location.hash = ''; location.reload(); }));
+                strip.firstElementChild.textContent = 'サンプル体験中：変更はこの画面内だけに保持します。';
+            }
+            else {
+                const link = node('a', 'サンプルで試す（別画面）');
+                link.href = location.pathname + location.search + '#sample';
+                link.target = '_blank';
+                link.rel = 'noopener';
+                banner.append(link, node('p', '架空データを使います。現在の保存データは変更しません。'));
+            }
+            strip.after(banner);
+        }
+        addEventListener('tool-backup-export', () => {
+            const date = new Date().toISOString();
+            showDate(date);
+            if (sampleMode) {
+                stamp.textContent = 'サンプルの書出し操作：' + new Date(date).toLocaleString('ja-JP') + '。通常のバックアップ操作日時は変更していません。';
+                return;
+            }
+            try {
+                localStorage.setItem(metaKey, date);
+            }
+            catch {
+                stamp.append(' 操作日時はこの画面だけに表示しています。');
+            }
+        });
+    }
+    setupToolShell({ "id": "handover-note", "name": "異動引継ぎノート", "version": "1.1.0", "ready": true });
+})();
+</script>
+</body>
+</html>

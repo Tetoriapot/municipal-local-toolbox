@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.pnpm-store/
+test-results/
+.local-review/
+.env
+.env.*
+!.env.example

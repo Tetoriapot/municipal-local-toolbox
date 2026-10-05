@@ -1,0 +1,30 @@
+---
+import SearchBox from './SearchBox.astro';
+import ToolCard from './ToolCard.astro';
+import { distributionSummary, tools } from '../data/tools';
+import { categories, categoryById } from '../data/categories';
+import type { CategoryId } from '../data/categories';
+interface Props { initialCategory?: CategoryId; }
+const { initialCategory = '' } = Astro.props;
+const visibleTools = initialCategory ? tools.filter(tool => tool.category === initialCategory) : tools;
+const tagList = ['引継ぎ', 'CSV', '印刷', 'JSON', 'カレンダー', '台帳', '検索', '備品', 'タスク'];
+const searchData = tools.map(tool => ({ ...tool, categoryName: categoryById(tool.category).name }));
+---
+<div class="section-soft"><div class="container catalog-layout" data-catalog data-initial-category={initialCategory}>
+  <aside class="filter-panel" aria-label="ツールの絞り込み"><div class="filter-header"><h2>絞り込み</h2><button class="reset-button" type="button" data-reset>条件をクリア</button></div>
+    <fieldset><legend>カテゴリ <span class="fine">（複数選択可）</span></legend><div class="category-options">{categories.map(category => <label class="check-label"><input type="checkbox" name="category" value={category.id} checked={category.id === initialCategory} /><span>{category.name}</span><small>{tools.filter(tool => tool.category === category.id).length}</small></label>)}</div></fieldset>
+    <fieldset><legend>タグ <span class="fine">（すべて一致）</span></legend><div class="filter-tags">{tagList.map(tag => <label><input type="checkbox" name="tag" value={tag} /><span>{tag}</span></label>)}</div></fieldset>
+    <p class="fine">複数のキーワードは、スペースで区切って検索できます。</p>
+  </aside>
+  <div class="catalog-main"><SearchBox id="catalog-search" compact /><noscript><p class="no-js">検索・絞り込みにはJavaScriptが必要です。ツールの詳細ページは下の一覧から開けます。</p></noscript>
+    <div class="catalog-toolbar"><p class="result-count" role="status" aria-live="polite" aria-atomic="true"><strong data-result-count>{visibleTools.length}</strong> 件のツール<span data-query-label></span></p><label class="sort-control" for="sort">並び替え<select id="sort" name="sort"><option value="recommended">おすすめ</option><option value="newest">新しい順</option><option value="updated">更新順</option><option value="name">名前順</option></select></label></div>
+    <div class="tool-grid" data-results>{tools.map(tool => <div class="catalog-card-wrapper" data-card-id={tool.id} hidden={initialCategory !== '' && tool.category !== initialCategory}><ToolCard tool={tool} /></div>)}</div>
+    <div class="empty-state" data-empty hidden={visibleTools.length > 0}><h2>該当するツールはありません</h2><p>キーワードを短くするか、絞り込み条件を変更してください。</p><button type="button" class="button button-outline" data-reset>条件をクリアして、すべて見る</button></div>
+    <p class="catalog-note">{distributionSummary}タグには予定機能も含まれます。詳細ページで実装状況をご確認ください。</p>
+  </div>
+  <script type="application/json" id="catalog-data" set:html={JSON.stringify(searchData).replace(/</g, '\\u003c')} />
+</div></div>
+<script>
+  import '../scripts/filters';
+</script>
+<style>.catalog-card-wrapper{display:flex;min-width:0}.catalog-card-wrapper :global(.tool-card){width:100%}</style>

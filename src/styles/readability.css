@@ -1,0 +1,81 @@
+/* Secondary text remains legible on both white and pale blue surfaces. */
+.section-heading p,
+.category-label,
+.tags span,
+.card-meta,
+.card-bottom small,
+.catalog-note,
+.category-chip small,
+.check-label small,
+.detail-subtitle,
+.download-version,
+.feature p,
+.guide-banner p,
+.footer-column a,
+.category-index small,
+.category-index p,
+.result-count,
+.sort-control {
+  color: #53647a;
+}
+.breadcrumb,
+.breadcrumb a,
+.page-heading p,
+.release-entry time { color: #53647a; }
+
+#main-nav a { font-size: 15px; }
+.card-description { font-size: 16px; min-height: 61px; }
+.tool-card h3 { font-size: 19px; }
+.feature p { font-size: 15px; }
+.feature h3 { font-size: 18px; }
+.section-heading p,
+.guide-banner p,
+.page-heading p { font-size: 16px; }
+.category-chip { font-size: 16px; }
+.check-label { font-size: 14px; min-height: 44px; }
+.filter-tags span { font-size: 13px; padding: 9px 10px; }
+.category-label,
+.tags span,
+.card-meta,
+.card-bottom small { font-size: 12px; }
+.card-meta { flex-wrap: wrap; }
+.card-meta > .ready-label { color: #247a4d; }
+.handover-overview { background: #fff; border: 1px solid #d6e1ed; border-top: 4px solid #245b9e; border-radius: 14px; padding: 28px; box-shadow: 0 14px 32px #193d7410; }
+.handover-overview h2 { margin: 10px 0; font-size: clamp(23px, 2vw, 29px); }
+.handover-overview p { color: #4a5d73; line-height: 1.8; }
+.handover-overview ul { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 22px 0 26px; padding: 0; list-style: none; }
+.handover-overview li { display: flex; align-items: center; gap: 9px; font-size: 15px; }
+.handover-overview li svg { flex: none; color: #245b9e; }
+@media (max-width: 480px) {
+  .handover-overview { padding: 22px 16px; }
+  .handover-overview ul { gap: 12px 6px; }
+  .handover-overview li { font-size: 14px; }
+}
+.card-bottom { flex-wrap: wrap; gap: 0 8px; }
+.card-bottom a { min-height: 44px; font-size: 14px; }
+.catalog-note,
+.detail-subtitle,
+.download-version { font-size: 14px; }
+.download-button small,
+.download-panel > .fine,
+.demo-status p,
+.footer-bottom small,
+.footer-top .fine { font-size: 12px; }
+.footer-column { font-size: 14px; }
+.footer-column a { min-height: 32px; }
+.footer-top p { font-size: 14px; }
+.search-box input::placeholder { color: #586b83; }
+
+@media (max-width: 1199px) {
+  #main-nav { gap: 19px; }
+  #main-nav a { font-size: 14px; }
+}
+@media (max-width: 640px) {
+  .section-heading p { font-size: 14px; }
+  .section-heading { flex-wrap: wrap; }
+  .category-chip { font-size: 14px; }
+  .feature h3 { font-size: 16px; }
+  .feature p { font-size: 14px; }
+  .card-bottom { flex-wrap: nowrap; }
+  .download-button small { font-size: 12px; }
+}

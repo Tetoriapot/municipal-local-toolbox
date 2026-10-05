@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>消耗品在庫管理（配布確認版）</title>
+<style>:root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Yu Gothic UI','Yu Gothic',Meiryo,sans-serif;color:#202938;background:#f5f7fa;font-size:16px;line-height:1.8}*{box-sizing:border-box}body{margin:0}header{padding:24px 36px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:2px solid #cfd6df;background:white}.brand{font-size:12px;color:#667085}h1{font-size:25px;margin:4px 0;line-height:1.6}h1 small{font-size:13px;color:#79632f;margin-left:8px}#save-status{font-size:13px;border:1px solid #cfd6df;border-radius:5px;padding:7px 14px;white-space:nowrap}.unsaved{color:#b42318;background:#fff2ee}.layout{max-width:1300px;margin:auto;display:grid;grid-template-columns:200px 1fr}nav{display:flex;flex-direction:column;padding:26px 20px;gap:10px}nav a{padding:10px 14px;color:#2457a6;text-decoration:none;border-radius:4px}nav a:hover{background:#e7eef9}nav span{font-size:12px;color:#667085;padding:12px 14px}main{background:white;padding:30px 40px;min-width:0}.notice,.warning{background:#fffbef;border:1px solid #dbcca8;border-left:4px solid #a0782d;padding:15px 20px;color:#705e39;font-size:14px}.notice p{margin:7px 0 0}h2{font-size:22px;margin:28px 0 12px}p{margin:0 0 16px}label{display:block;font-weight:700;margin-bottom:9px}label span,.muted{font-weight:400;color:#667085;font-size:13px}textarea{display:block;width:100%;min-height:250px;padding:16px;border:1px solid #aab9cd;border-radius:5px;resize:vertical;font:inherit;line-height:1.8;color:#202938}.muted{margin:6px 0 25px}.actions{display:flex;gap:12px;flex-wrap:wrap}button{font:inherit;font-size:14px;padding:12px 18px;min-height:46px;border:1px solid #2457a6;border-radius:4px;background:#2457a6;color:white;cursor:pointer}.secondary{background:white;color:#2457a6}.danger{background:white;color:#b42318;border-color:#c99692;font-size:13px}button:hover{filter:brightness(.94)}:focus-visible{outline:3px solid #b76a00;outline-offset:3px}section{border-top:1px solid #cfd6df;padding-bottom:26px}#feedback{margin-top:12px;color:#3e5a74;font-size:14px;overflow-wrap:anywhere}details{border:1px solid #cfd6df;border-radius:4px;margin-bottom:12px}summary{padding:12px 16px;font-weight:650;cursor:pointer;min-height:48px}details p{padding:0 16px;font-size:14px}footer{text-align:center;padding:20px;color:#667085;font-size:12px}.skip{position:absolute;top:-100px;left:20px;padding:10px;background:white;color:#2457a6}.skip:focus{top:10px}#print-text{display:none}@media(max-width:700px){header{padding:20px;display:block}h1{font-size:22px}#save-status{display:inline-block;margin-top:12px}.layout{display:block}nav{flex-direction:row;flex-wrap:wrap;padding:12px;gap:4px}nav span{display:none}main{padding:22px}button{width:100%}nav a{padding:9px 12px;font-size:14px}}@media print{header{padding:0;display:block}header small,#save-status,nav,.notice,.warning,label,textarea,.muted,#data,#help,footer,.skip{display:none!important}.layout{display:block}main{padding:0}#print-text{display:block;white-space:pre-wrap;overflow-wrap:anywhere}body{background:white}h1{font-size:20px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+:root { color-scheme: light; }
+.header-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px; }
+.header-actions button, .shell-help { width:auto; font-size:13px; padding:8px 12px; min-height:44px; }
+.shell-help { display:inline-flex; align-items:center; border:1px solid #aabbd1; border-radius:5px; text-decoration:none; }
+.storage-strip { margin:0 auto; padding:12px 24px; max-width:1440px; font-size:13px; border-bottom:1px solid #cfd6df; }
+.storage-strip p { margin:0 0 5px; }
+.storage-strip details { margin:0; border:0; }
+.storage-strip summary { padding:0; min-height:32px; cursor:pointer; }
+.storage-strip details p { padding:0; }
+[data-theme-notice]:empty { display:none; }
+dialog { width:min(760px,calc(100% - 28px)); max-height:calc(100dvh - 36px); overflow:auto; border:1px solid #aebed1; border-radius:8px; padding:24px; background:white; color:#202938; }
+dialog::backdrop { background:#14263f90; }
+@media (max-width:700px) { .header-actions { justify-content:flex-end; margin-top:12px; } #save-status { flex-basis:100%; white-space:normal; text-align:right; } .storage-strip { padding:12px 18px; } }
+@media screen {
+html[data-theme=dark] { color-scheme:dark; background:#101824; color:#e4edf8; --primary:#8fbcff; --border:#53647b; --muted:#b9c8dc; }
+html[data-theme=dark] :is(body,main,header,dialog,.secondary,.danger,.shell-help,input:not([type=checkbox]),select,textarea) { background:#182334; color:#e4edf8; border-color:#53647b; }
+html[data-theme=dark] :is(.workspace,.layout,#navigation,.action-bar,.storage-strip,footer) { background:#101824; color:#c5d4e8; }
+html[data-theme=dark] :is(.summary-grid button,.equipment-filters,.empty,.month-heading,.record-card,.content-panel,.progress-panel,.status-tag,#equipment-table th,#equipment-table tbody tr:nth-child(even)) { background:#23334a; color:#e4edf8; border-color:#53647b; }
+html[data-theme=dark] :is(.brand,.muted,.eyebrow,dt,.completion-sections,h1 small,#navigation button,nav a,.feedback,.progress-panel strong,#equipment-table summary,#equipment-table td::before) { color:#bfd5f3; }
+html[data-theme=dark] button:not(.secondary):not(.danger):not(:disabled) { background:#315d96; color:#fff; border-color:#8fbcff; }
+html[data-theme=dark] :is(button:hover,nav a:hover,#navigation button[aria-current=page]) { background:#375175; color:white; }
+html[data-theme=dark] button:disabled { background:#283449; color:#b1c0d2; border-color:#53647b; }
+html[data-theme=dark] :is(.warning,.notice,.local-label) { background:#332d1e; color:#ffdfa2; border-color:#a18a58; }
+html[data-theme=dark] :is(.required,.danger,#form-error,#clear-error,.feedback.error,#save-status.unsaved) { color:#ffb8ac; background:#3a2227; }
+html[data-theme=dark] .status-tag[data-status=repair] { color:#ffdfa2; background:#3b3120; }
+html[data-theme=dark] .status-tag[data-status=disposed] { color:#d2dceb; background:#343d49; }
+html[data-theme=dark] :focus-visible { outline-color:#ffd37b; }
+html[data-theme=dark] :is(nav>span,label>span) { color:#bfd1e8; }
+html[data-theme=dark] #equipment-table td::before { color:#bfd5f3; }
+html[data-theme=dark] input::placeholder { color:#b9c8dc; }
+}
+@media print { .storage-strip,.header-actions,.sample-banner,.draft-panel,dialog { display:none!important; } }
+</style>
+<script>(() => {
+  const key = 'municipal-toolbox:theme:v1';
+  const media = matchMedia('(prefers-color-scheme: dark)');
+  let choice = null;
+  try { choice = localStorage.getItem(key); } catch {}
+  if (!['light', 'dark'].includes(choice)) choice = null;
+  function render() {
+    const dark = (choice || (media.matches ? 'dark' : 'light')) === 'dark';
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    document.querySelectorAll('[data-theme-toggle]').forEach(button => {
+      button.textContent = dark ? 'ライトモード' : 'ダークモード';
+      button.setAttribute('aria-label', dark ? 'ライトモードに切り替える' : 'ダークモードに切り替える');
+      button.disabled = false;
+    });
+  }
+  render();
+  document.addEventListener('DOMContentLoaded', () => {
+    render();
+    document.querySelectorAll('[data-theme-toggle]').forEach(button => button.addEventListener('click', () => {
+      choice = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      render();
+      try { localStorage.setItem(key, choice); }
+      catch { document.querySelectorAll('[data-theme-notice]').forEach(node => { node.textContent = '配色はこの画面に適用しました。設定は保存できません。'; }); }
+    }));
+  });
+  media.addEventListener('change', () => { if (!choice) render(); });
+  addEventListener('storage', event => {
+    if (event.key === key || event.key === null) { choice = ['light','dark'].includes(event.newValue) ? event.newValue : null; render(); }
+  });
+})();
+</script></head>
+<body>
+<a class="skip" href="#main">本文へ移動</a>
+<header><div><span class="brand">自治体ローカルツール箱</span><h1>消耗品在庫管理 <small>配布確認版</small></h1></div><span id="save-status" role="status" aria-live="polite">保存状態を確認中</span></header>
+<div class="layout"><nav aria-label="ツールメニュー"><a href="#main">メモ</a><a href="#data">データ管理</a><a href="#help">ヘルプ</a><span>v0.1.1-preview</span></nav>
+<main id="main"><noscript><p class="warning">このツールの保存・バックアップにはJavaScriptが必要です。JavaScriptが無効な間、入力内容は保存されません。</p></noscript><div class="notice"><strong>このファイルは配布・保存の動作確認用です。</strong><p>消耗品在庫管理の業務機能は今後実装します。実際の業務データは入力しないでください。入力内容を外部へ送信する機能はありません。</p></div>
+<h2>確認用メモ</h2><p>テスト用の文章を入力し、保存やバックアップの動作を確認してください。</p><label for="memo">メモ <span>（50,000文字まで）</span></label><textarea id="memo" rows="14" maxlength="50000" placeholder="動作確認用のメモを入力してください"></textarea><div id="print-text"></div><p class="muted" id="count">0 / 50,000文字</p>
+<section id="data"><h2>データ管理</h2><p>ブラウザ内の保存とは別に、JSONファイルを書き出して保管してください。</p><div class="actions"><button type="button" id="export">バックアップを書き出す</button><button type="button" class="secondary" id="import">バックアップを読み込む</button><button type="button" class="secondary" id="print">印刷</button></div><input id="import-file" type="file" accept=".json,application/json" hidden><p id="feedback" role="status" aria-live="polite"></p><button type="button" id="clear" class="danger">すべてのデータを削除</button></section>
+<section id="help"><h2>ヘルプ</h2><details><summary>保存・バックアップについて</summary><p>メモは利用中のブラウザのlocalStorageに自動保存します。HTMLファイル自体には書き込みません。ブラウザの設定、データ削除、PC・ファイル名・保存場所の変更により、保存データを利用できなくなることがあります。</p><p>「未保存」と表示された場合は、閉じる前にJSONを書き出してください。読込みは現在のメモを置き換えます。同じツールのバックアップだけを読み込めます。</p><p>ダウンロードしたJSONは暗号化されません。所属組織で許可された場所に保管してください。</p></details><details><summary>安全な使い方</summary><p>この確認版は外部通信、アカウント、外部ライブラリを必要としません。個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。確認版には実際の業務データを入力しないでください。</p><p>主要な対応対象はMicrosoft Edge / Google Chromeの最新版です。Internet Explorerには対応しません。</p></details></section></main></div>
+<footer>単一HTML・外部通信なし ／ 配布確認版 v0.1.1-preview</footer>
+<script>(() => {
+  'use strict';
+  const config = {"id":"inventory-manager","name":"消耗品在庫管理"};
+  const MAX_TEXT_LENGTH = 50000;
+const MAX_FILE_BYTES = 1024 * 1024;
+
+function validateBackup(data, toolId) {
+  if (!data || typeof data !== 'object' || Array.isArray(data) || data.schemaVersion !== 1 || data.toolId !== toolId || typeof data.text !== 'string' || data.text.length > MAX_TEXT_LENGTH) {
+    throw new Error('同じツールの有効なバックアップを選択してください。メモは50,000文字までです。');
+  }
+  return data.text;
+}
+
+function makeBackup(toolId, text, exportedAt = new Date().toISOString(), original = {}) {
+  return { ...original, schemaVersion: 1, toolId, exportedAt, text };
+}
+
+function serializeBackup(data) {
+  const text = JSON.stringify(data, null, 2);
+  if (new TextEncoder().encode(text).length > MAX_FILE_BYTES) {
+    throw new Error('バックアップが1MBを超えるため反映できません。必要な内容を書き出し、メモを短くしてください。');
+  }
+  return text;
+}
+
+function backupComparison(name, fileName, before, after, exportedAt, sample = false) {
+  const date = typeof exportedAt === 'string' && Number.isFinite(Date.parse(exportedAt)) ? new Date(exportedAt).toLocaleString('ja-JP') : '未記録または不明';
+  const lines = ['JSON読込み前の確認', '対象ツール：' + name, 'ファイル：' + fileName, '書出し日時（JSONの記録）：' + date, '', '項目：現在 → 読込み後'];
+  for (const label of Object.keys(before)) lines.push(label + '：' + before[label].toLocaleString('ja-JP') + ' → ' + after[label].toLocaleString('ja-JP'));
+  if (sample) lines.push('', 'このJSONにはサンプルデータの印が付いています。');
+  lines.push('', '確定済みのデータを、読込み後の内容ですべて置き換えます。追加や結合ではありません。', '下書きは別に保持します。必要な確定済みデータはキャンセルして先にJSONへ書き出してください。', '', 'この内容で置き換えますか？');
+  return lines.join('\n');
+}
+
+  const key = 'municipal-toolbox:preview:v1:' + config.id;
+  const memo = document.getElementById('memo');
+  const saveStatus = document.getElementById('save-status');
+  const feedback = document.getElementById('feedback');
+  const fileInput = document.getElementById('import-file');
+  let protectedStorage = false;
+  let originalBackup = {};
+  let lastStoredRaw = null;
+  let importBusy = false;
+  let acceptedMemo = '';
+  function statusText(message, unsaved = false) {
+    saveStatus.textContent = message;
+    saveStatus.classList.toggle('unsaved', unsaved);
+  }
+  function refresh() {
+    document.getElementById('count').textContent = memo.value.length.toLocaleString('ja-JP') + ' / 50,000文字';
+    document.getElementById('print-text').textContent = memo.value;
+  }
+  function save() {
+    refresh();
+    if (protectedStorage) {
+      statusText('未保存：既存データを保護中', true);
+      return false;
+    }
+    try {
+      if (localStorage.getItem(key) !== lastStoredRaw) {
+        statusText('未保存：別の画面で変更されています', true);
+        feedback.textContent = 'この画面のメモをバックアップに書き出し、画面を再読込みしてください。他の画面のデータは上書きしません。';
+        return false;
+      }
+      const raw = serializeBackup(makeBackup(config.id, memo.value, new Date().toISOString(), originalBackup));
+      localStorage.setItem(key, raw);
+      lastStoredRaw = raw;
+      statusText('このブラウザ内に自動保存済み');
+      return true;
+    } catch {
+      statusText('未保存：バックアップを書き出してください', true);
+      return false;
+    }
+  }
+  try {
+    const raw = localStorage.getItem(key);
+    lastStoredRaw = raw;
+    if (raw !== null) {
+      try {
+        const data = JSON.parse(raw);
+        memo.value = validateBackup(data, config.id);
+        originalBackup = data;
+        acceptedMemo = memo.value;
+        statusText('このブラウザ内に自動保存済み');
+      } catch {
+        protectedStorage = true;
+        statusText('保存データを読めません：未保存', true);
+        feedback.textContent = '保存データに問題があります。既存データは上書きしません。必要なら元の保存領域を管理者に確認し、有効なJSONを読み込むか「すべてのデータを削除」で初期化してください。';
+      }
+    } else statusText('未入力');
+  } catch {
+    statusText('保存機能を利用できません：未保存', true);
+  }
+  refresh();
+  memo.addEventListener('input', () => {
+    try {
+      serializeBackup(makeBackup(config.id, memo.value, new Date().toISOString(), originalBackup));
+      acceptedMemo = memo.value;
+      save();
+    } catch (error) {
+      memo.value = acceptedMemo;
+      refresh();
+      feedback.textContent = error.message + '直前の入力は反映していません。';
+    }
+  });
+  document.getElementById('export').addEventListener('click', () => {
+    let data;
+    try { data = serializeBackup(makeBackup(config.id, memo.value, new Date().toISOString(), originalBackup)); }
+    catch (error) { feedback.textContent = error.message; return; }
+    const blob = new Blob([data], { type: 'application/json;charset=utf-8' });
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    const now = new Date();
+    const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('');
+    anchor.href = objectUrl; anchor.download = config.id + '-backup-' + date + '.json';
+    document.body.append(anchor); anchor.click(); anchor.remove();
+    dispatchEvent(new Event('tool-backup-export'));
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    feedback.textContent = 'バックアップのダウンロードを開始しました。保存先をご確認ください。';
+  });
+  document.getElementById('import').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    fileInput.value = '';
+    if (!file || importBusy) return;
+    importBusy = true;
+    document.getElementById('import').disabled = true;
+    let incoming;
+    let incomingBackup;
+    try {
+      if (!/\.json$/i.test(file.name)) throw new Error('拡張子が.jsonのバックアップを選択してください。');
+      if (!file.size) throw new Error('ファイルが空です。内容のあるJSONを選択してください。');
+      if (file.type && !['application/json', 'text/json', 'text/plain', 'application/octet-stream'].includes(file.type)) throw new Error('JSONファイルとして認識できません。元のバックアップを選択してください。');
+      if (file.size > MAX_FILE_BYTES) throw new Error('1MB以下のJSONファイルを選択してください。');
+      incomingBackup = JSON.parse((await file.text()).replace(/^\uFEFF/, ''));
+      incoming = validateBackup(incomingBackup, config.id);
+      serializeBackup(makeBackup(config.id, incoming, new Date().toISOString(), incomingBackup));
+    } catch (error) {
+      feedback.textContent = error instanceof SyntaxError ? 'JSONの形式が正しくありません。現在のメモは変更していません。' : error.message;
+      return;
+    } finally {
+      importBusy = false;
+      document.getElementById('import').disabled = false;
+    }
+    if (!confirm(backupComparison(config.name, file.name, { 'メモ文字数': memo.value.length }, { 'メモ文字数': incoming.length }, incomingBackup.exportedAt))) return;
+    memo.value = incoming;
+    acceptedMemo = incoming;
+    originalBackup = incomingBackup;
+    protectedStorage = false;
+    const saved = save();
+    feedback.textContent = saved ? 'バックアップを読み込みました。' : 'メモを読み込みましたが、ブラウザ内に保存できません。JSONを書き出して保管してください。';
+  });
+  document.getElementById('clear').addEventListener('click', () => {
+    if (!confirm('このツールのすべてのデータを削除しますか？この操作は取り消せません。必要な内容をバックアップしてください。')) return;
+    try {
+      if (localStorage.getItem(key) !== lastStoredRaw) {
+        feedback.textContent = '別の画面でデータが変更されています。画面を再読込みしてから削除してください。';
+        return;
+      }
+      localStorage.removeItem(key);
+    } catch {
+      feedback.textContent = '保存領域から削除できませんでした。メモは変更していません。';
+      return;
+    }
+    protectedStorage = false; lastStoredRaw = null; originalBackup = {}; acceptedMemo = ''; memo.value = ''; refresh(); statusText('未入力');
+    feedback.textContent = 'このツールのデータを削除しました。書き出したJSONファイルは削除されません。';
+  });
+  document.getElementById('print').addEventListener('click', () => { refresh(); window.print(); });
+})();
+(() => {
+    function el(id) {
+        const found = document.getElementById(id);
+        if (!found)
+            throw new Error('Missing element: ' + id);
+        return found;
+    }
+    function node(tag, text = '', className = '') {
+        const result = document.createElement(tag);
+        result.textContent = text;
+        if (className)
+            result.className = className;
+        return result;
+    }
+    function action(text, handler, className = 'secondary') {
+        const button = node('button', text, className);
+        button.type = 'button';
+        button.addEventListener('click', handler);
+        return button;
+    }
+    function trapDialogFocus(modal) {
+        modal.addEventListener('keydown', event => {
+            if (event.key !== 'Tab')
+                return;
+            const controls = [...modal.querySelectorAll('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href]')].filter(control => control.getClientRects().length > 0);
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last?.focus();
+            }
+            else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first?.focus();
+            }
+        });
+    }
+    function setupToolShell(config) {
+        const sampleMode = config.ready && location.hash === '#sample';
+        const header = document.querySelector('body > header');
+        let controls = header.querySelector('.header-actions');
+        if (!controls) {
+            controls = node('div', '', 'header-actions');
+            controls.append(document.getElementById('save-status'));
+            header.append(controls);
+        }
+        const help = controls.querySelector('[data-view="help"]');
+        if (help) {
+            help.textContent = 'Help';
+            help.setAttribute('aria-label', 'Help（使い方）');
+        }
+        const updates = node('dialog');
+        updates.id = 'updates-dialog';
+        updates.setAttribute('aria-labelledby', 'updates-title');
+        const title = node('h2', '更新情報');
+        title.id = 'updates-title';
+        updates.append(title, node('p', config.name + ' v' + config.version), node('p', '2026-10-05：右上の更新情報・配色切替・Helpと、保存先・バックアップの案内を追加しました。'));
+        updates.append(node('p', 'JSONを読み込む前に、対象ツール・ファイル・書出し日時・件数を確認できます。'));
+        if (config.ready)
+            updates.append(node('p', '編集中の下書き保存・再開と、架空データで操作を試せるサンプルを追加しました。'));
+        if (config.id === 'equipment-manager')
+            updates.append(node('p', 'CSVから備品を追加できます。列の対応・重複・入力内容を検証し、プレビューで確認してから取り込みます。'));
+        updates.append(node('p', config.ready ? '業務機能を実装済みです。更新情報はこのファイルに含まれる内容を表示します。更新の自動取得は行いません。' : '配布確認版です。メモの保存・JSON・印刷を確認できます。業務機能は未実装です。'));
+        const close = action('閉じる', () => updates.close());
+        close.id = 'close-updates';
+        updates.append(close);
+        document.body.append(updates);
+        trapDialogFocus(updates);
+        const open = action('更新情報', () => { updates.showModal(); close.focus(); });
+        open.id = 'open-updates';
+        const theme = action('ダークモード', () => { });
+        theme.dataset.themeToggle = '';
+        theme.disabled = true;
+        controls.insertBefore(open, help);
+        controls.insertBefore(theme, help);
+        if (!help) {
+            const link = node('a', 'Help', 'secondary shell-help');
+            link.href = '#help';
+            link.setAttribute('aria-label', 'Help（使い方）');
+            controls.append(link);
+        }
+        const strip = node('aside', '', 'storage-strip');
+        strip.setAttribute('aria-label', '保存先とバックアップ');
+        strip.append(node('p', '保存先はこのブラウザ内です。HTMLファイルには入力データを保存しません。'));
+        const details = node('details');
+        details.append(node('summary', 'バックアップとPC移行の手順'));
+        details.append(node('p', '作業後は「バックアップを書き出す」でJSONを保存し、保存先でファイルを確認してください。ブラウザ内の自動保存とは別の操作です。'));
+        details.append(node('p', 'PC・ブラウザ・ファイルの場所を変える前にJSONを書き出します。移行先で同じツールを開き、JSONを読み込んで内容を確認してください。HTMLだけをコピーしても入力データは移りません。'));
+        details.append(node('p', '共有PCでは同じブラウザを使う人が保存内容を閲覧できる場合があります。組織で許可された保存先を使ってください。'));
+        const stamp = node('p');
+        stamp.id = 'backup-operation';
+        const metaKey = 'municipal-toolbox:export-operation:v1:' + config.id;
+        function showDate(value) {
+            const date = value ? new Date(value) : null;
+            stamp.textContent = date && Number.isFinite(date.valueOf()) ? '最終書出し操作：' + date.toLocaleString('ja-JP') + '。ファイルの保存完了は保存先で確認してください。' : 'このブラウザでの書出し操作は未記録です。';
+        }
+        try {
+            showDate(sampleMode ? null : localStorage.getItem(metaKey));
+        }
+        catch {
+            showDate(null);
+        }
+        details.append(stamp);
+        strip.append(details);
+        const themeNotice = node('p');
+        themeNotice.dataset.themeNotice = '';
+        themeNotice.setAttribute('role', 'status');
+        strip.append(themeNotice);
+        header.after(strip);
+        if (config.ready) {
+            const banner = node('aside', '', sampleMode ? 'sample-banner warning' : 'sample-banner storage-strip');
+            banner.id = 'sample-banner';
+            if (sampleMode) {
+                banner.append(node('strong', 'サンプル体験中'), node('p', '架空データで操作を試せます。通常の保存データと下書きは読み書きしません。変更はこの画面内だけに保持し、再読込みすると初期のサンプルへ戻ります。'));
+                banner.append(action('サンプルを終了', () => { location.hash = ''; location.reload(); }));
+                strip.firstElementChild.textContent = 'サンプル体験中：変更はこの画面内だけに保持します。';
+            }
+            else {
+                const link = node('a', 'サンプルで試す（別画面）');
+                link.href = location.pathname + location.search + '#sample';
+                link.target = '_blank';
+                link.rel = 'noopener';
+                banner.append(link, node('p', '架空データを使います。現在の保存データは変更しません。'));
+            }
+            strip.after(banner);
+        }
+        addEventListener('tool-backup-export', () => {
+            const date = new Date().toISOString();
+            showDate(date);
+            if (sampleMode) {
+                stamp.textContent = 'サンプルの書出し操作：' + new Date(date).toLocaleString('ja-JP') + '。通常のバックアップ操作日時は変更していません。';
+                return;
+            }
+            try {
+                localStorage.setItem(metaKey, date);
+            }
+            catch {
+                stamp.append(' 操作日時はこの画面だけに表示しています。');
+            }
+        });
+    }
+    setupToolShell({ "id": "inventory-manager", "name": "消耗品在庫管理", "version": "0.1.1-preview", "ready": false });
+})();
+</script>
+</body>
+</html>

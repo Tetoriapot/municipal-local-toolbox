@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2, "toolId": "equipment-manager", "sampleData": true,
+  "text": "操作練習用の架空データです。実際の備品情報ではありません。",
+  "items": [
+    { "id": "sample-pc", "assetNumber": "0001", "name": "ノートパソコン（例）", "category": "情報機器", "location": "総務課（例）", "purchaseDate": "2025-04-01", "status": "in-use", "notes": "検索、編集、CSV出力を試してください。" },
+    { "id": "sample-printer", "assetNumber": "0002", "name": "プリンター（例）", "category": "情報機器", "location": "別館（例）", "purchaseDate": "2024-06-01", "status": "repair", "notes": "点検中の例です。" },
+    { "id": "sample-desk", "assetNumber": "0003", "name": "事務机（例）", "category": "家具", "location": "倉庫（例）", "purchaseDate": "", "status": "stored", "notes": "" }
+  ]
+}

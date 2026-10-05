@@ -1,0 +1,5 @@
+---
+import ArticleLayout from '../layouts/ArticleLayout.astro';
+import { url } from '../lib/paths';
+---
+<ArticleLayout title="ページが見つかりません" eyebrow="404 NOT FOUND" lead="URLが変更されたか、ページが存在しない可能性があります。"><p>ツール一覧から、目的のツールをお探しください。</p><a class="button button-primary" href={url('/tools/')}>ツール一覧へ</a></ArticleLayout>

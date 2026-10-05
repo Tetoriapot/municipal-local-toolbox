@@ -1,0 +1,50 @@
+[
+  {
+    "id": "handover-note",
+    "version": "1.1.0",
+    "bytes": 93845,
+    "sha256": "687571ab30a4f2d23501211dbe86a1713763b42bdbac7c473a4f84237d4dcba8"
+  },
+  {
+    "id": "equipment-manager",
+    "version": "1.1.0",
+    "bytes": 105602,
+    "sha256": "7dd1ea82cbdd38d14d6fff3d0be489f4dc8aa0047261b096bf43edb8d671b09f"
+  },
+  {
+    "id": "lending-manager",
+    "version": "0.1.1-preview",
+    "bytes": 29380,
+    "sha256": "5c59990de0cb1330c35208c5745a6263e17ebb3baac40eecc28c7d936f36bfcc"
+  },
+  {
+    "id": "inventory-manager",
+    "version": "0.1.1-preview",
+    "bytes": 29384,
+    "sha256": "62f21887adcaec6f2a150c5f40afb3af49e860548c68a011a86862355724659e"
+  },
+  {
+    "id": "annual-calendar",
+    "version": "0.1.1-preview",
+    "bytes": 29410,
+    "sha256": "87e4c51f8a1d66487ac639d27b0266432a50b83581aa312462048f4a21c83a3a"
+  },
+  {
+    "id": "meeting-minutes",
+    "version": "0.1.1-preview",
+    "bytes": 29395,
+    "sha256": "708e44dfff3fc7ac14dd5a3f4fe62c450d4ede40d8f7e407f9031d5c26938831"
+  },
+  {
+    "id": "inquiry-log",
+    "version": "0.1.1-preview",
+    "bytes": 29372,
+    "sha256": "9fc01602d944c92bb5c23716f589bb5c10c4b93724e7b216242399ae02011954"
+  },
+  {
+    "id": "event-manager",
+    "version": "0.1.1-preview",
+    "bytes": 29391,
+    "sha256": "5041caed0322ff83a7a6e48d8f5a06a5caee8cc03982228a2c29f894639679e8"
+  }
+]

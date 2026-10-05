@@ -1,0 +1,12 @@
+---
+import Icon from './Icon.astro';
+import { url } from '../lib/paths';
+interface Props { id?: string; value?: string; compact?: boolean; }
+const { id = 'tool-search', value = '', compact = false } = Astro.props;
+---
+<form action={url('/tools/')} method="get" role="search" class:list={['search-box', { compact }]}>
+  <label for={id} class="sr-only">ツールを検索</label>
+  <Icon name="search" size={23} />
+  <input id={id} name="q" type="search" placeholder="ツール名・機能で検索" value={value} autocomplete="off" maxlength="200" />
+  <button class="button button-primary" type="submit">検索<span class="search-button-icon"><Icon name="arrow" size={18} /></span></button>
+</form>

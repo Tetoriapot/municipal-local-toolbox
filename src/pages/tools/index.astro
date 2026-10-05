@@ -1,0 +1,7 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Catalog from '../../components/Catalog.astro';
+import Icon from '../../components/Icon.astro';
+import { url } from '../../lib/paths';
+---
+<BaseLayout title="ツール一覧"><div class="container"><nav class="breadcrumb" aria-label="パンくず"><a href={url('/')}>ホーム</a><Icon name="chevron" size={12} /><span aria-current="page">ツール一覧</span></nav><div class="page-heading"><span class="eyebrow">FIND YOUR TOOLS</span><h1>ツールを探す</h1><p>ツール名・機能で検索し、カテゴリやタグで絞り込めます。</p></div></div><Catalog /></BaseLayout>

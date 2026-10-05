@@ -1,0 +1,13 @@
+---
+import Icon from './Icon.astro';
+import { url } from '../lib/paths';
+---
+<footer class="site-footer">
+  <div class="container footer-top">
+    <div><a class="footer-brand" href={url('/')}><Icon name="toolbox" size={25} /> 自治体ローカルツール箱</a><p>単一HTMLの業務ツールをTXT・HTMLで配布</p><p class="fine">自治体・公共団体向けのローカル業務ツール集</p></div>
+    <div class="footer-column"><strong>ツールを使う</strong><a href={url('/tools/')}>ツール一覧</a><a href={url('/categories/')}>カテゴリから探す</a><a href={url('/changelog/')}>更新履歴</a></div>
+    <div class="footer-column"><strong>利用ガイド</strong><a href={url('/guide/')}>初めての方へ</a><a href={url('/guide/txt-to-html/')}>TXT → HTML 変更方法</a><a href={url('/safety/')}>安全性について</a><a href={url('/faq/')}>よくある質問</a></div>
+    <div class="footer-column"><strong>このサイト</strong><a href={url('/about/')}>このサイトについて</a><a href={url('/terms/')}>利用規約</a><a href={url('/disclaimer/')}>免責事項</a></div>
+  </div>
+  <div class="container footer-bottom"><small>© 2026 自治体ローカルツール箱</small><small>個人情報・機密情報の取り扱いは、所属組織の規定をご確認ください。</small></div>
+</footer>

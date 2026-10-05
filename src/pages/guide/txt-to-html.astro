@@ -1,0 +1,9 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import { url } from '../../lib/paths';
+---
+<ArticleLayout title="TXT → HTML の変更方法" eyebrow="FILE GUIDE" lead="ファイルの内容を変えずに、末尾の拡張子だけを変更します。">
+  <div class="notice">ダウンロード制限を回避するための手順ではありません。所属組織でHTMLの実行や拡張子の変更が許可されているか確認してください。</div>
+  <ol class="steps" style="margin-top:32px"><li><h3>TXT版を保存する</h3><p>ツール詳細の「TXT版をダウンロード」からファイルを保存します。例：<code>handover-note.txt</code></p></li><li><h3>ファイル名の拡張子を表示する</h3><p>エクスプローラーの表示設定で「ファイル名拡張子」を有効にします。Windowsのバージョンによって項目の場所が異なります。設定を変更できない場合は情報システム担当者に確認してください。</p></li><li><h3>末尾を .html に変更する</h3><p>ファイルを選んで名前の変更を行います。<code>handover-note.txt</code> を <code>handover-note.html</code> に変更します。</p><p>確認画面が出たら、ファイルと変更内容を確認したうえで変更を確定します。<code>handover-note.html.txt</code> のように、末尾に <code>.txt</code> が残らないようにしてください。</p></li><li><h3>EdgeまたはChromeで開く</h3><p>HTMLファイルを右クリックし、「プログラムから開く」などからMicrosoft Edge / Google Chromeを選びます。インターネットにつながらない環境でも起動できます。</p></li></ol>
+  <h2>うまく開けないとき</h2><ul><li>メモ帳が開く：拡張子と、開くアプリの設定を確認してください。</li><li>ソースコードが表示される：末尾が <code>.html</code> になっているか確認してください。</li><li>保存・実行が禁止されている：組織の管理者に確認してください。</li><li>日本語が文字化けする：ファイルの中身を編集せず、もう一度ダウンロードしてください。配布ファイルはUTF-8です。</li></ul><p><a href={url('/guide/')}>初めての方へ戻る</a></p>
+</ArticleLayout>

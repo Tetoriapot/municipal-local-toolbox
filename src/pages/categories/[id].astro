@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Catalog from '../../components/Catalog.astro';
+import Icon from '../../components/Icon.astro';
+import { categories } from '../../data/categories';
+import { url } from '../../lib/paths';
+export function getStaticPaths() { return categories.map(category => ({ params: { id: category.id }, props: { category } })); }
+const { category } = Astro.props;
+---
+<BaseLayout title={`${category.name}のツール`}><div class="container"><nav class="breadcrumb" aria-label="パンくず"><a href={url('/')}>ホーム</a><Icon name="chevron" size={12} /><a href={url('/categories/')}>カテゴリ一覧</a><Icon name="chevron" size={12} /><span aria-current="page">{category.name}</span></nav><div class="page-heading"><span class="eyebrow">CATEGORY</span><h1>{category.name}のツール</h1><p>{category.description}</p></div></div><Catalog initialCategory={category.id} /></BaseLayout>

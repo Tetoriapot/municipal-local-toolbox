@@ -1,0 +1,27 @@
+---
+import { distributionSummary } from '../data/tools';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { url } from '../lib/paths';
+import '../styles/global.css';
+import '../styles/readability.css';
+import '../styles/appearance.css';
+import themeInit from '../../tools-src/shared/theme-init.js?raw';
+interface Props { title?: string; description?: string; noindex?: boolean; }
+const { title, description = '自治体・公共団体向けの無料ローカルWebツール。異動引継ぎ、備品管理、貸出管理、年間予定などをインストール不要・外部通信なしで利用するためのツール箱。' + distributionSummary, noindex = false } = Astro.props;
+const pageTitle = title ? `${title} | 自治体ローカルツール箱` : '自治体ローカルツール箱 | インストール不要の自治体業務ツール';
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={themeInit}></script>
+    <meta name="description" content={description} /><meta name="theme-color" content="#173d78" />
+    <meta name="referrer" content="same-origin" />
+    {noindex && <meta name="robots" content="noindex" />}
+    {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
+    <meta property="og:type" content="website" /><meta property="og:locale" content="ja_JP" /><meta property="og:title" content={pageTitle} /><meta property="og:description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} /><title>{pageTitle}</title>
+  </head>
+  <body><a class="skip-link" href="#main">本文へ移動</a><Header /><main id="main" tabindex="-1"><slot /></main><Footer /></body>
+</html>

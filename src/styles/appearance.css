@@ -1,0 +1,25 @@
+:root { color-scheme:light; }
+.utility-bar .container { align-items:center; gap:12px; flex-wrap:wrap; }
+.site-utilities { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:8px; margin-left:auto; }
+.site-utilities a,.site-utilities button { display:inline-flex; align-items:center; min-height:44px; padding:5px 10px; background:white; border:1px solid #aabbd1; border-radius:4px; color:#244e85; font-size:13px; font-weight:600; text-decoration:none; }
+.site-utilities :is(a,button):hover { background:#e2ebf8; }
+[data-theme-notice]:empty { display:none; }
+@media screen {
+html[data-theme=dark] { color-scheme:dark; --color-bg:#101824; --color-surface:#182334; --color-text:#e4edf8; --color-text-muted:#b9c8dc; --color-border:#53647b; --color-primary:#9bc3ff; --color-primary-dark:#bcd8ff; }
+html[data-theme=dark] body { background:#101824; }
+html[data-theme=dark] :is(.site-header,.tool-card,.category-chip,.category-index a,.filter-panel,.download-panel,.handover-overview,.search-box,.faq-list details,.button-outline,.site-utilities a,.site-utilities button,.menu-toggle,.skip-link,input,select,textarea) { background:#182334; color:#e4edf8; border-color:#53647b; }
+html[data-theme=dark] :is(.hero,.utility-bar,.site-footer,.section-soft,.guide-banner,.tags span,.file-conversion,.trust-strip,.filter-tags span,.button-muted,.safety-table th) { background:#23334a; color:#d2e1f4; border-color:#53647b; }
+html[data-theme=dark] :is(p,small,.fine,.muted,.brand,.brand small,.footer-brand,.footer-column strong,.footer-column a,.breadcrumb,.breadcrumb a,.hero-kicker,.hero-copy,.hero-notes,.trust-item,.category-label,.category-chip small,.card-meta,.card-meta>span:first-child,.card-description,.card-bottom small,.tool-card h3 a,#main-nav a,.page-heading p,.sort-control,.result-count,.check-label,.search-examples,.search-examples a,.search-intro span,.feature p,.guide-banner p,.news-row a,.release-entry time,.detail-subtitle,.download-version,.tags span,.handover-overview p,.section-heading p) { color:#bfd1e8; }
+html[data-theme=dark] :is(.tool-icon,.tone-equipment,.tone-date,.tone-counter,.tone-meetings,.tone-events) { background:#30435d; color:#b8d7ff; }
+html[data-theme=dark] :is(.notice,.noscript-notice) { background:#332d1e; color:#ffdfa2; border-color:#a18a58; }
+html[data-theme=dark] .notice p { color:#ffdfa2; }
+html[data-theme=dark] :is(.button-primary,.brand-mark) { background:#315d96; color:white; border-color:#8fbcff; }
+html[data-theme=dark] .button-primary:hover { background:#426fab; color:white; }
+html[data-theme=dark] input::placeholder { color:#b9c8dc; }
+html[data-theme=dark] :is(.news-row time,.news-label) { color:#bfd1e8; }
+html[data-theme=dark] .file-conversion code { color:#bfd1e8; }
+html[data-theme=dark] .button-primary :is(span,small) { color:white!important; }
+html[data-theme=dark] :is(.article-body li,.article-body li h3) { color:#bfd1e8; }
+html[data-theme=dark] :focus-visible { outline-color:#ffd37b; }
+}
+@media print { .site-utilities { display:none; } }

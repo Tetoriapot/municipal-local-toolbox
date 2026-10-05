@@ -1,0 +1,16 @@
+---
+import Icon from './Icon.astro';
+import type { Tool } from '../data/tools';
+import { categoryById } from '../data/categories';
+import { url } from '../lib/paths';
+interface Props { tool: Tool; }
+const { tool } = Astro.props;
+---
+<article class="tool-card" data-tool-id={tool.id}>
+  <div class="card-top"><span class={`tool-icon tone-${tool.category}`}><Icon name={tool.icon} size={29} /></span><span class="category-label">{categoryById(tool.category).name}</span></div>
+  <h3><a href={url(`/tools/${tool.id}/`)}>{tool.name}</a></h3>
+  <p class="card-description">{tool.description}</p>
+  <div class="tags">{tool.tags.slice(0, 3).map(tag => <span>{tag}</span>)}</div>
+  <div class="card-meta"><span class:list={{ 'ready-label': tool.status === 'ready' }}>{tool.status === 'ready' ? '業務機能を実装済み' : '配布確認版'}</span><span><time datetime={tool.updatedAt}>{tool.updatedAt.replaceAll('-', '.')}</time> 更新</span></div>
+  <div class="card-bottom"><small>v{tool.version}</small><a href={url(`/tools/${tool.id}/`)} aria-label={`${tool.name}の詳細を見る`}>詳細を見る <Icon name="arrow" size={18} /></a></div>
+</article>

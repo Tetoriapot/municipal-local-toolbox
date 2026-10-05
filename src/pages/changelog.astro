@@ -1,0 +1,9 @@
+---
+import ArticleLayout from '../layouts/ArticleLayout.astro';
+---
+<ArticleLayout title="更新履歴" eyebrow="CHANGELOG" lead="サイトと配布ファイルの変更をお知らせします。">
+<article class="release-entry"><time datetime="2026-10-05">2026.10.05</time><div><span class="eyebrow">引継ぎ・備品 v1.1.0 / 配布確認版 v0.1.1-preview</span><h2>右上の操作と保存・読込みを改善しました</h2><ul><li>サイトと8ツールの右上に更新情報、ライト／ダーク切替、Helpを追加。</li><li>ブラウザ内保存とJSONバックアップの区別、書出し操作日時、PC移行の案内を追加。</li><li>引継ぎノートと備品台帳に、編集下書きの保存・再開と、通常データから分離したサンプル体験を追加。</li><li>JSON読込み前に対象ツール・日時・件数を比較して確認。</li><li>備品CSVの文字コード・列対応・重複・入力内容を検証し、プレビューを確認して追加。</li></ul><p>既存の保存形式・業務機能を維持しています。残り6ツールの業務機能は引き続き未実装です。</p></div></article>
+<article class="release-entry"><time datetime="2026-10-05">2026.10.05</time><div><span class="eyebrow">備品管理台帳 · v1.0.0</span><h2>備品管理台帳の業務機能を追加しました</h2><ul><li>備品の登録・編集・削除、管理番号・カテゴリ・設置場所・購入日・状態の管理。</li><li>検索・絞り込み・並び替え、全件と絞り込み結果のCSV出力・印刷。</li><li>旧メモの移行、JSONバックアップ、不正データと別タブの上書き防止。</li></ul><p>他の6件は配布確認版です。詳細ページをツールごとの説明に修正し、実装状況の表示を共通化しました。</p></div></article>
+
+<article class="release-entry"><time datetime="2026-10-05">2026.10.05</time><div><span class="eyebrow">異動引継ぎノート · v1.0.0</span><h2>異動引継ぎノートの業務機能を追加しました</h2><ul><li>担当業務・年間予定・関係者・資料の保存場所・申し送り事項・チェックリストの登録、編集、削除。</li><li>月別の年間予定、全文検索、確認済みの割合を示す完成度チェック。</li><li>全データと表示中の一覧の印刷、JSONバックアップ、旧メモの移行。</li><li>別の画面からの上書き防止、不正なJSONの拒否、不明なJSON項目の保持。</li></ul><p>他の7件は引き続き配布確認版です。サイトの実装状況と操作説明を更新しました。</p></div></article>
+<article class="release-entry"><time datetime="2026-10-05">2026.10.05</time><div><span class="eyebrow">PHASE 1 · v0.1.0</span><h2>サイト基盤と配布確認版を用意しました</h2><ul><li>TOP、ツール一覧・詳細、9カテゴリのページを追加。</li><li>検索、カテゴリ複数選択、タグ、並び替えを追加。</li><li>8種類のTXT / HTML配布確認版（v0.1.0-preview）を追加。</li><li>使い方、安全性、FAQなどの案内ページを追加。</li></ul><p>各ツールの業務機能、サンプルデータ付きデモ、実画面のスクリーンショットは今後実装します。</p></div></article></ArticleLayout>

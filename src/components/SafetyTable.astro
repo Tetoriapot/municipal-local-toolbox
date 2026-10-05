@@ -1,0 +1,4 @@
+---
+const rows = [['外部通信', 'なし'], ['サーバー送信', 'なし'], ['アカウント', '不要'], ['データ保存', 'ブラウザ内（localStorage）'], ['外部ライブラリ', 'なし'], ['インストール', '不要'], ['バックアップ', 'JSONファイルを書出し・読込み']];
+---
+<div class="table-wrap"><table class="safety-table"><caption class="sr-only">配布ツールの安全仕様</caption><tbody>{rows.map(([label, value]) => <tr><th scope="row">{label}</th><td>{value}</td></tr>)}</tbody></table></div>

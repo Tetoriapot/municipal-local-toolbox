@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2, "toolId": "handover-note", "sampleData": true,
+  "text": "操作練習用の架空データです。実際の業務情報ではありません。",
+  "profile": { "department": "サンプル市 総務課", "predecessor": "前任担当（例）", "successor": "後任担当（例）", "handoverDate": "2026-04-01" },
+  "sections": {
+    "duties": [{ "id": "sample-duty", "title": "月末の備品確認（例）", "procedure": "備品一覧と現物を照合し、変更点を記録する。", "frequency": "毎月", "completed": false }],
+    "schedule": [{ "id": "sample-schedule", "title": "年度初めの台帳確認（例）", "month": "4", "timing": "4月上旬", "completed": false }],
+    "contacts": [{ "id": "sample-contact", "title": "庶務担当窓口（例）", "organization": "サンプル市 総務課", "completed": true }],
+    "files": [{ "id": "sample-file", "title": "備品台帳（例）", "location": "組織で許可された共有フォルダーに保存", "completed": false }],
+    "notes": [{ "id": "sample-note", "title": "プリンターの点検（例）", "priority": "通常", "details": "点検予定を確認する。", "completed": false }],
+    "checklist": [{ "id": "sample-check", "title": "資料の保存場所を確認（例）", "completed": false }]
+  }
+}
