@@ -1,0 +1,7 @@
+{
+  "schemaVersion":2,"toolId":"meeting-minutes","text":"架空の議事録です。議事録とTODOを編集し、印刷を確認できます。","sampleData":true,
+  "sections":{
+    "meetings":[{"id":"meeting-1","title":"年度末業務の確認会議（例）","date":"2026-10-20","time":"10:00","location":"第1会議室","attendees":"庶務担当（架空）\n窓口担当（架空）","agenda":"1. 備品確認の日程\n2. 引継ぎ資料の準備","notes":"担当ごとに作業状況を確認した。","decisions":"11月中に備品一覧を確認する。"}],
+    "todos":[{"id":"todo-1","meetingId":"meeting-1","title":"備品一覧を配布する（例）","owner":"庶務担当（架空）","dueDate":"2026-11-01","status":"未着手"},{"id":"todo-2","meetingId":"meeting-1","title":"会議室を予約する（例）","status":"完了"}]
+  }
+}

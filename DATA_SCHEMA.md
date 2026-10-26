@@ -2,7 +2,7 @@
 
 ## 配色・操作日時・下書き・サンプル
 
-v1.2.0でも確定済みデータのschemaVersionと保存キーを変更していません。配色は`municipal-toolbox:theme:v1`に`light`または`dark`を保存します。JSON書出し操作日時は`municipal-toolbox:export-operation:v1:<toolId>`にISO日時を保存します。どちらも業務データのJSONには含みません。
+引継ぎ・備品台帳v1.3.0も確定済みデータのschemaVersionと保存キーを維持しています。6ツールの旧配布確認版からの移行は後述します。配色は`municipal-toolbox:theme:v1`に`light`または`dark`を保存します。JSON書出し操作日時は`municipal-toolbox:export-operation:v1:<toolId>`にISO日時を保存します。どちらも業務データのJSONには含みません。
 
 編集下書きは`municipal-toolbox:draft:v1:<toolId>`に1件保存します。schemaVersionは1で、toolId、section、id、base、values、updatedAtを持ちます。idは元の記録IDまたはnull、baseは編集開始時の記録をJSON化した文字列またはnull、valuesは項目名と文字列・真偽値の対応、updatedAtはISO日時です。下書きは600,000文字以内、valuesは40項目以内、文字列値は50,000文字以内です。記録の確定時に削除し、保存失敗時は保持します。通常のJSON・CSV・印刷には含めず、専用のJSON書出し・読込みで移行します。通常のJSON読込み・全削除でも下書きは保持し、専用操作で削除します。
 
@@ -12,7 +12,7 @@ CSV読込みでは追加と、管理番号で照合する追加・更新を選�
 
 CSV内の管理番号重複、列数不一致、必須欄や日付などの不正が1件でもあれば取り込みません。追加モードでは既存台帳との管理番号重複も拒否します。取込み後の件数・JSON容量の上限を検証し、新規備品にはIDを発行します。更新する備品のID・管理番号の表記・不明なキー、メモ、CSVにない備品は保持します。CSV出力時の数式対策アポストロフィは既定で保持し、明示選択時だけ対象パターンの先頭1文字を除きます。
 
-## 異動引継ぎノートv1.2.0
+## 異動引継ぎノートv1.3.0
 
 保存キーは`municipal-toolbox:data:v2:handover-note`です。ブラウザ内保存とバックアップは同じJSON形式です。保存時に`exportedAt`を更新します。HTMLファイル自体にはデータを書き込みません。
 
@@ -82,7 +82,7 @@ CSV内の管理番号重複、列数不一致、必須欄や日付などの不�
 
 破損した保存データは自動で上書きしません。利用者が有効なJSONの読込みを確定するか、全削除を実行するまで保護します。全削除では有効な空データを新キーに保存し、旧メモの再移行を防ぎます。旧版の領域と書き出したJSONは残します。
 
-## 備品管理台帳v1.2.0
+## 備品管理台帳v1.3.0
 
 保存キーは`municipal-toolbox:data:v2:equipment-manager`です。旧キーは`municipal-toolbox:preview:v1:equipment-manager`です。
 
@@ -140,6 +140,39 @@ CSV列は「管理番号、備品名、カテゴリ、設置場所、購入日�
 
 CSVの更新では既存の管理番号をNFKC・前後空白除去・英字小文字化で照合し、既存IDと管理番号の表記を保持します。CSV内の重複番号は拒否します。選択された列だけを更新し、選択された列の空欄は空値へ変更します。未選択列、CSVにない備品、メモ、未知の拡張項目を保持します。変更前後と件数を確認して反映し、その間に画面内または保存先の台帳が変わった場合は再検証を求めます。
 
-## 他の6種類の配布確認版の保存
+## 貸出・消耗品・カレンダー・会議・問い合わせ・イベントの保存
+
+6ツールのv1.0.0は`municipal-toolbox:data:v2:{toolId}`に保存します。schemaVersionは2です。共通項目は`toolId`、`text`、`sections`、保存時の`exportedAt`です。各分類は記録の配列で、記録に`id`と下表の項目を持ちます。既知の分類配列は必須です。
+
+| toolId | 分類ID | id以外の項目 |
+| --- | --- | --- |
+| lending-manager | assets | assetNumber, name, location, notes |
+| lending-manager | borrowers | name, department, contact, notes |
+| lending-manager | loans | assetId, borrowerId, loanDate, dueDate, returnedAt, notes |
+| inventory-manager | items | code, name, unit, initialQuantity, minimum, location, notes |
+| inventory-manager | movements | itemId, date, direction, quantity, person, notes |
+| annual-calendar | events | title, date, time, kind, owner, location, details |
+| meeting-minutes | meetings | title, date, time, location, attendees, agenda, notes, decisions |
+| meeting-minutes | todos | meetingId, title, owner, dueDate, status, notes |
+| inquiry-log | inquiries | receivedAt, category, content, owner, answer, status |
+| event-manager | events | title, date, time, location, owner, purpose |
+| event-manager | tasks | eventId, title, owner, dueDate, status, notes |
+| event-manager | participants | eventId, name, organization, status, notes |
+| event-manager | materials | eventId, title, location, owner, notes |
+| event-manager | checklist | eventId, title, owner, dueDate, status, notes |
+
+`id`は分類内で一意の英数字・ハイフン・アンダースコア1〜100文字で、新規登録時はUUIDを発行します。項目値は文字列です。1行入力は500文字、管理番号・品目コードは100文字、複数行は20,000文字、共通メモは50,000文字までです。記録数は既知の全分類を合計して3,000件、JSONの読込み・整形後の書出しはUTF-8で10MiB（画面表記は10MB）以内です。任意文字列の欠損は空文字へ補います。
+
+数値項目もJSONには文字列で保存します。初期在庫・最低在庫は0〜1,000,000,000、入出庫数量は1〜1,000,000,000の整数です。小数・負数・数値型を拒否します。入出庫を日付順、同日分は配列順に計算し、途中の在庫も0〜1,000,000,000に収まる必要があります。
+
+日付は実在する`YYYY-MM-DD`、時刻は空文字または`HH:mm`です。参照IDは対応する分類に存在する必要があり、参照されている記録は削除できません。備品管理番号・品目コードは全角半角・前後空白・英字大小を正規化して重複を拒否します。貸出は未返却の同一備品を重複登録できず、返却予定日・返却日は貸出日以降です。延滞は、未返却で返却予定日が利用端末の今日より前の記録です。
+
+状態や種別は各`config.ts`の選択肢に限定し、欠損時は先頭の選択肢を補います。会議TODO・イベントタスクは未着手／対応中／完了、問い合わせは未対応／対応中／完了、当日確認は未確認／完了です。参加者は出席予定／出席／欠席、予定種別は定例業務／イベント、入出庫は入庫／出庫です。
+
+ルート・分類・記録の不明なキーは保持します。schemaVersion 1はメモを検証して新形式へ移し、元データ全体を`legacyBackup`に保持します。旧保存領域も変更しません。破損した保存データは通常編集では上書きせず、有効なJSONの明示的な読込みか全削除で初期化します。保存失敗や競合時の画面内データはJSONへ書き出せます。
+
+下書きと書出し日時には既存の共通形式を使います。専用デモページは`#sample`で起動するツールをsandbox内に表示し、通常のlocalStorageを参照できない状態にします。編集はメモリ内で処理します。子画面から親画面に送る通知はダイアログ表示を知らせる固定文字列だけで、入力内容は含めません。
+
+## 旧配布確認版の保存
 
 保存キーは`municipal-toolbox:preview:v1:{toolId}`です。schemaVersionは1、メモは50,000文字までです。JSONの読込み・書出し上限は1MiB（画面表記は1MB）です。ツールID・形式・文字数・容量を検証し、不明なキーは保存し直すときも保持します。別の画面で保存内容が変更された場合は上書きと削除を止めます。

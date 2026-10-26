@@ -23,10 +23,13 @@ async function inlineCss(text, directory) {
 for (const tool of tools) {
   let toolTemplate = template;
   let toolCss = css;
+  let toolConfig = {};
   let script = runtime.replace('/* CONFIG */ {}', JSON.stringify({ id: tool.id, name: tool.name }).replaceAll('<', '\\u003c')).replace('/* BACKUP_HELPERS */', (helpers + '\n' + commonModules[6]).replace(/^export /gm, ''));
   if (tool.status === 'ready') {
-    const directory = new URL('../tools-src/' + tool.id + '/', import.meta.url);
-    const sources = await Promise.all(['template.html', 'style.css', 'model.ts', 'runtime.ts', 'sample.json'].map(name => readFile(new URL(name, directory), 'utf8')));
+    const specialized = ['handover-note','equipment-manager'].includes(tool.id);
+    const directory = new URL('../tools-src/' + (specialized ? tool.id : 'business') + '/', import.meta.url);
+    if (!specialized) toolConfig = (await import(new URL('../tools-src/' + tool.id + '/config.ts',import.meta.url))).default;
+    const sources = await Promise.all(['template.html', 'style.css', 'model.ts', 'runtime.ts', 'sample.json'].map(name => readFile(name === 'sample.json' ? new URL('../tools-src/' + tool.id + '/sample.json',import.meta.url) : new URL(name, directory), 'utf8')));
     [toolTemplate, toolCss] = sources;
     toolCss = await inlineCss(toolCss, directory);
     const extensions = await Promise.all((tool.id === 'equipment-manager' ? ['csv.ts','csv-runtime.ts'] : tool.id === 'handover-note' ? ['examples.ts'] : []).map(name => readFile(new URL(name,directory),'utf8')));
@@ -44,8 +47,8 @@ for (const tool of tools) {
   toolCss += '\n' + shellCss;
   toolTemplate = toolTemplate.replace('</head>', '<script>' + themeInit + '</script></head>');
   if (tool.status === 'ready') toolTemplate = toolTemplate.replace('<body>', '<body><span id="sample" hidden></span>');
-  const replacements = { NAME: escapeHtml(tool.name), VERSION: tool.version, CSS: toolCss, SCRIPT: script };
-  const html = toolTemplate.replace(/\{\{(NAME|VERSION|CSS|SCRIPT)\}\}/g, (_, key) => replacements[key]);
+  const replacements = { NAME: escapeHtml(tool.name), VERSION: tool.version, CSS: toolCss, SCRIPT: script, CONFIG: JSON.stringify(toolConfig).replaceAll('<','\\u003c') };
+  const html = toolTemplate.replace(/\{\{(NAME|VERSION|CSS|SCRIPT|CONFIG)\}\}/g, (_, key) => replacements[key]);
   if (/\{\{\w+\}\}/.test(html)) throw new Error('Unresolved template token: ' + tool.id);
   const bytes = Buffer.from(html, 'utf8');
   await writeFile(new URL(tool.id + '.html', output), bytes);

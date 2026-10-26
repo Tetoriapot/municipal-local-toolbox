@@ -16,6 +16,12 @@ export function action(text: string, handler: () => void, className = 'secondary
   return button;
 }
 export function trapDialogFocus(modal: HTMLDialogElement) {
+  if (window.self !== window.top) {
+    const observer = new MutationObserver(() => {
+      if (modal.open) window.parent.postMessage('municipal-toolbox:demo-dialog-open', '*');
+    });
+    observer.observe(modal, { attributes: true, attributeFilter: ['open'] });
+  }
   modal.addEventListener('keydown', event => {
     if (event.key !== 'Tab') return;
     const controls = [...modal.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href]')].filter(control => control.getClientRects().length > 0);

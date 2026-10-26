@@ -35,12 +35,36 @@ const definitions = [
 ] satisfies Array<Pick<Tool, 'id' | 'name' | 'description' | 'summary' | 'category' | 'icon' | 'tags' | 'features' | 'useCases'>>;
 
 const releases: Partial<Record<string, { version: string; status: Tool['status']; implementation: NonNullable<Tool['implementation']> }>> = {
-  'handover-note': { version: '1.2.0', status: 'ready', implementation: {
+  'event-manager': {version:'1.0.0',status:'ready',implementation:{
+    featureNote:'イベント基本情報、準備タスクと担当・締切、参加者、資料の保存場所、当日チェックリストを登録・編集・削除できます。イベントや状態で絞り込めます。',
+    storageDescription:'全イベントと関連記録・メモをJSONで保存・復元します。旧版のメモ・JSON、不明な項目を保持します。下書きは専用JSONで移行できます。',printLabel:'全イベント・関連記録・表示中の一覧の印刷',extraOutputs:[],
+  }},
+  'inquiry-log': {version:'1.0.0',status:'ready',implementation:{
+    featureNote:'受付日・分類・内容・対応者・回答・状態を登録・編集・削除できます。全項目の検索、状態の絞り込み、表示条件に合う全件のCSV出力に対応します。',
+    storageDescription:'問い合わせ記録とメモをJSONで保存・復元できます。旧版のメモ・JSONと不明な項目を保持します。CSVは一覧の出力用です。',printLabel:'全記録・表示条件に合う問い合わせの印刷',extraOutputs:['表示条件に合う全件のCSV出力'],
+  }},
+  'meeting-minutes': {version:'1.0.0',status:'ready',implementation:{
+    featureNote:'会議名・日時・場所・出席者・議題・メモ・決定事項を登録できます。会議に関連付けたTODOに担当・締切・状態を記録し、会議や状態で絞り込めます。',
+    storageDescription:'議事録・TODO・メモをまとめてJSONで保存・復元します。旧版のメモ・JSON、不明な項目を保持します。下書きの専用JSON移行にも対応します。',printLabel:'議事録・TODO・表示条件に合う一覧の印刷',extraOutputs:[],
+  }},
+  'annual-calendar': {version:'1.0.0',status:'ready',implementation:{
+    featureNote:'定例業務・イベントを日付、時刻、担当、場所とともに登録・編集・削除できます。月・月曜始まりの週・4月始まりの年度一覧、検索と種別の絞り込みに対応します。',
+    storageDescription:'全予定とメモをブラウザ内に保存し、JSONで書出し・復元できます。旧版のメモ・JSONも移行します。下書きは専用JSONで移行できます。',printLabel:'全予定・表示期間と条件に合う予定の印刷',extraOutputs:[],
+  }},
+  'inventory-manager': { version:'1.0.0',status:'ready',implementation:{
+    featureNote:'品目・初期在庫・最低在庫と入出庫記録を登録・編集・削除できます。現在庫を計算し、最低在庫を下回る品目を表示します。負の在庫になる変更と、履歴がある品目の削除を防ぎます。',
+    storageDescription:'品目・入出庫履歴・メモをJSONで書出し・復元できます。旧版のメモ・JSON、不明な項目を保持します。下書きの保存と専用JSONによる移行にも対応します。',printLabel:'品目・在庫・入出庫履歴の印刷',extraOutputs:[],
+  }},
+  'lending-manager': { version: '1.0.0', status: 'ready', implementation: {
+    featureNote:'備品と貸出者の登録・編集・削除、貸出登録、返却日入力、延滞表示、履歴の検索と絞り込みに対応しています。貸出中の備品の二重貸出と、履歴が参照する備品・貸出者の削除を防ぎます。',
+    storageDescription:'全記録とメモをブラウザ内に保存し、JSONで書出し・復元できます。配布確認版のメモ・JSONを移行し、不明な項目も保持します。下書きは専用JSONで移行できます。',printLabel:'全記録・表示条件に合う一覧の印刷',extraOutputs:[],
+  } },
+  'handover-note': { version: '1.3.0', status: 'ready', implementation: {
     featureNote: '6分類の記録を登録・編集・削除できます。分類別の記入例、申し送り事項・チェックリストの期限順表示、直前の削除の取消に対応しています。年間予定は4月から翌年3月の月別表示です。完成度は、登録した記録のうち確認済みにした割合を表示します。',
     storageDescription: 'すべての記録と基本情報・メモをブラウザ内に保存し、JSONで書き出せます。配布確認版のメモとJSONも読み込めます。下書きの移行には専用のJSONを使用します。',
     printLabel: '全記録・表示中の一覧の印刷', extraOutputs: [],
   } },
-  'equipment-manager': { version: '1.2.0', status: 'ready', implementation: {
+  'equipment-manager': { version: '1.3.0', status: 'ready', implementation: {
     featureNote: '備品の管理番号、備品名、カテゴリ、設置場所、購入日、状態、備考、棚卸確認日・確認者・差異メモを登録・編集・削除できます。検索・絞り込み・並び替えと、全件または絞り込み結果のCSV出力と、変更前後を確認するCSV追加・更新に対応しています。直前の削除・CSV反映は、別の変更を行う前なら取り消せます。',
     storageDescription: '全備品とメモをブラウザ内に保存し、JSONで書き出せます。配布確認版のメモとJSONも読み込めます。CSVから備品を追加・更新できます。下書きは専用のJSONで書出し・読込みができます。メモ・ID・拡張項目を含む復元にはJSONを使用してください。',
     printLabel: '全データ・絞り込み結果の印刷', extraOutputs: ['全件・絞り込み結果のCSV出力'],
@@ -48,10 +72,10 @@ const releases: Partial<Record<string, { version: string; status: Tool['status']
 };
 
 export const tools: Tool[] = definitions.map((tool, order) => ({
-  ...tool, order, version: '0.1.2-preview', createdAt: '2026-10-05', updatedAt: '2026-10-26', status: 'preview',
+  ...tool, order, version: '0.1.2-preview', createdAt: '2026-10-05', updatedAt: '2026-10-27', status: 'preview',
   ...releases[tool.id],
   downloads: { txt: `/downloads/${tool.id}.txt`, html: `/downloads/${tool.id}.html` },
-  demo: releases[tool.id] ? `/downloads/${tool.id}.html#sample` : null, network: false, account: false, externalLibrary: false,
+  demo: releases[tool.id] ? `/demo/${tool.id}/` : null, network: false, account: false, externalLibrary: false,
 }));
 
-export const distributionSummary = tools.filter(tool => tool.status === 'ready').map(tool => tool.name).join('、') + 'は業務機能を実装済みです。他の' + tools.filter(tool => tool.status === 'preview').length + '件は配布確認版です。';
+export const distributionSummary = tools.every(tool=>tool.status==='ready') ? '全8ツールの業務機能を実装済みです。各ツールを架空データ付きのデモで試せます。' : tools.filter(tool => tool.status === 'ready').map(tool => tool.name).join('、') + 'は業務機能を実装済みです。他の' + tools.filter(tool => tool.status === 'preview').length + '件は配布確認版です。';

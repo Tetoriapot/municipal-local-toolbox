@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {tools} from '../../data/tools';
+import {url} from '../../lib/paths';
+export function getStaticPaths(){return tools.map(tool=>({params:{id:tool.id},props:{tool}}));}
+const {tool}=Astro.props;
+const source=url(`/downloads/${tool.id}.html#sample`);
+---
+<BaseLayout title={`${tool.name}のデモ`} noindex>
+  <div class="demo-page"><nav class="breadcrumb" aria-label="パンくず"><a href={url('/')}>ホーム</a><a href={url('/demo/')}>デモ一覧</a><span aria-current="page">{tool.name}</span></nav>
+  <div class="demo-heading"><div><span class="eyebrow">DEMO · v{tool.version}</span><h1>{tool.name}のデモ</h1></div><a class="button button-outline" href={url(`/tools/${tool.id}/`)}>機能・ダウンロード</a></div>
+  <div class="notice"><strong>これはデモ版です。入力内容は実際の業務には使用しないでください。</strong><p>架空データで操作を試せます。通常の保存データは変更しません。変更はこの画面内だけに保持し、再読込み・リセットで初期状態に戻ります。</p></div>
+  <div class="demo-toolbar"><button type="button" class="button button-outline" id="reset-demo" disabled>デモを初期状態に戻す</button><a class="text-link" href={source} target="_blank" rel="noopener">別画面で大きく開く</a><a class="text-link" href={url('/demo/')}>他のデモを選ぶ</a><span id="demo-load-status" role="status">プレビューを読み込んでいます。</span></div>
+  <iframe id="demo-frame" src={source} title={`${tool.name}の操作プレビュー`} sandbox="allow-scripts allow-forms allow-modals allow-downloads" referrerpolicy="no-referrer"></iframe>
+  <noscript><p>デモの操作にはJavaScriptが必要です。<a href={url(`/tools/${tool.id}/`)}>説明とダウンロード</a>はJavaScriptなしでも確認できます。</p></noscript>
+  </div>
+</BaseLayout>
+<style is:global>html:has(.demo-page){scroll-behavior:auto}</style>
+<style>.demo-page{max-width:1640px;margin:auto;padding:0 24px 40px}.demo-heading{display:flex;justify-content:space-between;align-items:center;gap:20px;margin:24px 0}.demo-heading h1{font-size:28px;margin:0}.demo-toolbar{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:20px 0}.demo-toolbar span{font-size:14px}iframe{display:block;width:100%;height:80vh;min-height:680px;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg)}@media(max-width:700px){.demo-page{padding:0 12px 28px}.demo-heading{align-items:start;flex-direction:column}.demo-heading h1{font-size:23px}.demo-toolbar{gap:12px}iframe{height:85vh;min-height:600px}}</style>
+<script>
+  let frame=document.querySelector<HTMLIFrameElement>('#demo-frame');
+  const reset=document.querySelector<HTMLButtonElement>('#reset-demo');
+  const status=document.querySelector<HTMLElement>('#demo-load-status');
+  if(frame&&reset&&status){
+    reset.disabled=false;
+    function observe(target:HTMLIFrameElement){
+      target.addEventListener('load',()=>{status!.textContent='プレビューを表示しました。';});
+      target.addEventListener('error',()=>{status!.textContent='プレビューを読み込めません。「別画面で大きく開く」をお試しください。';});
+    }
+    observe(frame);
+    window.addEventListener('message',event=>{if(event.source===frame?.contentWindow&&event.data==='municipal-toolbox:demo-dialog-open')frame.scrollIntoView({block:'start',behavior:'instant'});});
+    reset.addEventListener('click',()=>{if(!confirm('デモでの変更を破棄し、初期データに戻しますか？'))return;status.textContent='初期状態を読み込んでいます。';const next=frame!.cloneNode(false) as HTMLIFrameElement;observe(next);frame!.replaceWith(next);frame=next;});
+  }
+</script>

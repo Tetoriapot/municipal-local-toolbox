@@ -12,5 +12,5 @@ const { tool } = Astro.props;
   <p class="card-description">{tool.description}</p>
   <div class="tags">{tool.tags.slice(0, 3).map(tag => <span>{tag}</span>)}</div>
   <div class="card-meta"><span class:list={{ 'ready-label': tool.status === 'ready' }}>{tool.status === 'ready' ? '業務機能を実装済み' : '配布確認版'}</span><span><time datetime={tool.updatedAt}>{tool.updatedAt.replaceAll('-', '.')}</time> 更新</span></div>
-  <div class="card-bottom"><small>v{tool.version}</small><a href={url(`/tools/${tool.id}/`)} aria-label={`${tool.name}の詳細を見る`}>詳細を見る <Icon name="arrow" size={18} /></a></div>
+  <div class="card-bottom"><small>v{tool.version}</small>{tool.demo && <a href={url(tool.demo)} aria-label={`${tool.name}のデモを開く`}>デモ</a>}<a href={url(`/tools/${tool.id}/`)} aria-label={`${tool.name}の詳細を見る`}>詳細を見る <Icon name="arrow" size={18} /></a></div>
 </article>

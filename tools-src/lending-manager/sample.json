@@ -1,0 +1,8 @@
+{
+  "schemaVersion":2,"toolId":"lending-manager","text":"架空の備品貸出台帳です。備品・貸出者・履歴の操作を試せます。","sampleData":true,
+  "sections":{
+    "assets":[{"id":"asset-1","assetNumber":"PJ-001","name":"会議用プロジェクター（例）","location":"総務課棚A"},{"id":"asset-2","assetNumber":"PC-002","name":"貸出用パソコン（例）","location":"総務課棚B"}],
+    "borrowers":[{"id":"borrower-1","name":"窓口担当（架空）","department":"市民課","contact":"内線0000"}],
+    "loans":[{"id":"loan-1","assetId":"asset-1","borrowerId":"borrower-1","loanDate":"2026-10-01","dueDate":"2026-10-10","notes":"庁内研修（例）"},{"id":"loan-2","assetId":"asset-2","borrowerId":"borrower-1","loanDate":"2026-09-01","dueDate":"2026-09-05","returnedAt":"2026-09-05"}]
+  }
+}

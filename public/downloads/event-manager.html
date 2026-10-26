@@ -1,12 +1,147 @@
 <!doctype html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; object-src 'none'; base-uri 'none'; form-action 'none'">
-<meta name="referrer" content="no-referrer">
-<title>イベント進行管理（配布確認版）</title>
-<style>:root{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Yu Gothic UI','Yu Gothic',Meiryo,sans-serif;color:#202938;background:#f5f7fa;font-size:16px;line-height:1.8}*{box-sizing:border-box}body{margin:0}header{padding:24px 36px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:2px solid #cfd6df;background:white}.brand{font-size:12px;color:#667085}h1{font-size:25px;margin:4px 0;line-height:1.6}h1 small{font-size:13px;color:#79632f;margin-left:8px}#save-status{font-size:13px;border:1px solid #cfd6df;border-radius:5px;padding:7px 14px;white-space:nowrap}.unsaved{color:#b42318;background:#fff2ee}.layout{max-width:1300px;margin:auto;display:grid;grid-template-columns:200px 1fr}nav{display:flex;flex-direction:column;padding:26px 20px;gap:10px}nav a{padding:10px 14px;color:#2457a6;text-decoration:none;border-radius:4px}nav a:hover{background:#e7eef9}nav span{font-size:12px;color:#667085;padding:12px 14px}main{background:white;padding:30px 40px;min-width:0}.notice,.warning{background:#fffbef;border:1px solid #dbcca8;border-left:4px solid #a0782d;padding:15px 20px;color:#705e39;font-size:14px}.notice p{margin:7px 0 0}h2{font-size:22px;margin:28px 0 12px}p{margin:0 0 16px}label{display:block;font-weight:700;margin-bottom:9px}label span,.muted{font-weight:400;color:#667085;font-size:13px}textarea{display:block;width:100%;min-height:250px;padding:16px;border:1px solid #aab9cd;border-radius:5px;resize:vertical;font:inherit;line-height:1.8;color:#202938}.muted{margin:6px 0 25px}.actions{display:flex;gap:12px;flex-wrap:wrap}button{font:inherit;font-size:14px;padding:12px 18px;min-height:46px;border:1px solid #2457a6;border-radius:4px;background:#2457a6;color:white;cursor:pointer}.secondary{background:white;color:#2457a6}.danger{background:white;color:#b42318;border-color:#c99692;font-size:13px}button:hover{filter:brightness(.94)}:focus-visible{outline:3px solid #b76a00;outline-offset:3px}section{border-top:1px solid #cfd6df;padding-bottom:26px}#feedback{margin-top:12px;color:#3e5a74;font-size:14px;overflow-wrap:anywhere}details{border:1px solid #cfd6df;border-radius:4px;margin-bottom:12px}summary{padding:12px 16px;font-weight:650;cursor:pointer;min-height:48px}details p{padding:0 16px;font-size:14px}footer{text-align:center;padding:20px;color:#667085;font-size:12px}.skip{position:absolute;top:-100px;left:20px;padding:10px;background:white;color:#2457a6}.skip:focus{top:10px}#print-text{display:none}@media(max-width:700px){header{padding:20px;display:block}h1{font-size:22px}#save-status{display:inline-block;margin-top:12px}.layout{display:block}nav{flex-direction:row;flex-wrap:wrap;padding:12px;gap:4px}nav span{display:none}main{padding:22px}button{width:100%}nav a{padding:9px 12px;font-size:14px}}@media print{header{padding:0;display:block}header small,#save-status,nav,.notice,.warning,label,textarea,.muted,#data,#help,footer,.skip{display:none!important}.layout{display:block}main{padding:0}#print-text{display:block;white-space:pre-wrap;overflow-wrap:anywhere}body{background:white}h1{font-size:20px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+<html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; object-src 'none'; base-uri 'none'; form-action 'none'"><meta name="referrer" content="no-referrer"><title>イベント進行管理</title><style>:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Yu Gothic UI', 'Yu Gothic', Meiryo, sans-serif;
+  color: #202938; background: #f5f7fa; font-size: 16px; line-height: 1.8;
+  --primary: #2457a6; --border: #cfd6df; --muted: #53647a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+h1, h2, h3, h4 { line-height: 1.5; margin-top: 0; }
+h1 { font-size: 26px; margin: 3px 0 0; }
+h1 small { font-size: 13px; font-weight: 400; color: var(--muted); }
+h2 { font-size: 25px; margin-bottom: 12px; }
+h3 { font-size: 19px; margin-bottom: 12px; }
+h4 { font-size: 17px; }
+p { margin: 0 0 16px; }
+button, input, select, textarea { font: inherit; }
+input:not([type=checkbox]), select, textarea { width: 100%; min-height: 46px; border: 1px solid #aab9cd; border-radius: 5px; padding: 9px 12px; color: #202938; background: white; }
+textarea { resize: vertical; min-height: 110px; }
+input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--primary); flex-shrink: 0; }
+label { display: block; font-size: 15px; font-weight: 600; }
+label > input, label > select, label > textarea { margin-top: 6px; }
+button { min-height: 44px; border: 1px solid var(--primary); border-radius: 5px; background: var(--primary); padding: 9px 16px; color: white; cursor: pointer; line-height: 1.6; }
+button:hover { background: #173d78; color: white; }
+button:active { background: #102d5d; }
+button:disabled { cursor: not-allowed; background: #e7ebf0; border-color: #cfd6df; color: #586679; }
+.secondary { background: white; color: #2457a6; border-color: #aabbd1; }
+.danger { background: white; color: #b42318; border-color: #bc6e67; }
+.danger:hover { background: #b42318; color: white; }
+:focus-visible { outline: 3px solid #a66b00; outline-offset: 3px; }
+.skip { position: absolute; top: -100px; left: 20px; background: white; padding: 12px; z-index: 5; }
+.skip:focus { top: 8px; }
+.app-header { background: white; border-bottom: 2px solid var(--border); padding: 21px 32px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.brand { color: var(--muted); font-size: 12px; }
+.header-actions { display: flex; align-items: center; gap: 14px; }
+#save-status { border: 1px solid var(--border); padding: 7px 12px; border-radius: 4px; font-size: 13px; }
+#save-status.unsaved { background: #fff3ef; color: #a92217; border-color: #bf796e; }
+.workspace { display: grid; grid-template-columns: 224px minmax(0, 1fr); max-width: 1440px; margin: auto; }
+#navigation { padding: 25px 16px; display: flex; flex-direction: column; gap: 7px; align-self: start; }
+#navigation button { background: transparent; border-color: transparent; color: #3b506e; text-align: left; font-size: 15px; }
+#navigation button:hover { background: #e8eff9; }
+#navigation button[aria-current=page] { background: #e5edfa; color: #173d78; border-color: #becfea; font-weight: 700; }
+main { padding: 30px 34px 45px; background: white; min-width: 0; min-height: 70vh; }
+main:focus { outline: none; }
+.muted { color: var(--muted); font-size: 14px; }
+.eyebrow { color: var(--muted); font-size: 12px; font-weight: 650; }
+.section-title { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+.section-title > div { min-width: 0; }
+.section-title button { flex-shrink: 0; }
+.section-title h2 { margin-bottom: 7px; }
+.local-label { font-size: 12px; border: 1px solid #c6dacf; background: #f1f8f4; color: #28613f; padding: 5px 10px; border-radius: 4px; }
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px; }
+.summary-grid button { background: #f6f8fc; border-color: #cbd7e6; color: #29486f; text-align: left; padding: 17px 20px; }
+.summary-grid strong { display: block; font-size: 27px; line-height: 1.5; }
+.summary-grid span { font-size: 13px; }
+.summary-grid button:hover { background: #e8effa; }
+.progress-panel, .content-panel { padding: 23px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 22px; }
+.progress-panel > div:first-child { display: flex; align-items: center; gap: 15px; justify-content: space-between; }
+.progress-panel h3 { margin-bottom: 0; }
+.progress-panel strong { color: #2457a6; }
+progress { width: 100%; accent-color: #2457a6; height: 13px; margin: 18px 0 9px; }
+.progress-panel p { font-size: 13px; color: var(--muted); }
+.completion-sections { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 13px; color: #465c78; }
+.field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
+.field-grid .wide { grid-column: 1 / -1; }
+.required { font-size: 12px; color: #a4271d; margin-left: 8px; }
+.list-toolbar { display: flex; align-items: end; gap: 16px; margin-bottom: 18px; }
+.list-toolbar label:first-child { flex: 1; }
+.record-card { padding: 21px; border: 1px solid #cbd7e4; border-radius: 6px; margin-bottom: 14px; break-inside: avoid; }
+.record-top { display: flex; align-items: start; justify-content: space-between; gap: 20px; }
+.record-top h3 { margin: 0 0 8px; overflow-wrap: anywhere; }
+.record-category { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.record-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.record-actions button { font-size: 13px; min-height: 44px; padding: 7px 12px; }
+.check-field { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; font-weight: 400; cursor: pointer; }
+.check-field input { margin: 0; }
+.record-card dl { display: grid; grid-template-columns: 155px minmax(0, 1fr); margin: 15px 0; font-size: 14px; gap: 8px 15px; }
+dt { color: #53647a; }
+dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.empty { border: 1px dashed #b3c4d9; border-radius: 5px; padding: 26px 22px; background: #f8fafd; color: #4f617b; }
+.month-heading { padding: 10px 15px; background: #edf2f9; color: #274c7a; border-left: 3px solid #2457a6; margin: 25px 0 14px; font-size: 18px; }
+.warning { padding: 17px 20px; border: 1px solid #cebb93; border-left: 4px solid #a37b26; background: #fffbef; color: #6e5422; margin-bottom: 20px; font-size: 14px; }
+.feedback { color: #244f70; overflow-wrap: anywhere; font-size: 14px; }
+.feedback:empty { display: none; }
+.feedback.error, #form-error, #clear-error { color: #a92217; }
+.danger-panel { border-color: #d3aba5; }
+.action-bar { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; background: #edf2f7; padding: 18px 24px; border-top: 1px solid var(--border); }
+.action-bar button { font-size: 14px; }
+dialog { width: min(760px, calc(100% - 28px)); max-height: calc(100dvh - 36px); overflow: auto; border: 1px solid #aebed1; border-radius: 8px; padding: 27px; color: #202938; }
+dialog::backdrop { background: #14263f90; }
+.dialog-heading { display: flex; justify-content: space-between; align-items: start; gap: 15px; }
+.dialog-heading h2 { font-size: 23px; }
+.dialog-actions { display: flex; gap: 10px; margin-top: 22px; }
+#edit-fields { margin-bottom: 22px; }
+#form-error, #clear-error { margin-top: 12px; }
+#print-area { display: none; }
+@media (max-width: 1000px) {
+  .workspace { grid-template-columns: 190px minmax(0, 1fr); }
+  main { padding: 24px; }
+  .app-header { padding: 20px 24px; }
+  .header-actions { flex-wrap: wrap; justify-content: flex-end; }
+  .record-top { flex-wrap: wrap; gap: 8px; }
+  .record-card dl { grid-template-columns: 125px minmax(0, 1fr); }
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .section-title { flex-wrap: wrap; }
+}
+@media (max-width: 700px) {
+  .app-header { display: block; padding: 18px; }
+  h1 { font-size: 23px; }
+  .header-actions { margin-top: 15px; justify-content: space-between; }
+  .workspace { display: block; }
+  #navigation { display: grid; grid-template-columns: repeat(2, 1fr); padding: 13px; gap: 5px; }
+  #navigation button { font-size: 14px; }
+  main { padding: 23px 18px; }
+  .field-grid, .completion-sections { grid-template-columns: 1fr; }
+  .list-toolbar { flex-wrap: wrap; }
+  .list-toolbar label:first-child { flex-basis: 100%; }
+  .record-card { padding: 17px; }
+  .record-card dl { display: block; }
+  dt { margin: 12px 0 3px; font-weight: 600; }
+  .progress-panel, .content-panel { padding: 18px; }
+  .progress-panel > div:first-child { display: block; }
+  .progress-panel strong { display: block; margin-top: 8px; }
+  .action-bar { display: grid; grid-template-columns: 1fr; padding: 18px; }
+  dialog { padding: 20px; }
+  .dialog-actions { flex-wrap: wrap; }
+}
+@media print {
+  body { background: white; color: black; font-size: 11pt; }
+  .app-header, .workspace, .action-bar, .skip, dialog { display: none !important; }
+  #print-area { display: block; }
+  #print-area h1 { font-size: 19pt; }
+  #print-area h2 { margin-top: 25px; font-size: 15pt; border-bottom: 1px solid #aaa; padding-bottom: 8px; }
+  #print-area h3 { font-size: 13pt; }
+  #print-area .record-card { border: 1px solid #aaa; padding: 12px; }
+  #print-area .print-memo { white-space: pre-wrap; overflow-wrap: anywhere; }
+  #print-area .record-card dl { display: block; font-size: 10pt; }
+  #print-area dt { margin-top: 7px; font-weight: bold; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+#section-navigation{display:contents}.record-filters{display:flex;gap:16px;align-items:end;flex-wrap:wrap;margin-bottom:20px}.record-filters label{flex:1;min-width:180px}.record-filters label input,.record-filters label select{display:block;width:100%}.record-card dl{display:grid;grid-template-columns:minmax(100px,180px) minmax(0,1fr);gap:5px 16px}.record-card dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.record-card dt{font-weight:650}.record-card .record-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.record-state{font-weight:650}.pagination{display:flex;gap:12px;justify-content:center;align-items:center;margin:20px 0}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.calendar-day{border:1px solid var(--border);padding:10px;min-height:120px;border-radius:4px}.calendar-day h3{font-size:15px;margin:0 0 8px}.calendar-day button{display:block;width:100%;min-width:0;margin:6px 0;text-align:left;overflow-wrap:anywhere}.calendar-empty{background:transparent}.calendar-period{grid-column:1/-1}#calendar-grid:empty{display:none}#record-list .record-card{margin-bottom:16px}@media(max-width:700px){.calendar-grid{grid-template-columns:1fr}.calendar-empty{display:none}.calendar-day{min-height:0}.record-card dl{grid-template-columns:1fr}.record-card dd{margin-bottom:10px}.record-filters label{min-width:100%;}.pagination{flex-wrap:wrap}}@media print{#calendar-grid,.pagination,#section-navigation{display:none!important}.record-card{break-inside:avoid}.record-card dd{white-space:pre-wrap}}
 
 :root { color-scheme: light; }
 .header-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:8px; }
@@ -41,8 +176,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
 }
 @media print { .storage-strip,.header-actions,.sample-banner,.draft-panel,dialog { display:none!important; } }
 .csv-change{border:1px solid #aabbd1;border-radius:6px;padding:12px;margin-block:12px;min-width:0}.csv-change-table{width:100%;table-layout:fixed;border-collapse:collapse}.csv-change-table th,.csv-change-table td{padding:8px;border:1px solid #aabbd1;vertical-align:top;overflow-wrap:anywhere}.csv-value{max-height:12rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}.csv-change h3{overflow-wrap:anywhere}#csv-page{align-self:center}
-</style>
-<script>(() => {
+</style><script>(() => {
   const key = 'municipal-toolbox:theme:v1';
   const media = matchMedia('(prefers-color-scheme: dark)');
   let choice = null;
@@ -73,183 +207,1091 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
   });
 })();
 </script></head>
-<body>
-<a class="skip" href="#main">本文へ移動</a>
-<header><div><span class="brand">自治体ローカルツール箱</span><h1>イベント進行管理 <small>配布確認版</small></h1></div><span id="save-status" role="status" aria-live="polite">保存状態を確認中</span></header>
-<div class="layout"><nav aria-label="ツールメニュー"><a href="#main">メモ</a><a href="#data">データ管理</a><a href="#help">ヘルプ</a><span>v0.1.2-preview</span></nav>
-<main id="main"><noscript><p class="warning">このツールの保存・バックアップにはJavaScriptが必要です。JavaScriptが無効な間、入力内容は保存されません。</p></noscript><div class="notice"><strong>このファイルは配布・保存の動作確認用です。</strong><p>イベント進行管理の業務機能は今後実装します。実際の業務データは入力しないでください。入力内容を外部へ送信する機能はありません。</p></div>
-<h2>確認用メモ</h2><p>テスト用の文章を入力し、保存やバックアップの動作を確認してください。</p><label for="memo">メモ <span>（50,000文字まで）</span></label><textarea id="memo" rows="14" maxlength="50000" placeholder="動作確認用のメモを入力してください"></textarea><div id="print-text"></div><p class="muted" id="count">0 / 50,000文字</p>
-<section id="data"><h2>データ管理</h2><p>ブラウザ内の保存とは別に、JSONファイルを書き出して保管してください。</p><div class="actions"><button type="button" id="export">バックアップを書き出す</button><button type="button" class="secondary" id="import">バックアップを読み込む</button><button type="button" class="secondary" id="print">印刷</button></div><input id="import-file" type="file" accept=".json,application/json" hidden><p id="feedback" role="status" aria-live="polite"></p><button type="button" id="clear" class="danger">すべてのデータを削除</button></section>
-<section id="help"><h2>ヘルプ</h2><details><summary>保存・バックアップについて</summary><p>メモは利用中のブラウザのlocalStorageに自動保存します。HTMLファイル自体には書き込みません。ブラウザの設定、データ削除、PC・ファイル名・保存場所の変更により、保存データを利用できなくなることがあります。</p><p>「未保存」と表示された場合は、閉じる前にJSONを書き出してください。読込みは現在のメモを置き換えます。同じツールのバックアップだけを読み込めます。</p><p>ダウンロードしたJSONは暗号化されません。所属組織で許可された場所に保管してください。</p></details><details><summary>安全な使い方</summary><p>この確認版は外部通信、アカウント、外部ライブラリを必要としません。個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。確認版には実際の業務データを入力しないでください。</p><p>主要な対応対象はMicrosoft Edge / Google Chromeの最新版です。Internet Explorerには対応しません。</p></details></section></main></div>
-<footer>単一HTML・外部通信なし ／ 配布確認版 v0.1.2-preview</footer>
-<script>(() => {
-  'use strict';
-  const config = {"id":"event-manager","name":"イベント進行管理"};
-  const MAX_TEXT_LENGTH = 50000;
-const MAX_FILE_BYTES = 1024 * 1024;
-
-function validateBackup(data, toolId) {
-  if (!data || typeof data !== 'object' || Array.isArray(data) || data.schemaVersion !== 1 || data.toolId !== toolId || typeof data.text !== 'string' || data.text.length > MAX_TEXT_LENGTH) {
-    throw new Error('同じツールの有効なバックアップを選択してください。メモは50,000文字までです。');
-  }
-  return data.text;
-}
-
-function makeBackup(toolId, text, exportedAt = new Date().toISOString(), original = {}) {
-  return { ...original, schemaVersion: 1, toolId, exportedAt, text };
-}
-
-function serializeBackup(data) {
-  const text = JSON.stringify(data, null, 2);
-  if (new TextEncoder().encode(text).length > MAX_FILE_BYTES) {
-    throw new Error('バックアップが1MBを超えるため反映できません。必要な内容を書き出し、メモを短くしてください。');
-  }
-  return text;
-}
-
-function backupComparison(name, fileName, before, after, exportedAt, sample = false) {
-  const date = typeof exportedAt === 'string' && Number.isFinite(Date.parse(exportedAt)) ? new Date(exportedAt).toLocaleString('ja-JP') : '未記録または不明';
-  const lines = ['JSON読込み前の確認', '対象ツール：' + name, 'ファイル：' + fileName, '書出し日時（JSONの記録）：' + date, '', '項目：現在 → 読込み後'];
-  for (const label of Object.keys(before)) lines.push(label + '：' + before[label].toLocaleString('ja-JP') + ' → ' + after[label].toLocaleString('ja-JP'));
-  if (sample) lines.push('', 'このJSONにはサンプルデータの印が付いています。');
-  lines.push('', '確定済みのデータを、読込み後の内容ですべて置き換えます。追加や結合ではありません。', '下書きは別に保持します。必要な確定済みデータはキャンセルして先にJSONへ書き出してください。', '', 'この内容で置き換えますか？');
-  return lines.join('\n');
-}
-
-  const key = 'municipal-toolbox:preview:v1:' + config.id;
-  const memo = document.getElementById('memo');
-  const saveStatus = document.getElementById('save-status');
-  const feedback = document.getElementById('feedback');
-  const fileInput = document.getElementById('import-file');
-  let protectedStorage = false;
-  let originalBackup = {};
-  let lastStoredRaw = null;
-  let importBusy = false;
-  let acceptedMemo = '';
-  function statusText(message, unsaved = false) {
-    saveStatus.textContent = message;
-    saveStatus.classList.toggle('unsaved', unsaved);
-  }
-  function refresh() {
-    document.getElementById('count').textContent = memo.value.length.toLocaleString('ja-JP') + ' / 50,000文字';
-    document.getElementById('print-text').textContent = memo.value;
-  }
-  function save() {
-    refresh();
-    if (protectedStorage) {
-      statusText('未保存：既存データを保護中', true);
-      return false;
+<body><span id="sample" hidden></span><a class="skip" href="#main">本文へ移動</a>
+<header class="app-header"><div><span class="brand">自治体ローカルツール箱</span><h1>イベント進行管理 <small>v1.0.0</small></h1></div><div class="header-actions"><span id="save-status" role="status" aria-live="polite">保存状態を確認中</span><button type="button" class="secondary" data-view="help">Help</button></div></header>
+<div class="workspace"><nav id="navigation" aria-label="ツールメニュー"><button type="button" data-view="home" aria-current="page">ホーム</button><div id="section-navigation"></div><button type="button" data-view="data">データ管理</button></nav>
+<main id="main" tabindex="-1"><noscript><p class="warning">JavaScriptが無効なため、登録・保存・読込みを利用できません。</p></noscript><div id="storage-warning" class="warning" hidden><p id="storage-message"></p><button type="button" class="secondary" id="reload-data">保存済みデータを読み直す</button></div><p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+<section data-panel="home"><h2>ホーム</h2><p id="description"></p><div id="summary" class="summary-grid"></div><div class="content-panel"><h3>メモ</h3><p>配布確認版のメモもここに引き継ぎます。</p><label for="memo">メモ（50,000文字まで）</label><textarea id="memo" rows="5" maxlength="50000"></textarea><p id="count" class="muted"></p></div></section>
+<section data-panel="records" hidden><div class="section-title"><h2 id="section-title"></h2><button type="button" id="add-record">新規登録</button></div><div class="record-filters"><label for="query">キーワード<input id="query" type="search" maxlength="200" placeholder="スペース区切りで検索"></label><label for="state-filter">表示条件<select id="state-filter"><option value="">すべて</option></select></label><label for="parent-filter" id="parent-filter-label" hidden>対象<select id="parent-filter"><option value="">すべて</option></select></label></div>
+<div id="calendar-controls" class="record-filters" hidden><label for="calendar-mode">表示<select id="calendar-mode"><option value="month">月表示</option><option value="week">週表示</option><option value="list">年度一覧（4月〜翌年3月）</option></select></label><label for="calendar-date">表示する日付<input id="calendar-date" type="date"></label><div class="dialog-actions"><button type="button" class="secondary" id="period-previous">前の期間</button><button type="button" class="secondary" id="period-next">次の期間</button></div></div>
+<p id="result-count" role="status"></p><p id="empty-state" class="empty" hidden>条件に一致する記録はありません。</p><div id="calendar-grid"></div><div id="record-list"></div><nav class="pagination" aria-label="一覧のページ"><button type="button" class="secondary" id="previous-page">前の50件</button><span id="page-number" role="status"></span><button type="button" class="secondary" id="next-page">次の50件</button></nav><button type="button" class="secondary" id="csv-current" hidden>表示条件に合う全件をCSV出力</button></section>
+<section data-panel="data" hidden><h2>データ管理</h2><div class="content-panel"><h3>保存と復元</h3><p>全分類とメモをJSONへ書き出せます。読込みは現在の確定済みデータ全体を置き換えます。必要な内容を先に書き出してください。下書きは専用のJSONで移行します。</p><p>記録は全分類の合計3,000件、JSONは10MBまでです。配布確認版のメモも移行できます。ブラウザ内に保存できない場合も、画面内の確定済みデータをJSONに書き出せます。</p></div><div class="content-panel danger-panel"><h3>すべてのデータを削除</h3><p>現在の全分類とメモを削除します。旧版の保存領域・書出したJSON・下書きは残ります。</p><button type="button" id="clear" class="danger">すべてのデータを削除</button></div></section>
+<section data-panel="help" hidden><h2>使い方</h2><div id="tool-help"></div><h3>保存・デモ・バックアップ</h3><p>通常画面はブラウザ内へ保存します。HTMLファイル自体にはデータを書き込みません。デモは架空データを使用し、変更は画面内だけに保持します。再読込みすると初期データへ戻ります。</p><p>登録・保存で記録を確定します。未確定の下書きは通常のJSON・CSV・印刷に含みません。直前の削除は、別の変更や再読込みの前なら取り消せます。</p><p>保存エラーや別画面の変更が表示されたら、現在の内容をJSONへ書き出して保管してください。ファイルの場所、ブラウザ、PCを変える前にもバックアップが必要です。共同編集には対応していません。</p><p>印刷は全データまたは表示条件に合う全件が対象です。CSVは一覧の出力用です。不明な項目やメモも含む復元にはJSONを使ってください。入力内容・出力ファイルは暗号化されません。</p><p>外部通信は行いません。個人情報・機密情報を入力する前に所属組織の規定を確認してください。</p></section></main></div>
+<footer class="action-bar"><button type="button" id="save-now" class="secondary">保存する</button><button type="button" id="export">バックアップを書き出す</button><button type="button" id="import" class="secondary">バックアップを読み込む</button><button type="button" id="print" class="secondary">全データを印刷</button><button type="button" id="print-current" class="secondary">表示中の一覧を印刷</button><input type="file" id="import-file" accept=".json,application/json" hidden></footer>
+<dialog id="edit-dialog" aria-labelledby="edit-title"><form id="record-form"><div class="dialog-heading"><h2 id="edit-title">新規登録</h2><button type="button" class="secondary" id="close-edit">閉じる</button></div><p>必須項目を入力し、登録・保存で確定してください。</p><p id="draft-save-status" role="status"></p><div id="edit-fields" class="field-grid"></div><p id="form-error" role="alert"></p><div class="dialog-actions"><button type="submit" id="submit-record">登録する</button><button type="button" id="suspend-edit" class="secondary">下書きを残して閉じる</button><button type="button" id="cancel-edit" class="secondary">キャンセル</button></div></form></dialog>
+<dialog id="clear-dialog" aria-labelledby="clear-title"><h2 id="clear-title">全データの削除を確認</h2><p>この操作は取り消せません。必要な内容は先にJSONへ書き出してください。</p><label for="clear-confirm">確認のため「すべて削除」と入力してください</label><input id="clear-confirm" autocomplete="off"><p id="clear-error" role="alert"></p><div class="dialog-actions"><button type="button" id="confirm-clear" class="danger" disabled>すべて削除</button><button type="button" id="cancel-clear" class="secondary">キャンセル</button></div></dialog>
+<section id="print-area"></section><script type="application/json" id="tool-config">{"id":"event-manager","name":"イベント進行管理","kind":"event","description":"イベントの基本情報と、準備タスク・参加者・資料・当日チェックを関連付けて管理します。","sections":[{"id":"events","label":"イベント基本情報","titleKey":"title","fields":[{"key":"title","label":"イベント名","required":true},{"key":"date","label":"開催日","type":"date","required":true},{"key":"time","label":"開始時刻","type":"time"},{"key":"location","label":"会場"},{"key":"owner","label":"主担当"},{"key":"purpose","label":"目的・内容","type":"textarea"}]},{"id":"tasks","label":"準備タスク","titleKey":"title","fields":[{"key":"eventId","label":"イベント","type":"reference","reference":"events","required":true},{"key":"title","label":"タスク","required":true},{"key":"owner","label":"担当者"},{"key":"dueDate","label":"締切","type":"date"},{"key":"status","label":"状態","type":"select","options":["未着手","対応中","完了"],"required":true},{"key":"notes","label":"備考","type":"textarea"}]},{"id":"participants","label":"参加者","titleKey":"name","fields":[{"key":"eventId","label":"イベント","type":"reference","reference":"events","required":true},{"key":"name","label":"氏名・担当名","required":true},{"key":"organization","label":"所属"},{"key":"status","label":"参加状況","type":"select","options":["出席予定","出席","欠席"],"required":true},{"key":"notes","label":"備考","type":"textarea"}]},{"id":"materials","label":"資料","titleKey":"title","fields":[{"key":"eventId","label":"イベント","type":"reference","reference":"events","required":true},{"key":"title","label":"資料名","required":true},{"key":"location","label":"保存場所","type":"textarea"},{"key":"owner","label":"担当者"},{"key":"notes","label":"備考","type":"textarea"}]},{"id":"checklist","label":"当日チェックリスト","titleKey":"title","fields":[{"key":"eventId","label":"イベント","type":"reference","reference":"events","required":true},{"key":"title","label":"確認項目","required":true},{"key":"owner","label":"担当者"},{"key":"dueDate","label":"確認日","type":"date"},{"key":"status","label":"状態","type":"select","options":["未確認","完了"],"required":true},{"key":"notes","label":"備考","type":"textarea"}]}],"help":["イベント基本情報を登録してから、準備タスク・参加者・資料・当日チェックを関連付けます。各一覧で対象のイベントを絞り込めます。","準備タスクには担当・締切・状態を記録します。当日チェックは確認後に「完了にする」を押します。状態の絞り込みで未完了の項目を確認できます。","関連する記録があるイベントは削除できません。資料の保存場所は文字として記録します。ファイルの添付やリンク先への接続は行いません。全データの印刷には全分類を含みます。"]}</script><script>(() => {
+    const sample = { "schemaVersion": 2, "toolId": "event-manager", "text": "架空の庁内研修です。準備から当日確認までの操作を試せます。", "sampleData": true, "sections": { "events": [{ "id": "event-1", "title": "業務引継ぎ研修（例）", "date": "2026-11-15", "time": "13:30", "location": "第2会議室", "owner": "総務担当（架空）", "purpose": "引継ぎ資料の作成手順を確認する。" }], "tasks": [{ "id": "task-1", "eventId": "event-1", "title": "会場の利用確認（例）", "owner": "総務担当（架空）", "dueDate": "2026-11-01", "status": "完了" }, { "id": "task-2", "eventId": "event-1", "title": "配布資料の準備（例）", "dueDate": "2026-11-10", "status": "未着手" }], "participants": [{ "id": "participant-1", "eventId": "event-1", "name": "庶務担当（架空）", "organization": "総務課", "status": "出席予定" }], "materials": [{ "id": "material-1", "eventId": "event-1", "title": "研修の進行表（例）", "location": "共有フォルダー / 研修 / 進行表", "owner": "総務担当（架空）" }], "checklist": [{ "id": "check-1", "eventId": "event-1", "title": "投影機器の動作確認（例）", "owner": "会場担当（架空）", "dueDate": "2026-11-15", "status": "未確認" }, { "id": "check-2", "eventId": "event-1", "title": "受付資料の配置（例）", "dueDate": "2026-11-15", "status": "未確認" }] } };
+    const MAX_TEXT_LENGTH = 50000;
+    const MAX_FILE_BYTES = 1024 * 1024;
+    function validateBackup(data, toolId) {
+        if (!data || typeof data !== 'object' || Array.isArray(data) || data.schemaVersion !== 1 || data.toolId !== toolId || typeof data.text !== 'string' || data.text.length > MAX_TEXT_LENGTH) {
+            throw new Error('同じツールの有効なバックアップを選択してください。メモは50,000文字までです。');
+        }
+        return data.text;
     }
-    try {
-      if (localStorage.getItem(key) !== lastStoredRaw) {
-        statusText('未保存：別の画面で変更されています', true);
-        feedback.textContent = 'この画面のメモをバックアップに書き出し、画面を再読込みしてください。他の画面のデータは上書きしません。';
-        return false;
-      }
-      const raw = serializeBackup(makeBackup(config.id, memo.value, new Date().toISOString(), originalBackup));
-      localStorage.setItem(key, raw);
-      lastStoredRaw = raw;
-      statusText('このブラウザ内に自動保存済み');
-      return true;
-    } catch {
-      statusText('未保存：バックアップを書き出してください', true);
-      return false;
+    function makeBackup(toolId, text, exportedAt = new Date().toISOString(), original = {}) {
+        return { ...original, schemaVersion: 1, toolId, exportedAt, text };
     }
-  }
-  try {
-    const raw = localStorage.getItem(key);
-    lastStoredRaw = raw;
-    if (raw !== null) {
-      try {
+    function serializeBackup(data) {
+        const text = JSON.stringify(data, null, 2);
+        if (new TextEncoder().encode(text).length > MAX_FILE_BYTES) {
+            throw new Error('バックアップが1MBを超えるため反映できません。必要な内容を書き出し、メモを短くしてください。');
+        }
+        return text;
+    }
+    function isObject(value) {
+        return value !== null && typeof value === 'object' && !Array.isArray(value);
+    }
+    function textValue(value) {
+        return typeof value === 'string' ? value : '';
+    }
+    function validDate(value) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value))
+            return false;
+        const parsed = new Date(value + 'T00:00:00Z');
+        return Number.isFinite(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
+    }
+    function readField(value, field) {
+        if (value === undefined && !field.required)
+            return field.type === 'select' ? field.options[0] : '';
+        if (typeof value !== 'string')
+            throw new Error(field.label + 'の形式が正しくありません。');
+        const limit = field.maxLength ?? (field.type === 'textarea' ? 20000 : 500);
+        if (value.length > limit)
+            throw new Error(field.label + 'は' + limit.toLocaleString('ja-JP') + '文字以内で入力してください。');
+        if (field.required && !value.trim())
+            throw new Error(field.label + 'を入力してください。');
+        if (field.type === 'select' && !field.options.includes(value))
+            throw new Error(field.label + 'を選択肢から選んでください。');
+        if (field.type === 'date' && value && !validDate(value))
+            throw new Error(field.label + 'に有効な日付を入力してください。');
+        return value;
+    }
+    function el(id) {
+        const found = document.getElementById(id);
+        if (!found)
+            throw new Error('Missing element: ' + id);
+        return found;
+    }
+    function node(tag, text = '', className = '') {
+        const result = document.createElement(tag);
+        result.textContent = text;
+        if (className)
+            result.className = className;
+        return result;
+    }
+    function action(text, handler, className = 'secondary') {
+        const button = node('button', text, className);
+        button.type = 'button';
+        button.addEventListener('click', handler);
+        return button;
+    }
+    function trapDialogFocus(modal) {
+        if (window.self !== window.top) {
+            const observer = new MutationObserver(() => {
+                if (modal.open)
+                    window.parent.postMessage('municipal-toolbox:demo-dialog-open', '*');
+            });
+            observer.observe(modal, { attributes: true, attributeFilter: ['open'] });
+        }
+        modal.addEventListener('keydown', event => {
+            if (event.key !== 'Tab')
+                return;
+            const controls = [...modal.querySelectorAll('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled),a[href]')].filter(control => control.getClientRects().length > 0);
+            const first = controls[0];
+            const last = controls[controls.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last?.focus();
+            }
+            else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first?.focus();
+            }
+        });
+    }
+    function createLocalStore(options) {
+        let data = options.fresh();
+        let lastRaw = null;
+        let blocked = null;
+        let dirty = false;
+        function notify(status, message) { options.onNotice({ status, message, dirty }); }
+        function conflict() {
+            blocked = 'conflict';
+            notify('conflict', '別の画面で保存データが変更されました。この画面の内容をJSONに書き出し、保存済みデータを読み直してください。');
+            return false;
+        }
+        function save() {
+            if (options.memoryOnly) {
+                dirty = false;
+                notify('saved', 'サンプル：変更はこの画面内だけに保持します。');
+                return true;
+            }
+            if (blocked) {
+                notify(blocked, blocked === 'corrupt' ? '保存データは上書きしません。有効なJSONを読み込むか、データ管理で初期化してください。' : '別の画面で変更されています。この画面の内容をJSONに書き出し、保存済みデータを読み直してください。');
+                return false;
+            }
+            try {
+                if (localStorage.getItem(options.key) !== lastRaw)
+                    return conflict();
+                const raw = options.serialize(data);
+                localStorage.setItem(options.key, raw);
+                lastRaw = raw;
+                dirty = false;
+                notify('saved', '自動保存済み');
+                return true;
+            }
+            catch {
+                dirty = true;
+                notify('unavailable', 'ブラウザ内に保存できません。容量不足や保存制限を確認し、画面を閉じる前にJSONを書き出してください。');
+                return false;
+            }
+        }
+        function load() {
+            data = options.fresh();
+            dirty = false;
+            blocked = null;
+            if (options.memoryOnly) {
+                notify('empty', 'サンプル');
+                return;
+            }
+            try {
+                lastRaw = localStorage.getItem(options.key);
+                const raw = lastRaw ?? localStorage.getItem(options.legacyKey);
+                if (raw === null) {
+                    notify('empty', '未入力');
+                    return;
+                }
+                try {
+                    data = options.parse(raw);
+                    options.serialize(data);
+                }
+                catch (error) {
+                    data = options.fresh();
+                    blocked = 'corrupt';
+                    notify('corrupt', '保存データを読めません。既存データは保護しています。' + (error instanceof Error ? error.message : '有効なJSONを読み込んでください。'));
+                    return;
+                }
+                if (lastRaw === null) {
+                    dirty = true;
+                    if (save())
+                        notify('saved', '旧版のメモを移行しました。旧版の保存領域は変更していません。');
+                }
+                else
+                    notify('saved', '自動保存済み');
+            }
+            catch {
+                dirty = true;
+                notify('unavailable', 'ブラウザの保存機能を利用できません。入力後はJSONを書き出してください。');
+            }
+        }
+        function replace(next, replaceCorrupt = false) {
+            options.serialize(next);
+            data = next;
+            dirty = true;
+            if (replaceCorrupt && blocked === 'corrupt')
+                blocked = null;
+            return save();
+        }
+        function clear() {
+            if (options.memoryOnly) {
+                data = options.fresh();
+                dirty = false;
+                notify('empty', 'サンプル');
+                return;
+            }
+            let currentRaw;
+            try {
+                currentRaw = localStorage.getItem(options.key);
+            }
+            catch {
+                throw new Error('保存領域を読み取れません。ブラウザの保存制限を確認してください。');
+            }
+            if (blocked === 'conflict' || currentRaw !== lastRaw)
+                throw new Error('別の画面でデータが変更されています。保存済みデータを読み直してから削除してください。');
+            const empty = options.fresh();
+            const raw = options.serialize(empty);
+            try {
+                localStorage.setItem(options.key, raw);
+            }
+            catch {
+                throw new Error('保存領域を更新できません。ブラウザの保存容量や保存制限を確認してください。');
+            }
+            lastRaw = raw;
+            data = empty;
+            blocked = null;
+            dirty = false;
+            notify('saved', '自動保存済み');
+        }
+        addEventListener('storage', event => {
+            if (options.memoryOnly)
+                return;
+            if ((event.key === options.key || event.key === null) && event.newValue !== lastRaw)
+                conflict();
+        });
+        return { get data() { return data; }, get dirty() { return dirty; }, load, replace, save, clear };
+    }
+    function draftFormValues(form) {
+        return Object.fromEntries([...form.querySelectorAll('input,textarea,select')].map(input => [input.name || input.id, input instanceof HTMLInputElement && input.type === 'checkbox' ? input.checked : input.value]));
+    }
+    function restoreDraftValues(form, values) {
+        for (const input of form.querySelectorAll('input,textarea,select')) {
+            const value = values[input.name || input.id];
+            if (input instanceof HTMLInputElement && input.type === 'checkbox' && typeof value === 'boolean')
+                input.checked = value;
+            else if (typeof value === 'string')
+                input.value = value;
+        }
+    }
+    function parseEditDraft(raw, toolId) {
+        if (raw.length > 600000)
+            throw new Error('下書きの容量が上限を超えています。');
         const data = JSON.parse(raw);
-        memo.value = validateBackup(data, config.id);
-        originalBackup = data;
-        acceptedMemo = memo.value;
-        statusText('このブラウザ内に自動保存済み');
-      } catch {
-        protectedStorage = true;
-        statusText('保存データを読めません：未保存', true);
-        feedback.textContent = '保存データに問題があります。既存データは上書きしません。必要なら元の保存領域を管理者に確認し、有効なJSONを読み込むか「すべてのデータを削除」で初期化してください。';
-      }
-    } else statusText('未入力');
-  } catch {
-    statusText('保存機能を利用できません：未保存', true);
-  }
-  refresh();
-  memo.addEventListener('input', () => {
-    try {
-      serializeBackup(makeBackup(config.id, memo.value, new Date().toISOString(), originalBackup));
-      acceptedMemo = memo.value;
-      save();
-    } catch (error) {
-      memo.value = acceptedMemo;
-      refresh();
-      feedback.textContent = error.message + '直前の入力は反映していません。';
+        if (!isObject(data) || data.schemaVersion !== 1 || data.toolId !== toolId || typeof data.section !== 'string' || (data.id !== null && typeof data.id !== 'string') || (data.base !== null && typeof data.base !== 'string') || !isObject(data.values) || typeof data.updatedAt !== 'string' || !Number.isFinite(Date.parse(data.updatedAt)))
+            throw new Error('下書きの形式が正しくありません。');
+        if (Object.keys(data.values).length > 40 || Object.values(data.values).some(value => typeof value !== 'boolean' && (typeof value !== 'string' || value.length > 50000)))
+            throw new Error('下書きの項目が正しくありません。');
+        return data;
     }
-  });
-  document.getElementById('export').addEventListener('click', () => {
-    let data;
-    try { data = serializeBackup(makeBackup(config.id, memo.value, new Date().toISOString(), originalBackup)); }
-    catch (error) { feedback.textContent = error.message; return; }
-    const blob = new Blob([data], { type: 'application/json;charset=utf-8' });
-    const objectUrl = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    const now = new Date();
-    const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('');
-    anchor.href = objectUrl; anchor.download = config.id + '-backup-' + date + '.json';
-    document.body.append(anchor); anchor.click(); anchor.remove();
-    dispatchEvent(new Event('tool-backup-export'));
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-    feedback.textContent = 'バックアップのダウンロードを開始しました。保存先をご確認ください。';
-  });
-  document.getElementById('import').addEventListener('click', () => fileInput.click());
-  fileInput.addEventListener('change', async () => {
-    const file = fileInput.files[0];
-    fileInput.value = '';
-    if (!file || importBusy) return;
-    importBusy = true;
-    document.getElementById('import').disabled = true;
-    let incoming;
-    let incomingBackup;
-    try {
-      if (!/\.json$/i.test(file.name)) throw new Error('拡張子が.jsonのバックアップを選択してください。');
-      if (!file.size) throw new Error('ファイルが空です。内容のあるJSONを選択してください。');
-      if (file.type && !['application/json', 'text/json', 'text/plain', 'application/octet-stream'].includes(file.type)) throw new Error('JSONファイルとして認識できません。元のバックアップを選択してください。');
-      if (file.size > MAX_FILE_BYTES) throw new Error('1MB以下のJSONファイルを選択してください。');
-      incomingBackup = JSON.parse((await file.text()).replace(/^\uFEFF/, ''));
-      incoming = validateBackup(incomingBackup, config.id);
-      serializeBackup(makeBackup(config.id, incoming, new Date().toISOString(), incomingBackup));
-    } catch (error) {
-      feedback.textContent = error instanceof SyntaxError ? 'JSONの形式が正しくありません。現在のメモは変更していません。' : error.message;
-      return;
-    } finally {
-      importBusy = false;
-      document.getElementById('import').disabled = false;
+    function validateDraftFields(draft, fields, checkboxKeys = []) {
+        for (const field of fields) {
+            if (Object.hasOwn(draft.values, field.key))
+                readField(draft.values[field.key], { ...field, required: false });
+        }
+        for (const key of checkboxKeys)
+            if (Object.hasOwn(draft.values, key) && typeof draft.values[key] !== 'boolean')
+                throw new Error('下書きのチェック項目が正しくありません。');
     }
-    if (!confirm(backupComparison(config.name, file.name, { 'メモ文字数': memo.value.length }, { 'メモ文字数': incoming.length }, incomingBackup.exportedAt))) return;
-    memo.value = incoming;
-    acceptedMemo = incoming;
-    originalBackup = incomingBackup;
-    protectedStorage = false;
-    const saved = save();
-    feedback.textContent = saved ? 'バックアップを読み込みました。' : 'メモを読み込みましたが、ブラウザ内に保存できません。JSONを書き出して保管してください。';
-  });
-  document.getElementById('clear').addEventListener('click', () => {
-    if (!confirm('このツールのすべてのデータを削除しますか？この操作は取り消せません。必要な内容をバックアップしてください。')) return;
-    try {
-      if (localStorage.getItem(key) !== lastStoredRaw) {
-        feedback.textContent = '別の画面でデータが変更されています。画面を再読込みしてから削除してください。';
-        return;
-      }
-      localStorage.removeItem(key);
-    } catch {
-      feedback.textContent = '保存領域から削除できませんでした。メモは変更していません。';
-      return;
+    function createEditDraft(toolId, restore, memoryOnly = false, validateImported = () => { }) {
+        const key = 'municipal-toolbox:draft:v1:' + toolId;
+        let raw = null;
+        let active = null;
+        const panel = node('section', '', 'draft-panel content-panel');
+        panel.id = 'draft-panel';
+        panel.setAttribute('aria-label', '編集中の下書き');
+        const title = node('h2', '編集中の下書き');
+        const message = node('p');
+        message.id = 'draft-message';
+        message.setAttribute('role', 'status');
+        const resume = action('下書きを再開', () => {
+            try {
+                if (raw)
+                    restore(parseEditDraft(raw, toolId));
+            }
+            catch {
+                message.textContent = '下書きを復元できません。下書きを書き出して内容を保管してください。';
+            }
+        });
+        resume.id = 'resume-draft';
+        const discard = action('下書きを削除', () => { if (confirm('編集中の下書きを削除しますか？確定済みの記録は削除しません。'))
+            clear(); }, 'danger');
+        discard.id = 'discard-draft';
+        const exportDraft = action('下書きを書き出す', () => {
+            if (!raw)
+                return;
+            const url = URL.createObjectURL(new Blob([raw], { type: 'application/json;charset=utf-8' }));
+            const link = node('a');
+            link.href = url;
+            link.download = (memoryOnly ? 'sample-' : '') + toolId + '-draft.json';
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            message.textContent = '下書きのJSONを書き出しました。移行先の同じツールで「下書きを読み込む」を使ってください。通常のバックアップ読込みには使用できません。';
+        });
+        panel.append(title, message, resume, discard, exportDraft);
+        document.getElementById('feedback').after(panel);
+        const importArea = node('section', '', 'content-panel');
+        importArea.append(node('h3', '下書きの移行'), node('p', '確定済みデータは通常のバックアップで移し、下書きは専用のJSONで移します。既存の下書きがある場合は、先に書き出してから再開または削除してください。'));
+        const picker = node('input');
+        picker.type = 'file';
+        picker.accept = '.json,application/json';
+        picker.hidden = true;
+        picker.id = 'import-draft-file';
+        const importButton = action('下書きを読み込む', () => picker.click());
+        importButton.id = 'import-draft';
+        const importMessage = node('p');
+        importMessage.id = 'draft-import-message';
+        importMessage.setAttribute('role', 'status');
+        importArea.append(importButton, picker, importMessage);
+        document.querySelector('[data-panel="data"]').append(importArea);
+        let importing = false;
+        picker.addEventListener('change', async () => {
+            const file = picker.files?.[0];
+            picker.value = '';
+            if (!file || importing)
+                return;
+            importing = true;
+            importButton.disabled = true;
+            try {
+                if (raw !== null || document.querySelector('#edit-dialog[open]'))
+                    throw new Error('既存の下書きまたは編集中の内容があります。先に書き出し、再開・保存または削除してください。');
+                if (!/\.json$/i.test(file.name) || !file.size || file.size > 2 * 1024 * 1024)
+                    throw new Error('空ではない2MB以下の下書きJSONファイルを選択してください。');
+                if (file.type && !['application/json', 'text/json', 'text/plain', 'application/octet-stream'].includes(file.type))
+                    throw new Error('JSONファイルとして認識できません。元の下書きファイルを選択してください。');
+                const incoming = parseEditDraft((await file.text()).replace(/^\uFEFF/, ''), toolId);
+                validateImported(incoming);
+                if (!confirm('下書きを読み込みますか？\nファイル：' + file.name + '\n分類：' + incoming.section + '\n下書きの日時：' + new Date(incoming.updatedAt).toLocaleString('ja-JP') + '\n確定済みの記録は変更しません。読込み後に「下書きを再開」で内容を確認してください。')) {
+                    importMessage.textContent = '下書きの読込みをキャンセルしました。';
+                    return;
+                }
+                if (raw !== null || document.querySelector('#edit-dialog[open]') || (!memoryOnly && localStorage.getItem(key) !== raw))
+                    throw new Error('別の画面または編集中の下書きが変更されています。上書きせず、内容を確認してください。');
+                const next = JSON.stringify(incoming);
+                if (!memoryOnly)
+                    localStorage.setItem(key, next);
+                raw = next;
+                active = null;
+                render();
+                resume.focus();
+                importMessage.textContent = memoryOnly ? '下書きをこのサンプル画面に読み込みました。通常の保存データは変更していません。' : '下書きを読み込みました。再開して内容を確認してください。';
+            }
+            catch (error) {
+                importMessage.textContent = '下書きを読み込めません。' + (error instanceof SyntaxError ? 'JSONの形式を確認してください。' : error instanceof DOMException ? 'ブラウザの保存制限や容量を確認してください。' : error instanceof Error ? error.message : 'ファイルと保存容量を確認してください。') + '現在のデータと下書きは変更していません。';
+            }
+            finally {
+                importing = false;
+                importButton.disabled = false;
+            }
+        });
+        function render() {
+            panel.hidden = raw === null;
+            exportDraft.disabled = raw === null;
+            if (!raw)
+                return;
+            try {
+                const draft = parseEditDraft(raw, toolId);
+                resume.disabled = false;
+                message.textContent = '未確定の下書き1件があります。' + (memoryOnly ? 'この画面内での保持日時：' : '保存日時：') + new Date(draft.updatedAt).toLocaleString('ja-JP') + '。確定済みの記録・通常のJSONバックアップ・印刷には含まれません。';
+            }
+            catch {
+                resume.disabled = true;
+                message.textContent = '下書きの形式を読めません。元の内容は保持しています。「下書きを書き出す」で保管できます。';
+            }
+        }
+        try {
+            raw = memoryOnly ? null : localStorage.getItem(key);
+            render();
+        }
+        catch {
+            panel.hidden = false;
+            resume.disabled = true;
+            discard.disabled = true;
+            exportDraft.disabled = true;
+            message.textContent = '下書きの保存領域を利用できません。入力後は登録・保存で確定し、JSONを書き出してください。';
+        }
+        function clear() {
+            try {
+                if (!memoryOnly && localStorage.getItem(key) !== raw)
+                    throw new Error('別の画面で下書きが変更されています。再読込みして確認してください。');
+                if (!memoryOnly)
+                    localStorage.removeItem(key);
+                raw = null;
+                active = null;
+                render();
+                return true;
+            }
+            catch (error) {
+                panel.hidden = false;
+                message.textContent = error instanceof Error ? error.message : '下書きを削除できません。';
+                return false;
+            }
+        }
+        function start(section, id, base, restoring = false) {
+            if (raw && !restoring) {
+                panel.hidden = false;
+                message.textContent = '保存済みの下書きがあります。先に再開するか、内容を確認して下書きを削除してください。';
+                resume.focus();
+                return false;
+            }
+            active = { section, id, base };
+            return true;
+        }
+        function save(values) {
+            if (!active)
+                return false;
+            try {
+                const previous = raw ? parseEditDraft(raw, toolId) : null;
+                const next = JSON.stringify({ ...previous, schemaVersion: 1, toolId, ...active, values: { ...previous?.values, ...values }, updatedAt: new Date().toISOString() });
+                parseEditDraft(next, toolId);
+                if (!memoryOnly && localStorage.getItem(key) !== raw)
+                    throw new Error('別の画面で下書きが変更されています。上書きしていません。編集中の内容を登録するか、手元に控えてください。');
+                if (!memoryOnly)
+                    localStorage.setItem(key, next);
+                raw = next;
+                render();
+                return true;
+            }
+            catch (error) {
+                panel.hidden = false;
+                message.textContent = '下書きは未保存です。' + (error instanceof Error && error.message.includes('別の画面') ? error.message : 'ブラウザの容量や保存制限を確認し、画面を閉じる前に登録・保存してください。');
+                return false;
+            }
+        }
+        return { start, save, clear, get exists() { return raw !== null; } };
     }
-    protectedStorage = false; lastStoredRaw = null; originalBackup = {}; acceptedMemo = ''; memo.value = ''; refresh(); statusText('未入力');
-    feedback.textContent = 'このツールのデータを削除しました。書き出したJSONファイルは削除されません。';
-  });
-  document.getElementById('print').addEventListener('click', () => { refresh(); window.print(); });
+    const practiceMode = location.hash === '#sample';
+    function backupComparison(name, fileName, before, after, exportedAt, sample = false) {
+        const date = typeof exportedAt === 'string' && Number.isFinite(Date.parse(exportedAt)) ? new Date(exportedAt).toLocaleString('ja-JP') : '未記録または不明';
+        const lines = ['JSON読込み前の確認', '対象ツール：' + name, 'ファイル：' + fileName, '書出し日時（JSONの記録）：' + date, '', '項目：現在 → 読込み後'];
+        for (const label of Object.keys(before))
+            lines.push(label + '：' + before[label].toLocaleString('ja-JP') + ' → ' + after[label].toLocaleString('ja-JP'));
+        if (sample)
+            lines.push('', 'このJSONにはサンプルデータの印が付いています。');
+        lines.push('', '確定済みのデータを、読込み後の内容ですべて置き換えます。追加や結合ではありません。', '下書きは別に保持します。必要な確定済みデータはキャンセルして先にJSONへ書き出してください。', '', 'この内容で置き換えますか？');
+        return lines.join('\n');
+    }
+    function recoveryRevision(data, storageKey, memoryOnly = false) {
+        let stored = null;
+        try {
+            stored = memoryOnly ? null : localStorage.getItem(storageKey);
+        }
+        catch {
+            stored = 'storage-unavailable';
+        }
+        return JSON.stringify([data, stored]);
+    }
+    function createRecoveryControls(revision) {
+        const panel = node('aside', '', 'recovery-panel storage-strip');
+        panel.hidden = true;
+        panel.setAttribute('aria-label', '直前の操作の取消');
+        const status = node('p');
+        status.setAttribute('role', 'status');
+        let expected = '', restore = null;
+        const undo = action('直前の操作を取り消す', () => {
+            if (!restore)
+                return;
+            if (revision() !== expected) {
+                restore = null;
+                undo.disabled = true;
+                status.textContent = '操作後にデータが変更されています。新しい内容を保護するため、取り消せません。';
+                return;
+            }
+            const apply = restore;
+            if (apply()) {
+                restore = null;
+                undo.disabled = true;
+                panel.hidden = false;
+                status.textContent = '直前の操作を取り消しました。保存状態を確認してください。';
+            }
+        });
+        undo.id = 'undo-last';
+        panel.append(status, undo, node('p', '取消用の内容はこの画面だけに保持します。別の変更や再読込みで失われます。JSONバックアップとは別です。', 'muted'));
+        el('feedback').after(panel);
+        return {
+            invalidate() { restore = null; undo.disabled = true; panel.hidden = true; },
+            remember(label, apply) {
+                expected = revision();
+                restore = apply;
+                undo.disabled = false;
+                panel.hidden = false;
+                status.textContent = label + '。別の変更を行う前なら取り消せます。';
+            },
+        };
+    }
+    function setupBackupPreparation() {
+        const modal = node('dialog');
+        modal.id = 'prepare-import-dialog';
+        modal.setAttribute('aria-labelledby', 'prepare-import-title');
+        const title = node('h2', 'バックアップ読込み前の保存');
+        title.id = 'prepare-import-title';
+        const exportCurrent = action('現在のデータを書き出す', () => el('export').click());
+        exportCurrent.id = 'export-before-import';
+        const choose = action('読込みファイルを選ぶ', () => { modal.close(); el('import-file').click(); });
+        choose.id = 'choose-import-file';
+        const cancel = action('キャンセル', () => modal.close());
+        const actions = node('div', '', 'dialog-actions');
+        actions.append(exportCurrent, choose, cancel);
+        modal.append(title, node('p', 'JSONを読み込むと、確定済みデータ全体を置き換えます。現在の内容が必要な場合は、先にJSONを書き出し、保存先でファイルを確認してください。'), node('p', '下書きは別に残ります。ファイルを選んだ後に、対象ツールと件数を確認します。'), actions);
+        document.body.append(modal);
+        trapDialogFocus(modal);
+        el('import').addEventListener('click', () => { modal.showModal(); exportCurrent.focus(); });
+    }
+    const BUSINESS_MAX_BYTES = 10 * 1024 * 1024;
+    const normalizeBusiness = (value) => value.normalize('NFKC').trim().toLocaleLowerCase('ja');
+    function emptyBusiness(config) {
+        return { schemaVersion: 2, toolId: config.id, text: '', sections: Object.fromEntries(config.sections.map(section => [section.id, []])) };
+    }
+    function businessValue(row, key) { return typeof row[key] === 'string' ? row[key] : ''; }
+    function readBusinessField(value, field) {
+        if (value === undefined)
+            value = field.default ?? (field.type === 'number' ? '0' : field.type === 'select' ? field.options?.[0] : undefined);
+        if (field.type === 'number') {
+            if (typeof value !== 'string' || !/^\d{1,10}$/.test(value) || !Number.isSafeInteger(Number(value)) || Number(value) < (field.min ?? 0) || Number(value) > 1000000000)
+                throw new Error(field.label + 'は' + (field.min ?? 0) + '〜1,000,000,000の整数で入力してください。');
+            return String(Number(value));
+        }
+        if (field.type === 'time') {
+            const time = readField(value, { ...field, type: undefined });
+            if (time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(time))
+                throw new Error(field.label + 'は時:分で入力してください。');
+            return time;
+        }
+        return readField(value, { ...field, type: field.type === 'reference' ? undefined : field.type });
+    }
+    function validateBusinessRecord(value, section) {
+        if (!isObject(value) || typeof value.id !== 'string' || !/^[\w-]{1,100}$/.test(value.id))
+            throw new Error(section.label + 'のIDが正しくありません。');
+        const row = { ...value, id: value.id };
+        for (const field of section.fields)
+            row[field.key] = readBusinessField(value[field.key], field);
+        return row;
+    }
+    function inventoryQuantity(data, itemId) {
+        const item = data.sections.items.find(row => row.id === itemId);
+        return Number(item?.initialQuantity ?? 0) + data.sections.movements.filter(row => row.itemId === itemId).reduce((total, row) => total + (row.direction === '入庫' ? 1 : -1) * Number(row.quantity), 0);
+    }
+    function loanStatus(row, today) { return row.returnedAt ? '返却済み' : String(row.dueDate) < today ? '延滞' : '貸出中'; }
+    function validateBusinessRelations(data, config) {
+        for (const section of config.sections)
+            for (const field of section.fields.filter(field => field.reference))
+                for (const row of data.sections[section.id]) {
+                    if (!data.sections[field.reference].some(target => target.id === row[field.key]))
+                        throw new Error(section.label + 'の' + field.label + 'を登録済みの一覧から選んでください。関連する履歴がある記録は削除できません。');
+                }
+        if (config.kind === 'lending') {
+            const active = new Set();
+            for (const row of data.sections.loans) {
+                if (String(row.dueDate) < String(row.loanDate) || row.returnedAt && String(row.returnedAt) < String(row.loanDate))
+                    throw new Error('返却予定日・返却日は貸出日以降にしてください。');
+                if (!row.returnedAt) {
+                    if (active.has(String(row.assetId)))
+                        throw new Error('貸出中の備品は重ねて貸し出せません。先に返却処理を行ってください。');
+                    active.add(String(row.assetId));
+                }
+            }
+        }
+        if (config.kind === 'inventory')
+            for (const item of data.sections.items) {
+                let count = Number(item.initialQuantity);
+                for (const row of data.sections.movements.filter(row => row.itemId === item.id).sort((a, b) => String(a.date).localeCompare(String(b.date)))) {
+                    count += (row.direction === '入庫' ? 1 : -1) * Number(row.quantity);
+                    if (!Number.isSafeInteger(count) || count < 0 || count > 1000000000)
+                        throw new Error('「' + item.name + '」の在庫が範囲外になります。初期在庫と入出庫の日付・数量を確認してください。');
+                }
+            }
+    }
+    function parseBusiness(value, config) {
+        if (!isObject(value) || value.toolId !== config.id)
+            throw new Error(config.name + 'のJSONバックアップを選択してください。');
+        if (value.schemaVersion === 1)
+            return { ...value, ...emptyBusiness(config), text: validateBackup(value, config.id), legacyBackup: structuredClone(value) };
+        if (value.schemaVersion !== 2 || !isObject(value.sections))
+            throw new Error('保存形式または分類が正しくありません。元のJSONを確認してください。');
+        if (typeof value.text !== 'string' || value.text.length > 50000)
+            throw new Error('メモは50,000文字以内にしてください。');
+        const sections = { ...value.sections };
+        let count = 0;
+        for (const section of config.sections) {
+            const rows = value.sections[section.id];
+            if (!Array.isArray(rows))
+                throw new Error(section.label + 'がありません。');
+            count += rows.length;
+            if (count > 3000)
+                throw new Error('記録は全分類の合計3,000件までです。');
+            const ids = new Set(), unique = new Set();
+            sections[section.id] = rows.map(value => {
+                const row = validateBusinessRecord(value, section);
+                if (ids.has(row.id))
+                    throw new Error(section.label + 'のIDが重複しています。');
+                ids.add(row.id);
+                if (section.unique) {
+                    const key = normalizeBusiness(String(row[section.unique]));
+                    if (unique.has(key))
+                        throw new Error(section.label + 'の管理番号が重複しています。');
+                    unique.add(key);
+                }
+                return row;
+            });
+        }
+        const data = { ...value, schemaVersion: 2, toolId: config.id, text: value.text, sections };
+        validateBusinessRelations(data, config);
+        return data;
+    }
+    function serializeBusiness(data) {
+        const text = JSON.stringify({ ...data, exportedAt: new Date().toISOString() }, null, 2);
+        if (new TextEncoder().encode(text).length > BUSINESS_MAX_BYTES)
+            throw new Error('JSONは10MBまでです。データを分けて保管してください。');
+        return text;
+    }
+    function parseBusinessText(raw, config) {
+        if (new TextEncoder().encode(raw).length > BUSINESS_MAX_BYTES)
+            throw new Error('10MB以下のJSONを選んでください。');
+        try {
+            const data = parseBusiness(JSON.parse(raw.replace(/^\uFEFF/, '')), config);
+            serializeBusiness(data);
+            return data;
+        }
+        catch (error) {
+            if (error instanceof SyntaxError)
+                throw new Error('JSONの形式が正しくありません。現在のデータは変更していません。');
+            throw error;
+        }
+    }
+    function businessCsv(rows, section, display) {
+        const quote = (text) => '"' + ((/^[\s\u0000-\u001F\u007F-\u009F\u200B\uFEFF]*[=+\-@]/u.test(text) || /^[\t\r\n]/.test(text) ? "'" : '') + text).replaceAll('"', '""') + '"';
+        return '\uFEFF' + [section.fields.map(field => field.label), ...rows.map(row => section.fields.map(field => display(row, field)))].map(row => row.map(quote).join(',')).join('\r\n') + '\r\n';
+    }
+    function calendarRange(date, mode) {
+        if (!validDate(date))
+            throw new Error('表示する日付を選んでください。');
+        const day = new Date(date + 'T12:00:00Z'), year = day.getUTCFullYear(), month = day.getUTCMonth();
+        let start, end;
+        if (mode === 'month') {
+            start = new Date(Date.UTC(year, month, 1));
+            end = new Date(Date.UTC(year, month + 1, 0));
+        }
+        else if (mode === 'week') {
+            start = new Date(day);
+            start.setUTCDate(day.getUTCDate() - ((day.getUTCDay() + 6) % 7));
+            end = new Date(start);
+            end.setUTCDate(start.getUTCDate() + 6);
+        }
+        else {
+            const fiscal = month < 3 ? year - 1 : year;
+            start = new Date(Date.UTC(fiscal, 3, 1));
+            end = new Date(Date.UTC(fiscal + 1, 2, 31));
+        }
+        return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+    }
+    const config = JSON.parse(el('tool-config').textContent);
+    const storageKey = 'municipal-toolbox:data:v2:' + config.id;
+    const today = () => { const d = new Date(); return [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-'); };
+    const editor = el('edit-dialog'), form = el('record-form'), clearDialog = el('clear-dialog');
+    let currentView = 'home', pageNumber = 1, editSection = config.sections[0], editing, editorStart = '', returnFocus = null, savedLabel = '未入力', saveWarning = false;
+    function message(text, error = false) { el('feedback').textContent = text; el('feedback').classList.toggle('error', error); }
+    const store = createLocalStore({ key: storageKey, legacyKey: 'municipal-toolbox:preview:v1:' + config.id, fresh: () => emptyBusiness(config), parse: raw => parseBusinessText(raw, config), serialize: serializeBusiness, memoryOnly: practiceMode, onNotice: notice => {
+            savedLabel = notice.message;
+            saveWarning = notice.dirty || ['unavailable', 'corrupt', 'conflict'].includes(notice.status);
+            el('save-status').textContent = savedLabel;
+            el('save-status').classList.toggle('unsaved', saveWarning);
+            el('storage-warning').hidden = !saveWarning;
+            el('storage-message').textContent = notice.message;
+        } });
+    const recovery = createRecoveryControls(() => recoveryRevision(store.data, storageKey, practiceMode));
+    const drafts = createEditDraft(config.id, draft => {
+        const section = config.sections.find(section => section.id === draft.section);
+        if (!section)
+            throw new Error('分類を確認してください。');
+        const original = store.data.sections[section.id].find(row => row.id === draft.id);
+        const same = original && JSON.stringify(original) === draft.base;
+        if (draft.id && !same && !confirm('元の記録が変更または削除されています。新しい記録として下書きを再開しますか？'))
+            return;
+        openEditor(section, same ? original : undefined, true);
+        restoreDraftValues(form, draft.values);
+        el('draft-save-status').textContent = '下書きを復元しました。登録・保存で確定してください。';
+    }, practiceMode, draft => {
+        const section = config.sections.find(section => section.id === draft.section);
+        if (!section)
+            throw new Error('このツールの分類ではありません。');
+        for (const field of section.fields)
+            if (Object.hasOwn(draft.values, field.key) && draft.values[field.key] !== '')
+                readBusinessField(draft.values[field.key], { ...field, required: false });
+    });
+    const sectionFor = (id = currentView) => config.sections.find(section => section.id === id);
+    function display(row, field) {
+        const value = businessValue(row, field.key);
+        if (!field.reference)
+            return value;
+        const target = store.data.sections[field.reference].find(target => target.id === value), section = sectionFor(field.reference);
+        return target ? businessValue(target, section.titleKey) : '参照先なし';
+    }
+    function recordTitle(row, section) { const title = display(row, section.fields.find(field => field.key === section.titleKey)); return title.length > 120 ? title.slice(0, 120) + '…' : title; }
+    function commit(next, replaceCorrupt = false) {
+        try {
+            const data = parseBusiness(next, config);
+            serializeBusiness(data);
+            recovery.invalidate();
+            store.replace(data, replaceCorrupt);
+            render();
+            return true;
+        }
+        catch (error) {
+            message(error instanceof Error ? error.message : '保存できません。入力を確認してください。', true);
+            return false;
+        }
+    }
+    function rowState(row, section) {
+        if (config.kind === 'lending') {
+            if (section.id === 'loans')
+                return loanStatus(row, today());
+            if (section.id === 'assets')
+                return store.data.sections.loans.some(loan => loan.assetId === row.id && !loan.returnedAt) ? '貸出中' : '貸出可能';
+        }
+        if (config.kind === 'inventory' && section.id === 'items')
+            return inventoryQuantity(store.data, row.id) < Number(row.minimum) ? '在庫不足' : '在庫あり';
+        return businessValue(row, 'status') || businessValue(row, 'kind');
+    }
+    function filteredRows(section) {
+        const words = normalizeBusiness(el('query').value).split(/\s+/).filter(Boolean), state = el('state-filter').value, parent = el('parent-filter').value;
+        const relation = section.fields.find(field => field.reference);
+        let rows = store.data.sections[section.id].filter(row => {
+            const text = normalizeBusiness(section.fields.map(field => display(row, field)).join(' '));
+            return words.every(word => text.includes(word)) && (!state || rowState(row, section) === state) && (!parent || !relation || row[relation.key] === parent);
+        });
+        if (config.kind === 'calendar') {
+            const range = calendarRange(el('calendar-date').value, el('calendar-mode').value);
+            rows = rows.filter(row => String(row.date) >= range.start && String(row.date) <= range.end).sort((a, b) => (String(a.date) + String(a.time)).localeCompare(String(b.date) + String(b.time)));
+        }
+        return rows;
+    }
+    function stateOptions(section) {
+        if (config.kind === 'lending' && section.id === 'loans')
+            return ['貸出中', '延滞', '返却済み'];
+        if (config.kind === 'lending' && section.id === 'assets')
+            return ['貸出可能', '貸出中'];
+        if (config.kind === 'inventory' && section.id === 'items')
+            return ['在庫不足', '在庫あり'];
+        return section.fields.find(field => field.key === 'status' || field.key === 'kind')?.options ?? [];
+    }
+    function setFilters(section) {
+        const select = el('state-filter');
+        select.replaceChildren(new Option('すべて', ''), ...stateOptions(section).map(value => new Option(value, value)));
+        select.disabled = select.options.length === 1;
+        const relation = section.fields.find(field => field.reference), parent = el('parent-filter');
+        parent.replaceChildren(new Option('すべて', ''));
+        el('parent-filter-label').hidden = !relation;
+        if (relation) {
+            for (const row of store.data.sections[relation.reference])
+                parent.append(new Option(recordTitle(row, sectionFor(relation.reference)), row.id));
+            parent.setAttribute('aria-label', relation.label + 'で絞り込み');
+        }
+    }
+    function card(row, section, print = false) {
+        const root = node('article', '', 'record-card');
+        root.dataset.recordId = row.id;
+        root.append(node('h3', recordTitle(row, section)));
+        const state = rowState(row, section);
+        if (state)
+            root.append(node('p', state, 'record-state'));
+        if (config.kind === 'inventory' && section.id === 'items')
+            root.append(node('p', '現在庫：' + inventoryQuantity(store.data, row.id) + ' ' + String(row.unit || ''), 'record-state'));
+        const list = node('dl');
+        for (const field of section.fields)
+            list.append(node('dt', field.label), node('dd', display(row, field) || '未入力'));
+        root.append(list);
+        if (!print) {
+            const buttons = node('div', '', 'record-actions');
+            buttons.append(action('編集', () => openEditor(section, row)));
+            if (config.kind === 'lending' && section.id === 'loans' && !row.returnedAt)
+                buttons.append(action('返却日を入力', () => { if (!openEditor(section, row))
+                    return; el('field-returnedAt').value = today(); el('field-returnedAt').dispatchEvent(new Event('input', { bubbles: true })); el('field-returnedAt').focus(); }));
+            const statusField = section.fields.find(field => field.key === 'status' && field.options?.includes('完了'));
+            if (statusField)
+                buttons.append(action(row.status === '完了' ? statusField.options[0] + 'に戻す' : '完了にする', () => commit({ ...store.data, sections: { ...store.data.sections, [section.id]: store.data.sections[section.id].map(item => item.id === row.id ? { ...item, status: row.status === '完了' ? statusField.options[0] : '完了' } : item) } })));
+            buttons.append(action('削除', () => {
+                if (!confirm('「' + recordTitle(row, section) + '」を削除しますか？関連する記録がある場合は削除できません。'))
+                    return;
+                const before = structuredClone(store.data);
+                if (commit({ ...store.data, sections: { ...store.data.sections, [section.id]: store.data.sections[section.id].filter(item => item.id !== row.id) } })) {
+                    recovery.remember('記録を削除しました', () => commit(before));
+                    message('記録を削除しました。');
+                    el('add-record').focus();
+                }
+            }, 'danger'));
+            root.append(buttons);
+        }
+        return root;
+    }
+    function renderCalendar(rows, section) {
+        const root = el('calendar-grid');
+        root.replaceChildren();
+        root.className = '';
+        const mode = el('calendar-mode').value;
+        if (config.kind !== 'calendar' || mode === 'list')
+            return false;
+        root.className = 'calendar-grid';
+        const range = calendarRange(el('calendar-date').value, mode);
+        root.append(node('h3', range.start + ' 〜 ' + range.end, 'calendar-period'));
+        const start = new Date(range.start + 'T12:00:00Z'), end = new Date(range.end + 'T12:00:00Z');
+        if (mode === 'month')
+            for (let i = 0; i < (start.getUTCDay() + 6) % 7; i++)
+                root.append(node('div', '', 'calendar-empty'));
+        for (const date = new Date(start); date <= end; date.setUTCDate(date.getUTCDate() + 1)) {
+            const key = date.toISOString().slice(0, 10), day = node('section', '', 'calendar-day');
+            day.append(node('h3', key.slice(5) + '（' + '日月火水木金土'[date.getUTCDay()] + '）'));
+            for (const row of rows.filter(row => row.date === key))
+                day.append(action((row.time ? row.time + ' ' : '') + recordTitle(row, section), () => openEditor(section, row)));
+            root.append(day);
+        }
+        return true;
+    }
+    function renderRecords() {
+        const section = sectionFor();
+        if (!section)
+            return;
+        let rows;
+        try {
+            rows = filteredRows(section);
+        }
+        catch (error) {
+            message(error instanceof Error ? error.message : '表示条件を確認してください。', true);
+            return;
+        }
+        el('section-title').textContent = section.label;
+        el('calendar-controls').hidden = config.kind !== 'calendar';
+        el('csv-current').hidden = !config.csv;
+        el('result-count').textContent = rows.length + '件表示 / 登録' + store.data.sections[section.id].length + '件';
+        el('empty-state').hidden = rows.length > 0;
+        const grid = renderCalendar(rows, section), pages = Math.max(1, Math.ceil(rows.length / 50));
+        pageNumber = Math.min(pageNumber, pages);
+        el('record-list').replaceChildren(...(grid ? [] : rows.slice((pageNumber - 1) * 50, pageNumber * 50).map(row => card(row, section))));
+        el('page-number').textContent = pageNumber + ' / ' + pages;
+        el('previous-page').disabled = pageNumber === 1;
+        el('next-page').disabled = pageNumber === pages;
+        el('page-number').parentElement.hidden = grid;
+    }
+    function render() {
+        el('summary').replaceChildren(...config.sections.map(section => {
+            const box = node('div', '', 'summary-card');
+            box.append(node('h3', section.label), node('p', store.data.sections[section.id].length + '件'), action('一覧を開く', () => navigate(section.id)));
+            return box;
+        }));
+        el('memo').value = store.data.text;
+        el('count').textContent = store.data.text.length + ' / 50,000文字';
+        renderRecords();
+    }
+    function navigate(view) {
+        if (!['home', 'data', 'help'].includes(view) && !sectionFor(view))
+            return;
+        currentView = view;
+        pageNumber = 1;
+        el('query').value = '';
+        const section = sectionFor();
+        if (section)
+            setFilters(section);
+        document.querySelectorAll('[data-panel]').forEach(panel => { panel.hidden = panel.dataset.panel !== (section ? 'records' : view); });
+        document.querySelectorAll('#navigation [data-view]').forEach(button => { if (button.dataset.view === view)
+            button.setAttribute('aria-current', 'page');
+        else
+            button.removeAttribute('aria-current'); });
+        el('print-current').disabled = !section;
+        render();
+        el('main').focus();
+    }
+    function snapshot() { return JSON.stringify(draftFormValues(form)); }
+    function openEditor(section, row, restoring = false) {
+        if (!drafts.start(section.id, row?.id ?? null, row ? JSON.stringify(row) : null, restoring))
+            return false;
+        editSection = section;
+        editing = row;
+        returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        el('edit-title').textContent = section.label + (row ? 'を編集' : 'に登録');
+        el('submit-record').textContent = row ? '変更を保存' : '登録する';
+        el('form-error').textContent = '';
+        el('draft-save-status').textContent = '入力内容は下書きとして保存します。';
+        const fields = el('edit-fields');
+        fields.replaceChildren();
+        for (const field of section.fields) {
+            const label = node('label', field.label, field.type === 'textarea' ? 'wide' : '');
+            label.htmlFor = 'field-' + field.key;
+            if (field.required)
+                label.append(node('span', '必須', 'required'));
+            const input = field.type === 'textarea' ? node('textarea') : ['select', 'reference'].includes(field.type ?? '') ? node('select') : node('input');
+            input.id = 'field-' + field.key;
+            input.name = field.key;
+            input.required = !!field.required;
+            if (input instanceof HTMLSelectElement) {
+                if (field.reference) {
+                    input.append(new Option('選択してください', ''));
+                    for (const candidate of store.data.sections[field.reference])
+                        input.append(new Option(recordTitle(candidate, sectionFor(field.reference)), candidate.id));
+                }
+                else
+                    for (const option of field.options ?? [])
+                        input.append(new Option(option, option));
+            }
+            else {
+                input.maxLength = field.maxLength ?? (field.type === 'textarea' ? 20000 : 500);
+                if (input instanceof HTMLInputElement) {
+                    input.type = ['date', 'time', 'number'].includes(field.type ?? '') ? field.type : 'text';
+                    if (field.type === 'number') {
+                        input.min = String(field.min ?? 0);
+                        input.max = '1000000000';
+                        input.step = '1';
+                    }
+                }
+            }
+            input.value = row ? businessValue(row, field.key) : field.default ?? (field.type === 'number' ? '0' : field.type === 'select' ? field.options[0] : field.type === 'date' && field.required ? today() : '');
+            label.append(input);
+            fields.append(label);
+        }
+        editorStart = snapshot();
+        editor.showModal();
+        fields.querySelector('input,textarea,select')?.focus();
+        return true;
+    }
+    function closeEditor(force = false) {
+        if (!force && snapshot() !== editorStart) {
+            if (!confirm('未確定の変更を破棄しますか？残す場合はキャンセルし、「下書きを残して閉じる」を使ってください。'))
+                return;
+            if (!drafts.clear())
+                return;
+        }
+        editor.close();
+        el('save-status').textContent = savedLabel;
+        el('save-status').classList.toggle('unsaved', saveWarning);
+        if (returnFocus?.isConnected)
+            returnFocus.focus();
+        else
+            el('main').focus();
+    }
+    function download(text, extension) {
+        const url = URL.createObjectURL(new Blob([text], { type: extension === 'json' ? 'application/json;charset=utf-8' : 'text/csv;charset=utf-8' })), link = node('a');
+        link.href = url;
+        link.download = (practiceMode ? 'sample-' : '') + config.id + (extension === 'json' ? '-backup-' : '-') + today().replaceAll('-', '') + '.' + extension;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        if (extension === 'json')
+            dispatchEvent(new Event('tool-backup-export'));
+        message('ダウンロードを開始しました。保存先を確認してください。');
+    }
+    function print(all) {
+        const root = el('print-area');
+        root.replaceChildren(node('h1', config.name));
+        for (const section of all ? config.sections : sectionFor() ? [sectionFor()] : []) {
+            root.append(node('h2', section.label));
+            const rows = all ? store.data.sections[section.id] : filteredRows(section);
+            root.append(node('p', rows.length + '件'));
+            if (!rows.length)
+                root.append(node('p', '記録はありません。'));
+            for (const row of rows)
+                root.append(card(row, section, true));
+        }
+        if (all)
+            root.append(node('h2', 'メモ'), node('p', store.data.text, 'print-memo'));
+        window.print();
+    }
+    trapDialogFocus(editor);
+    trapDialogFocus(clearDialog);
+    for (const section of config.sections) {
+        const button = action(section.label, () => navigate(section.id));
+        button.dataset.view = section.id;
+        el('section-navigation').append(button);
+    }
+    document.querySelectorAll('[data-view]').forEach(button => { if (!sectionFor(button.dataset.view))
+        button.addEventListener('click', () => navigate(button.dataset.view)); });
+    el('description').textContent = config.description;
+    el('tool-help').replaceChildren(...config.help.map(text => node('p', text)));
+    el('calendar-date').value = today();
+    el('add-record').addEventListener('click', () => { const section = sectionFor(); if (section)
+        openEditor(section); });
+    for (const id of ['close-edit', 'cancel-edit'])
+        el(id).addEventListener('click', () => closeEditor());
+    editor.addEventListener('cancel', event => { event.preventDefault(); closeEditor(); });
+    for (const event of ['input', 'change'])
+        form.addEventListener(event, () => { if (editor.open) {
+            const saved = drafts.save(draftFormValues(form));
+            el('draft-save-status').textContent = saved ? '下書きを保存しました。登録・保存で確定してください。' : '下書きを保存できません。入力内容を控えるか、登録してJSONを書き出してください。';
+        } });
+    el('suspend-edit').addEventListener('click', () => { if (drafts.save(draftFormValues(form)))
+        closeEditor(true); });
+    form.addEventListener('submit', event => {
+        event.preventDefault();
+        const row = { ...editing, ...draftFormValues(form), id: editing?.id ?? crypto.randomUUID() };
+        const rows = store.data.sections[editSection.id];
+        const next = { ...store.data, sections: { ...store.data.sections, [editSection.id]: editing ? rows.map(item => item.id === editing.id ? row : item) : [...rows, row] } };
+        if (commit(next)) {
+            if (!store.dirty)
+                drafts.clear();
+            closeEditor(true);
+            message(store.dirty ? '登録しましたがブラウザ内は未保存です。JSONを書き出してください。' : '登録・変更を保存しました。', store.dirty);
+        }
+        else
+            el('form-error').textContent = el('feedback').textContent;
+    });
+    el('memo').addEventListener('input', () => { const text = el('memo').value; if (!commit({ ...store.data, text }))
+        el('memo').value = store.data.text; });
+    for (const id of ['query', 'state-filter', 'parent-filter', 'calendar-mode', 'calendar-date'])
+        el(id).addEventListener(id === 'query' ? 'input' : 'change', () => { pageNumber = 1; renderRecords(); });
+    for (const [id, step] of [['previous-page', -1], ['next-page', 1]])
+        el(id).addEventListener('click', () => { pageNumber += step; renderRecords(); });
+    for (const [id, step] of [['period-previous', -1], ['period-next', 1]])
+        el(id).addEventListener('click', () => {
+            const input = el('calendar-date');
+            if (!input.value)
+                return;
+            const d = new Date(input.value + 'T12:00:00Z'), mode = el('calendar-mode').value;
+            if (mode === 'week')
+                d.setUTCDate(d.getUTCDate() + step * 7);
+            else if (mode === 'month') {
+                d.setUTCDate(1);
+                d.setUTCMonth(d.getUTCMonth() + step);
+            }
+            else
+                d.setUTCFullYear(d.getUTCFullYear() + step);
+            input.value = d.toISOString().slice(0, 10);
+            pageNumber = 1;
+            renderRecords();
+        });
+    el('csv-current').addEventListener('click', () => { const section = sectionFor(); if (section)
+        download(businessCsv(filteredRows(section), section, display), 'csv'); });
+    el('print').addEventListener('click', () => print(true));
+    el('print-current').addEventListener('click', () => print(false));
+    el('save-now').addEventListener('click', () => { if (store.save())
+        message('現在のデータを保存しました。'); });
+    el('export').addEventListener('click', () => { try {
+        download(serializeBusiness({ ...store.data, ...(practiceMode ? { sampleData: true } : {}) }), 'json');
+    }
+    catch (error) {
+        message(error instanceof Error ? error.message : 'JSONを書き出せません。', true);
+    } });
+    setupBackupPreparation();
+    let importing = false;
+    el('import-file').addEventListener('change', async () => {
+        const input = el('import-file'), file = input.files?.[0];
+        input.value = '';
+        if (!file || importing)
+            return;
+        importing = true;
+        el('import').disabled = true;
+        try {
+            if (!/\.json$/i.test(file.name) || !file.size || file.size > BUSINESS_MAX_BYTES)
+                throw new Error('空ではない10MB以下のJSONファイルを選択してください。');
+            if (file.type && !['application/json', 'text/json', 'text/plain', 'application/octet-stream'].includes(file.type))
+                throw new Error('JSONファイルとして認識できません。');
+            const revision = recoveryRevision(store.data, storageKey, practiceMode), incoming = parseBusinessText(await file.text(), config);
+            const counts = (data) => Object.fromEntries([...config.sections.map(section => [section.label, data.sections[section.id].length]), ['メモ文字数', data.text.length]]);
+            if (!confirm(backupComparison(config.name, file.name, counts(store.data), counts(incoming), incoming.exportedAt)))
+                return;
+            if (revision !== recoveryRevision(store.data, storageKey, practiceMode))
+                throw new Error('読込み中にデータが変更されました。現在の内容を確認してから読み直してください。');
+            if (commit(incoming, true))
+                message(store.dirty ? '読み込みましたがブラウザ内は未保存です。JSONを書き出してください。' : 'バックアップを読み込みました。', store.dirty);
+        }
+        catch (error) {
+            message(error instanceof Error ? error.message : '読み込めません。元のJSONを確認してください。', true);
+        }
+        finally {
+            importing = false;
+            el('import').disabled = false;
+        }
+    });
+    el('clear').addEventListener('click', () => { el('clear-confirm').value = ''; el('confirm-clear').disabled = true; el('clear-error').textContent = ''; clearDialog.showModal(); el('clear-confirm').focus(); });
+    el('clear-confirm').addEventListener('input', () => { el('confirm-clear').disabled = el('clear-confirm').value !== 'すべて削除'; });
+    el('cancel-clear').addEventListener('click', () => clearDialog.close());
+    el('confirm-clear').addEventListener('click', () => { if (el('clear-confirm').value !== 'すべて削除')
+        return; try {
+        store.clear();
+        recovery.invalidate();
+        clearDialog.close();
+        render();
+        message('このバージョンの全データを削除しました。旧版の保存領域・下書き・書出したファイルは残ります。');
+    }
+    catch (error) {
+        el('clear-error').textContent = error instanceof Error ? error.message : '削除できません。';
+    } });
+    el('reload-data').addEventListener('click', () => { if (!confirm('画面内の未保存データを破棄して保存済みデータを読み直しますか？必要な内容は先にJSONを書き出してください。'))
+        return; recovery.invalidate(); store.load(); render(); });
+    addEventListener('beforeunload', event => { if (!practiceMode && (store.dirty || editor.open && snapshot() !== editorStart))
+        event.preventDefault(); });
+    store.load();
+    if (practiceMode) {
+        store.replace(parseBusiness(sample, config));
+        if (config.kind === 'calendar' && store.data.sections.events[0])
+            el('calendar-date').value = String(store.data.sections.events[0].date);
+    }
+    navigate('home');
 })();
 (() => {
     function el(id) {
@@ -272,6 +1314,13 @@ function backupComparison(name, fileName, before, after, exportedAt, sample = fa
         return button;
     }
     function trapDialogFocus(modal) {
+        if (window.self !== window.top) {
+            const observer = new MutationObserver(() => {
+                if (modal.open)
+                    window.parent.postMessage('municipal-toolbox:demo-dialog-open', '*');
+            });
+            observer.observe(modal, { attributes: true, attributeFilter: ['open'] });
+        }
         modal.addEventListener('keydown', event => {
             if (event.key !== 'Tab')
                 return;
@@ -308,6 +1357,8 @@ function backupComparison(name, fileName, before, after, exportedAt, sample = fa
         const title = node('h2', '更新情報');
         title.id = 'updates-title';
         updates.append(title, node('p', config.name + ' v' + config.version), node('p', '2026-10-05：右上の更新情報・配色切替・Helpと、保存先・バックアップの案内を追加しました。'));
+        if (config.ready)
+            updates.append(node('p', '2026-10-27：全8ツールの業務機能と、架空データを操作できる専用デモページを公開しました。デモは通常の保存データから分離し、初期状態に戻せます。'));
         if (config.ready)
             updates.append(node('p', '2026-10-26：直前の削除の取消、読込み前の書出し操作、下書きJSONの専用読込みを追加しました。'));
         if (config.id === 'equipment-manager')
@@ -372,8 +1423,11 @@ function backupComparison(name, fileName, before, after, exportedAt, sample = fa
             const banner = node('aside', '', sampleMode ? 'sample-banner warning' : 'sample-banner storage-strip');
             banner.id = 'sample-banner';
             if (sampleMode) {
-                banner.append(node('strong', 'サンプル体験中'), node('p', '架空データで操作を試せます。通常の保存データと下書きは読み書きしません。変更はこの画面内だけに保持し、再読込みすると初期のサンプルへ戻ります。'));
-                banner.append(action('サンプルを終了', () => { location.hash = ''; location.reload(); }));
+                banner.append(node('strong', 'サンプル体験中'), node('p', 'これはデモ版です。入力内容は実際の業務には使用しないでください。架空データで操作を試せます。通常の保存データと下書きは読み書きしません。変更はこの画面内だけに保持し、再読込みすると初期のサンプルへ戻ります。'));
+                const embedded = window.self !== window.top;
+                banner.append(action(embedded ? 'サンプルをリセット' : 'サンプルを終了', () => { if (embedded && !confirm('デモでの変更を破棄して初期状態に戻しますか？'))
+                    return; if (!embedded)
+                    location.hash = ''; location.reload(); }));
                 strip.firstElementChild.textContent = 'サンプル体験中：変更はこの画面内だけに保持します。';
             }
             else {
@@ -400,8 +1454,6 @@ function backupComparison(name, fileName, before, after, exportedAt, sample = fa
             }
         });
     }
-    setupToolShell({ "id": "event-manager", "name": "イベント進行管理", "version": "0.1.2-preview", "ready": false });
+    setupToolShell({ "id": "event-manager", "name": "イベント進行管理", "version": "1.0.0", "ready": true });
 })();
-</script>
-</body>
-</html>
+</script></body></html>

@@ -1,0 +1,4 @@
+{
+  "schemaVersion":2,"toolId":"annual-calendar","text":"架空の年間予定です。月・週・年度一覧と種別の絞り込みを確認できます。","sampleData":true,
+  "sections":{"events":[{"id":"event-1","title":"月次の備品確認（例）","date":"2026-10-05","time":"09:00","kind":"定例業務","owner":"庶務担当（架空）","location":"各執務室"},{"id":"event-2","title":"防災研修（例）","date":"2026-10-08","time":"13:30","kind":"イベント","location":"会議室"},{"id":"event-3","title":"年度末の引継ぎ確認（例）","date":"2027-03-15","kind":"定例業務"}]}
+}

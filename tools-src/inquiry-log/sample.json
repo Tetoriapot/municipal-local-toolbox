@@ -1,0 +1,4 @@
+{
+  "schemaVersion":2,"toolId":"inquiry-log","text":"架空の問い合わせ記録です。実在する住民の情報は含みません。","sampleData":true,
+  "sections":{"inquiries":[{"id":"inquiry-1","receivedAt":"2026-10-20","category":"施設利用","content":"会議室の利用方法を確認したい（例）","owner":"受付担当（架空）","answer":"利用案内の確認後に回答する。","status":"対応中"},{"id":"inquiry-2","receivedAt":"2026-10-21","category":"窓口案内","content":"受付時間について（例）","owner":"受付担当（架空）","answer":"架空の受付案内を回答した。","status":"完了"},{"id":"inquiry-3","receivedAt":"2026-10-22","category":"資料","content":"配布資料の在庫を確認したい（例）","status":"未対応"}]}
+}

@@ -21,11 +21,11 @@ async function exported(page) {
 test('ready filter combines with search, survives reload and resets', async ({ page }) => {
   await page.goto('/tools/');
   await page.getByLabel('業務機能を実装済みのツールだけ').check();
-  await expect(page.locator('[data-result-count]')).toHaveText('2');
+  await expect(page.locator('[data-result-count]')).toHaveText('8');
   await page.reload();
   await expect(page.getByLabel('業務機能を実装済みのツールだけ')).toBeChecked();
   await page.getByRole('searchbox').fill('CSV');
-  await expect(page.locator('[data-result-count]')).toHaveText('1');
+  await expect(page.locator('[data-result-count]')).toHaveText('2');
   await page.getByRole('button', { name:'条件をクリア', exact:true }).click();
   await expect(page.locator('[data-result-count]')).toHaveText('8');
   for (const route of ['/about/', '/terms/', '/faq/']) {

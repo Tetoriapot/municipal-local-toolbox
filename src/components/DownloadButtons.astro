@@ -16,5 +16,5 @@ const { tool } = Astro.props;
   <p class="fine">ファイルの内容は同一です。所属組織で許可された方法で保存してください。</p>
   <a class="text-link" href={url('/guide/txt-to-html/')}><Icon name="book" size={18} /> TXT版の使い方を見る <Icon name="chevron" size={16} /></a>
   <ol class="quick-start"><li>許可された形式でファイルを保存</li><li>TXT版は末尾の拡張子を.htmlへ変更</li><li>EdgeまたはChromeで開く</li></ol><p class="fine">HTML版は拡張子の変更不要です。HTML実行や拡張子変更の可否は組織のルールを確認してください。</p>
-  <div class="demo-status">{tool.demo ? <><a class="button button-outline" href={url(tool.demo)} target="_blank" rel="noopener">サンプルで試す（別画面）</a><p class="fine">架空データで操作を試せます。通常の保存データは変更しません。サンプル内の変更は再読込みでリセットします。</p></> : <><button class="button button-muted" type="button" disabled>デモを開く（準備中）</button><p class="fine">サンプルデータ付きデモはPhase 2で公開予定です。</p></>}</div>
+  <div class="demo-status">{tool.demo ? <><a class="button button-outline" href={url(tool.demo)} target="_blank" rel="noopener">デモを開く（別画面）</a><p class="fine">架空データで操作を試せます。通常の保存データは変更しません。デモ内の変更は再読込みでリセットします。</p></> : <><button class="button button-muted" type="button" disabled>デモを開く（準備中）</button><p class="fine">サンプルデータ付きデモはPhase 2で公開予定です。</p></>}</div>
 </aside>

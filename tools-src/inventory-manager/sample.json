@@ -1,0 +1,7 @@
+{
+  "schemaVersion":2,"toolId":"inventory-manager","text":"架空の消耗品台帳です。入庫・出庫後の在庫数と不足表示を確認できます。","sampleData":true,
+  "sections":{
+    "items":[{"id":"item-1","code":"PAPER-001","name":"A4コピー用紙（例）","unit":"箱","initialQuantity":"10","minimum":"5","location":"倉庫A"},{"id":"item-2","code":"PEN-002","name":"黒ボールペン（例）","unit":"本","initialQuantity":"30","minimum":"10","location":"事務室"}],
+    "movements":[{"id":"movement-1","itemId":"item-1","date":"2026-10-01","direction":"出庫","quantity":"8","person":"庶務担当（架空）","notes":"各係へ配布（例）"},{"id":"movement-2","itemId":"item-2","date":"2026-10-02","direction":"入庫","quantity":"20"}]
+  }
+}

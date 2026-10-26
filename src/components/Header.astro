@@ -1,7 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { url } from '../lib/paths';
-const nav = [{ path: '/tools/', name: 'ツールを探す' }, { path: '/guide/', name: '初めての方へ' }, { path: '/safety/', name: '安全性について' }, { path: '/faq/', name: 'よくある質問' }];
+const nav = [{ path: '/tools/', name: 'ツールを探す' }, { path: '/demo/', name: 'デモを試す' }, { path: '/guide/', name: '初めての方へ' }, { path: '/safety/', name: '安全性について' }, { path: '/faq/', name: 'よくある質問' }];
 const pathname = Astro.url.pathname;
 ---
 <div class="utility-bar"><div class="container"><span>自治体・公共団体向けのローカル業務ツール</span><div class="site-utilities"><a href={url('/changelog/')}>更新情報</a><button type="button" data-theme-toggle disabled>ダークモード</button><a href={url('/guide/')} aria-label="Help（使い方）">Help</a></div></div><p class="container" data-theme-notice role="status"></p></div>

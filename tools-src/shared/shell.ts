@@ -10,6 +10,7 @@ export function setupToolShell(config: { id: string; name: string; version: stri
   const updates = node('dialog'); updates.id = 'updates-dialog'; updates.setAttribute('aria-labelledby', 'updates-title');
   const title = node('h2', '更新情報'); title.id = 'updates-title';
   updates.append(title, node('p', config.name + ' v' + config.version), node('p', '2026-10-05：右上の更新情報・配色切替・Helpと、保存先・バックアップの案内を追加しました。'));
+  if (config.ready) updates.append(node('p','2026-10-27：全8ツールの業務機能と、架空データを操作できる専用デモページを公開しました。デモは通常の保存データから分離し、初期状態に戻せます。'));
   if (config.ready) updates.append(node('p','2026-10-26：直前の削除の取消、読込み前の書出し操作、下書きJSONの専用読込みを追加しました。'));
   if (config.id === 'equipment-manager') updates.append(node('p','管理番号で照合するCSV更新と変更前後の確認、CSV反映の取消、棚卸確認日・確認者・差異メモを追加しました。'));
   if (config.id === 'handover-note') updates.append(node('p','分類別の記入例と、申し送り事項・チェックリストの期限順表示を追加しました。'));
@@ -43,8 +44,9 @@ export function setupToolShell(config: { id: string; name: string; version: stri
   if (config.ready) {
     const banner = node('aside', '', sampleMode ? 'sample-banner warning' : 'sample-banner storage-strip'); banner.id = 'sample-banner';
     if (sampleMode) {
-      banner.append(node('strong', 'サンプル体験中'), node('p', '架空データで操作を試せます。通常の保存データと下書きは読み書きしません。変更はこの画面内だけに保持し、再読込みすると初期のサンプルへ戻ります。'));
-      banner.append(action('サンプルを終了', () => { location.hash = ''; location.reload(); }));
+      banner.append(node('strong', 'サンプル体験中'), node('p', 'これはデモ版です。入力内容は実際の業務には使用しないでください。架空データで操作を試せます。通常の保存データと下書きは読み書きしません。変更はこの画面内だけに保持し、再読込みすると初期のサンプルへ戻ります。'));
+      const embedded = window.self !== window.top;
+      banner.append(action(embedded ? 'サンプルをリセット' : 'サンプルを終了', () => { if (embedded && !confirm('デモでの変更を破棄して初期状態に戻しますか？')) return; if (!embedded) location.hash = ''; location.reload(); }));
       strip.firstElementChild!.textContent = 'サンプル体験中：変更はこの画面内だけに保持します。';
     } else {
       const link = node('a', 'サンプルで試す（別画面）'); link.href = location.pathname + location.search + '#sample'; link.target = '_blank'; link.rel = 'noopener';

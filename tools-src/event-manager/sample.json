@@ -1,0 +1,10 @@
+{
+  "schemaVersion":2,"toolId":"event-manager","text":"架空の庁内研修です。準備から当日確認までの操作を試せます。","sampleData":true,
+  "sections":{
+    "events":[{"id":"event-1","title":"業務引継ぎ研修（例）","date":"2026-11-15","time":"13:30","location":"第2会議室","owner":"総務担当（架空）","purpose":"引継ぎ資料の作成手順を確認する。"}],
+    "tasks":[{"id":"task-1","eventId":"event-1","title":"会場の利用確認（例）","owner":"総務担当（架空）","dueDate":"2026-11-01","status":"完了"},{"id":"task-2","eventId":"event-1","title":"配布資料の準備（例）","dueDate":"2026-11-10","status":"未着手"}],
+    "participants":[{"id":"participant-1","eventId":"event-1","name":"庶務担当（架空）","organization":"総務課","status":"出席予定"}],
+    "materials":[{"id":"material-1","eventId":"event-1","title":"研修の進行表（例）","location":"共有フォルダー / 研修 / 進行表","owner":"総務担当（架空）"}],
+    "checklist":[{"id":"check-1","eventId":"event-1","title":"投影機器の動作確認（例）","owner":"会場担当（架空）","dueDate":"2026-11-15","status":"未確認"},{"id":"check-2","eventId":"event-1","title":"受付資料の配置（例）","dueDate":"2026-11-15","status":"未確認"}]
+  }
+}
