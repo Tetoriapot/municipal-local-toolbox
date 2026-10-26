@@ -4,12 +4,12 @@ import ArticleLayout from '../../layouts/ArticleLayout.astro';
 import { url } from '../../lib/paths';
 ---
 <ArticleLayout title="初めての方へ" eyebrow="GETTING STARTED" lead="ツールの選択、ファイルの保存、起動の手順を説明します。">
-  <div class="notice"><strong>ツールごとに実装状況が異なります。</strong><p>{distributionSummary}配布確認版には実際の業務データを入力しないでください。</p></div>
+  <div class="notice"><strong>ダウンロード前に操作を確認できます。</strong><p>{distributionSummary}<a href={url('/demo/')}>デモ一覧</a>からツールを選べます。デモ画面には実際の業務データを入力しないでください。</p></div>
   <h2>ツールを使うまでの3ステップ</h2><ol class="steps"><li><h3>仕事に合うツールを選ぶ</h3><p><a href={url('/tools/')}>ツール一覧</a>で名前やキーワードを検索します。詳細ページで、公開状況、機能、安全仕様を確認してください。</p></li><li><h3>ファイルをPCに保存する</h3><p>詳細ページの「TXT版をダウンロード」を押します。HTMLを直接保存できる環境では「HTML版をダウンロード」も利用できます。TXT版とHTML版の内容は同じです。</p><p>ファイルの取得には配布サイトへの通信が必要です。所属組織の規定で許可された保存方法を使用してください。</p></li><li><h3>ブラウザで開く</h3><p>TXT版は末尾の <code>.txt</code> を <code>.html</code> に変更します。保存したHTMLファイルをダブルクリックするか、Microsoft Edge / Google Chromeで開いてください。</p><p><a href={url('/guide/txt-to-html/')}>TXT → HTMLの変更方法を詳しく見る</a></p></li></ol>
   <h2>入力したデータはどこにある？</h2><p>記録とメモは、利用中のブラウザ内（localStorage）に自動保存します。HTMLファイル自体に入力内容が書き込まれるわけではありません。</p><p>ブラウザ・プロファイルの変更、閲覧データの削除、PCの変更、ファイルの移動や名前の変更で、保存データを参照できなくなることがあります。ファイルを直接開く場合の保存動作はブラウザの設定にも依存します。</p>
   <h2>実際の画面で確認する</h2>
-  <figure><img src={url('/guide-images/download.png')} alt="備品管理台帳の配布欄。TXT版、HTML版、サンプル体験の操作があります。" loading="lazy" /><figcaption>1. 詳細ページで実装状況を確認し、組織で許可された形式を保存します。</figcaption></figure>
-  <figure><img src={url('/guide-images/start.png')} alt="備品管理台帳の初期画面。保存状態と左側のホーム・備品一覧・データ管理・Helpを確認できます。" loading="lazy" /><figcaption>2. HTMLをブラウザで開きます。「サンプルで試す」から架空データで操作を確認できます。</figcaption></figure>
+  <figure><img src={url('/guide-images/download.png')} alt="備品管理台帳の配布欄。TXT版、HTML版、デモを開く操作があります。" loading="lazy" /><figcaption>1. 詳細ページで実装状況を確認し、組織で許可された形式を保存します。</figcaption></figure>
+  <figure><img src={url('/guide-images/start.png')} alt="備品管理台帳の初期画面。保存状態とホーム・備品一覧・データ管理、右上のHelpを確認できます。" loading="lazy" /><figcaption>2. HTMLをブラウザで開きます。「サンプルで試す」から架空データで操作を確認できます。</figcaption></figure>
   <figure><img src={url('/guide-images/backup.png')} alt="バックアップ読込み前の保存画面。現在のデータの書出し、読込みファイルの選択、キャンセルを選べます。" loading="lazy" /><figcaption>3. 復元前に現在のデータが必要か確認し、必要なら先にJSONを書き出します。</figcaption></figure>
   <h2>バックアップの保存と復元</h2><ol><li>ツールの「バックアップを書き出す」を押します。</li><li>JSONファイルを、所属組織で許可された場所に保存します。</li><li>復元するときは、同じツールで「バックアップを読み込む」を選びます。</li><li>復元すると現在のデータ全体が置き換わります。必要な内容を先に書き出してください。</li></ol><p>保存できない環境では、画面に「未保存」と表示します。JSONバックアップを書き出してから画面を閉じてください。</p>
   <h2>利用環境と注意点</h2><p>Microsoft Edge / Google Chromeの最新版を主要な対応対象としています。Internet Explorerには対応しません。組織の制限やブラウザ設定によっては、保存・印刷・ダウンロードを利用できないことがあります。</p><div class="notice">個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。</div><p><a href={url('/safety/')}>安全性について</a> · <a href={url('/faq/')}>よくある質問</a></p>
