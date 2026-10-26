@@ -30,3 +30,4 @@ html[data-theme=dark] #equipment-table td::before { color:#bfd5f3; }
 html[data-theme=dark] input::placeholder { color:#b9c8dc; }
 }
 @media print { .storage-strip,.header-actions,.sample-banner,.draft-panel,dialog { display:none!important; } }
+.csv-change{border:1px solid #aabbd1;border-radius:6px;padding:12px;margin-block:12px;min-width:0}.csv-change-table{width:100%;table-layout:fixed;border-collapse:collapse}.csv-change-table th,.csv-change-table td{padding:8px;border:1px solid #aabbd1;vertical-align:top;overflow-wrap:anywhere}.csv-value{max-height:12rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}.csv-change h3{overflow-wrap:anywhere}#csv-page{align-self:center}

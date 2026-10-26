@@ -158,6 +158,9 @@ export function completion(data: HandoverData) {
   const done = rows.filter(row => row.completed).length;
   return { total: rows.length, done, percent: rows.length ? Math.round(done / rows.length * 100) : 0 };
 }
+export function sortByDueDate(entries: Entry[]) {
+  return [...entries].sort((a,b) => (textValue(a.dueDate) || '9999-99-99').localeCompare(textValue(b.dueDate) || '9999-99-99') || a.title.localeCompare(b.title,'ja'));
+}
 export function searchEntries(data: HandoverData, query: string) {
   const normalize = (value: string) => value.normalize('NFKC').toLocaleLowerCase('ja');
   const words = normalize(query).trim().split(/\s+/).filter(Boolean);

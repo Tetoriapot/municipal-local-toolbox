@@ -25,7 +25,7 @@ export interface Tool {
 
 const definitions = [
   { id: 'handover-note', name: '異動引継ぎノート', description: '担当業務、年間予定、関係者、引継ぎ状況を管理。', summary: '異動・退職時に伝えておきたい担当業務、年間予定、関係者、ファイルの場所を一か所に整理するツールです。', category: 'handover', icon: 'notebook', tags: ['引継ぎ', '年間予定', '検索', 'JSON'], features: ['担当業務管理', '年間予定', '関係者リスト', 'ファイル保存場所', '申し送り事項', 'チェックリスト', '完成度チェック', '全文検索', 'JSONバックアップ'], useCases: ['異動前に、担当業務を少しずつ整理したい', '後任の方が迷わず仕事を始められるようにしたい'] },
-  { id: 'equipment-manager', name: '備品管理台帳', description: '管理番号、設置場所、購入日、備品の状態を記録。', summary: '管理番号、設置場所、購入日、状態を整理して、部署内の備品を把握するための台帳です。', category: 'equipment', icon: 'box', tags: ['台帳', '備品', 'CSV'], features: ['備品登録', '管理番号', 'カテゴリ', '設置場所', '購入日', '状態管理', 'CSV出力', 'CSV読込み'], useCases: ['部署にある備品と保管場所を把握したい', '年度末の備品確認をスムーズに進めたい'] },
+  { id: 'equipment-manager', name: '備品管理台帳', description: '管理番号、設置場所、購入日、備品の状態を記録。', summary: '管理番号、設置場所、購入日、状態を整理して、部署内の備品を把握するための台帳です。', category: 'equipment', icon: 'box', tags: ['台帳', '備品', 'CSV'], features: ['備品登録', '管理番号', 'カテゴリ', '設置場所', '購入日', '状態管理', 'CSV出力', 'CSV読込み', 'CSV更新', '棚卸確認'], useCases: ['部署にある備品と保管場所を把握したい', '年度末の備品確認をスムーズに進めたい'] },
   { id: 'lending-manager', name: '貸出・返却管理', description: '備品の貸出先、返却予定、利用履歴を管理。', summary: '備品の貸出先と返却予定を記録し、返却漏れを防ぐための管理ツールです。', category: 'equipment', icon: 'exchange', tags: ['貸出', '備品', '履歴'], features: ['備品一覧', '貸出登録', '返却処理', '貸出者管理', '返却予定', '延滞表示', '利用履歴'], useCases: ['共有備品の貸出状況を確認したい', '返却予定日を過ぎた備品を見つけたい'] },
   { id: 'inventory-manager', name: '消耗品在庫管理', description: '消耗品の在庫数、入出庫、補充基準を管理。', summary: '消耗品の入庫・出庫と最低在庫を管理し、補充が必要なものを確認するツールです。', category: 'equipment', icon: 'layers', tags: ['在庫', '備品', '台帳'], features: ['在庫数量', '最低在庫の設定', '入庫記録', '出庫記録', '在庫不足表示'], useCases: ['用紙や文具の在庫を管理したい', '必要なタイミングで補充を行いたい'] },
   { id: 'annual-calendar', name: '年間業務カレンダー', description: '定例業務とイベントを月・週・一覧で確認。', summary: '年間の定例業務とイベントを、月・週・一覧の表示で整理するカレンダーです。', category: 'date', icon: 'calendar', tags: ['年間予定', 'カレンダー', '印刷'], features: ['年間予定', '月表示', '週表示', '一覧表示', '定例業務', 'イベント', '印刷'], useCases: ['年度を通した業務の流れを把握したい', '部署の年間予定を印刷して共有したい'] },
@@ -35,20 +35,20 @@ const definitions = [
 ] satisfies Array<Pick<Tool, 'id' | 'name' | 'description' | 'summary' | 'category' | 'icon' | 'tags' | 'features' | 'useCases'>>;
 
 const releases: Partial<Record<string, { version: string; status: Tool['status']; implementation: NonNullable<Tool['implementation']> }>> = {
-  'handover-note': { version: '1.1.0', status: 'ready', implementation: {
-    featureNote: '6分類の記録を登録・編集・削除できます。年間予定は4月から翌年3月の月別表示です。完成度は、登録した記録のうち確認済みにした割合を表示します。',
-    storageDescription: 'すべての記録と基本情報・メモをブラウザ内に保存し、JSONで書き出せます。配布確認版のメモとJSONも読み込めます。',
+  'handover-note': { version: '1.2.0', status: 'ready', implementation: {
+    featureNote: '6分類の記録を登録・編集・削除できます。分類別の記入例、申し送り事項・チェックリストの期限順表示、直前の削除の取消に対応しています。年間予定は4月から翌年3月の月別表示です。完成度は、登録した記録のうち確認済みにした割合を表示します。',
+    storageDescription: 'すべての記録と基本情報・メモをブラウザ内に保存し、JSONで書き出せます。配布確認版のメモとJSONも読み込めます。下書きの移行には専用のJSONを使用します。',
     printLabel: '全記録・表示中の一覧の印刷', extraOutputs: [],
   } },
-  'equipment-manager': { version: '1.1.0', status: 'ready', implementation: {
-    featureNote: '備品の管理番号、備品名、カテゴリ、設置場所、購入日、状態、備考を登録・編集・削除できます。検索・絞り込み・並び替えと、全件または絞り込み結果のCSV出力と、列の対応を確認するCSV読込みに対応しています。',
-    storageDescription: '全備品とメモをブラウザ内に保存し、JSONで書き出せます。配布確認版のメモとJSONも読み込めます。CSVから備品を追加できます。メモ・ID・拡張項目を含む復元にはJSONを使用してください。',
+  'equipment-manager': { version: '1.2.0', status: 'ready', implementation: {
+    featureNote: '備品の管理番号、備品名、カテゴリ、設置場所、購入日、状態、備考、棚卸確認日・確認者・差異メモを登録・編集・削除できます。検索・絞り込み・並び替えと、全件または絞り込み結果のCSV出力と、変更前後を確認するCSV追加・更新に対応しています。直前の削除・CSV反映は、別の変更を行う前なら取り消せます。',
+    storageDescription: '全備品とメモをブラウザ内に保存し、JSONで書き出せます。配布確認版のメモとJSONも読み込めます。CSVから備品を追加・更新できます。下書きは専用のJSONで書出し・読込みができます。メモ・ID・拡張項目を含む復元にはJSONを使用してください。',
     printLabel: '全データ・絞り込み結果の印刷', extraOutputs: ['全件・絞り込み結果のCSV出力'],
   } },
 };
 
 export const tools: Tool[] = definitions.map((tool, order) => ({
-  ...tool, order, version: '0.1.1-preview', createdAt: '2026-10-05', updatedAt: '2026-10-05', status: 'preview',
+  ...tool, order, version: '0.1.2-preview', createdAt: '2026-10-05', updatedAt: '2026-10-26', status: 'preview',
   ...releases[tool.id],
   downloads: { txt: `/downloads/${tool.id}.txt`, html: `/downloads/${tool.id}.html` },
   demo: releases[tool.id] ? `/downloads/${tool.id}.html#sample` : null, network: false, account: false, externalLibrary: false,

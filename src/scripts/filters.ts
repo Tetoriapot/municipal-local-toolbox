@@ -6,6 +6,7 @@ if (root) {
   const tools = JSON.parse(document.querySelector('#catalog-data')!.textContent!) as (Tool & { categoryName: string })[];
   const search = root.querySelector<HTMLInputElement>('#catalog-search')!;
   const sort = root.querySelector<HTMLSelectElement>('#sort')!;
+  const ready = root.querySelector<HTMLInputElement>('input[name="ready"]')!;
   const categoryInputs = [...root.querySelectorAll<HTMLInputElement>('input[name="category"]')];
   const tagInputs = [...root.querySelectorAll<HTMLInputElement>('input[name="tag"]')];
   const grid = root.querySelector<HTMLElement>('[data-results]')!;
@@ -13,7 +14,7 @@ if (root) {
   const checked = (inputs: HTMLInputElement[]) => inputs.filter(input => input.checked).map(input => input.value);
 
   function render(updateUrl = true) {
-    const state = { query: search.value.slice(0, 200), categories: checked(categoryInputs), tags: checked(tagInputs), sort: sort.value };
+    const state = { query: search.value.slice(0, 200), categories: checked(categoryInputs), tags: checked(tagInputs), sort: sort.value, readyOnly: ready.checked };
     const matches = filterTools(tools, state);
     cards.forEach(card => { card.hidden = true; });
     matches.forEach((tool: Tool) => { const card = cards.get(tool.id)!; card.hidden = false; grid.append(card); });
@@ -28,6 +29,7 @@ if (root) {
       if (root!.dataset.initialCategory && !state.categories.length) params.set('category', '');
       state.tags.forEach(value => params.append('tag', value));
       if (state.sort !== 'recommended') params.set('sort', state.sort);
+      if (state.readyOnly) params.set('status', 'ready');
       const query = params.toString();
       history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
     }
@@ -35,6 +37,7 @@ if (root) {
   function restore() {
     const params = new URLSearchParams(location.search);
     search.value = (params.get('q') || '').slice(0, 200);
+    ready.checked = params.get('status') === 'ready';
     const selectedCategories = params.has('category') ? params.getAll('category') : [root!.dataset.initialCategory];
     categoryInputs.forEach(input => { input.checked = selectedCategories.includes(input.value); });
     tagInputs.forEach(input => { input.checked = params.getAll('tag').includes(input.value); });
@@ -43,9 +46,9 @@ if (root) {
   }
   search.addEventListener('input', () => render());
   search.closest('form')!.addEventListener('submit', event => { event.preventDefault(); render(); });
-  [...categoryInputs, ...tagInputs, sort].forEach(input => input.addEventListener('change', () => render()));
+  [...categoryInputs, ...tagInputs, sort, ready].forEach(input => input.addEventListener('change', () => render()));
   root.querySelectorAll('[data-reset]').forEach(button => button.addEventListener('click', () => {
-    search.value = ''; sort.value = 'recommended'; [...categoryInputs, ...tagInputs].forEach(input => { input.checked = false; }); render(); search.focus();
+    search.value = ''; sort.value = 'recommended'; ready.checked = false; [...categoryInputs, ...tagInputs].forEach(input => { input.checked = false; }); render(); search.focus();
   }));
   addEventListener('popstate', restore);
   restore();

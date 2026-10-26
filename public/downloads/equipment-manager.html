@@ -232,6 +232,7 @@ html[data-theme=dark] #equipment-table td::before { color:#bfd5f3; }
 html[data-theme=dark] input::placeholder { color:#b9c8dc; }
 }
 @media print { .storage-strip,.header-actions,.sample-banner,.draft-panel,dialog { display:none!important; } }
+.csv-change{border:1px solid #aabbd1;border-radius:6px;padding:12px;margin-block:12px;min-width:0}.csv-change-table{width:100%;table-layout:fixed;border-collapse:collapse}.csv-change-table th,.csv-change-table td{padding:8px;border:1px solid #aabbd1;vertical-align:top;overflow-wrap:anywhere}.csv-value{max-height:12rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}.csv-change h3{overflow-wrap:anywhere}#csv-page{align-self:center}
 </style>
 <script>(() => {
   const key = 'municipal-toolbox:theme:v1';
@@ -266,7 +267,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
 </script></head>
 <body><span id="sample" hidden></span>
 <a class="skip" href="#main">本文へ移動</a>
-<header class="app-header"><div><span class="brand">自治体ローカルツール箱</span><h1>備品管理台帳 <small>v1.1.0</small></h1></div><div class="header-actions"><span id="save-status" role="status" aria-live="polite">保存状態を確認中</span><button type="button" class="secondary" data-view="help">ヘルプ</button></div></header>
+<header class="app-header"><div><span class="brand">自治体ローカルツール箱</span><h1>備品管理台帳 <small>v1.2.0</small></h1></div><div class="header-actions"><span id="save-status" role="status" aria-live="polite">保存状態を確認中</span><button type="button" class="secondary" data-view="help">ヘルプ</button></div></header>
 <div class="workspace">
   <nav id="navigation" aria-label="ツールメニュー"><button type="button" data-view="home" aria-current="page">ホーム</button><button type="button" data-view="list">備品一覧</button><button type="button" data-view="data">データ管理</button></nav>
   <main id="main" tabindex="-1">
@@ -286,17 +287,19 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         <label for="category-filter">カテゴリ<select id="category-filter"><option value="">すべて</option></select></label>
         <label for="location-filter">設置場所<select id="location-filter"><option value="">すべて</option></select></label>
         <label for="status-filter">状態<select id="status-filter"><option value="">すべて</option></select></label>
+        <label for="check-year">棚卸の対象年<input id="check-year" type="number" min="1000" max="9999" step="1"></label>
+        <label for="checked-filter">棚卸確認<select id="checked-filter"><option value="">すべて</option><option value="done">対象年に確認済み</option><option value="pending">対象年に未確認</option></select></label>
         <label for="sort">並び替え<select id="sort"><option value="number">管理番号順</option><option value="name">備品名順</option><option value="date-desc">購入日が新しい順</option><option value="date-asc">購入日が古い順</option></select></label>
       </div>
       <div class="list-actions"><button type="button" class="secondary" id="reset-filters">条件をクリア</button><button type="button" class="secondary" id="csv-all">全備品をCSV出力</button><button type="button" class="secondary" id="csv-current">絞り込み結果をCSV出力</button></div>
       <p id="result-count" role="status" class="muted"></p><p id="empty-state" class="empty" hidden></p>
       <table id="equipment-table"><caption class="sr-only">備品一覧</caption><thead><tr><th scope="col">管理番号</th><th scope="col">備品名・備考</th><th scope="col">カテゴリ</th><th scope="col">設置場所</th><th scope="col">購入日</th><th scope="col">状態</th><th scope="col">操作</th></tr></thead><tbody id="equipment-rows"></tbody></table>
       <nav class="pagination" aria-label="備品一覧のページ"><button type="button" class="secondary" id="previous-page">前のページ</button><span id="page-number" role="status"></span><button type="button" class="secondary" id="next-page">次のページ</button></nav>
-      <p class="muted">CSVは備品の出力・追加に使えます。メモや復元用の情報はJSONバックアップに保存します。</p>
+      <p class="muted">CSVは備品の出力・追加・更新に使えます。メモや復元用の情報はJSONバックアップに保存します。</p>
     </section>
     <section data-panel="data" hidden>
       <h2>データ管理</h2><div class="content-panel"><h3>保存と復元</h3><p>全備品とメモをJSONファイルに保存・復元します。読込みは現在の全データを置き換えます。必要な内容を先に書き出してください。10MB以下の、このツールのJSONを読み込めます。配布確認版のJSONにも対応しています。</p><p id="data-count" class="muted"></p></div>
-      <div class="content-panel"><h3>CSVと印刷</h3><p>CSV出力は備品一覧から操作します。絞り込み結果の出力には、現在のページ以外も含まれます。CSVはUTF-8で出力します。管理番号の先頭の0を残す場合は、表計算ソフトの読込み時に文字列を指定してください。</p><p>数式として解釈される可能性があるセルには、先頭にアポストロフィを付けます。台帳やJSONの元データは変更しません。CSVの読込みは備品一覧の「CSVを読み込む」から行います。文字コードと列の対応を確認し、検証後のプレビューで追加件数を確認してください。重複や不正な行があれば全件を取り込みません。元の備品・メモは残します。</p><p>「全データを印刷」は全備品とメモ、「絞り込み結果を印刷」は一覧の検索・並び替え条件に合う全備品を印刷します。</p></div>
+      <div class="content-panel"><h3>CSVと印刷</h3><p>CSV出力は備品一覧から操作します。絞り込み結果の出力には、現在のページ以外も含まれます。CSVはUTF-8で出力します。管理番号の先頭の0を残す場合は、表計算ソフトの読込み時に文字列を指定してください。</p><p>数式として解釈される可能性があるセルには、先頭にアポストロフィを付けます。台帳やJSONの元データは変更しません。CSVの読込みは備品一覧の「CSVを読み込む」から行います。文字コードと列の対応を確認し、取込み方法を選び、検証後のプレビューで追加・更新・変更なしの件数と変更前後を確認してください。重複や不正な行があれば全件を取り込みません。CSVにない備品・メモ・拡張項目は保持します。更新では、選んだ列の空欄は既存値を消し、選ばない列は既存値を保持します。</p><p>「全データを印刷」は全備品とメモ、「絞り込み結果を印刷」は一覧の検索・並び替え条件に合う全備品を印刷します。</p></div>
       <div class="content-panel danger-panel"><h3>すべてのデータを削除</h3><p>このバージョンの確定済みデータを削除します。下書きは「下書きを削除」で別に削除してください。旧版の保存領域と、書き出したJSON・CSVは残ります。</p><button type="button" id="clear" class="danger">すべてのデータを削除</button></div>
     </section>
     <section data-panel="help" hidden>
@@ -304,7 +307,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
       <h3>管理番号と状態</h3><p>管理番号は必須です。前後の空白、全角・半角、英字の大小だけが異なる番号も重複として扱います。状態は使用中・保管中・修理中・廃棄済み・未確認から選びます。廃棄済みにしても記録は残ります。</p>
       <h3>保存と旧版からの移行</h3><p>データは利用中のブラウザ内に保存します。HTMLファイル自体には書き込みません。メモは入力時に自動保存し、備品の編集は「登録する」「変更を保存」で確定します。未確定の内容はJSON・CSV・印刷に含まれません。</p><p>同じ保存場所で旧版のメモを見つけたら新領域へ複製します。見つからない場合は、旧版からJSONを書き出して読み込んでください。旧版の保存領域は変更しません。</p><p>別の画面からの変更を検出すると保存を止めます。この画面の内容をJSONへ書き出した後に、保存済みデータを読み直してください。共同編集や自動マージには対応していません。</p>
       <h3>出力とデータ保護</h3><p>CSVと絞り込み印刷は、ページ分割に関係なく条件に合う全備品が対象です。全データ印刷とJSONバックアップは検索条件の影響を受けません。</p><p>保存に失敗したときは「未保存」と表示します。JSONを書き出してから画面を閉じてください。ファイルの移動・改名、ブラウザ・PCの変更、閲覧データの削除で保存内容を参照できなくなる場合があります。</p><p>記録は3,000件、JSONは10MBまでです。ブラウザの保存可能容量は設定や環境で異なります。</p>
-      <h3>下書きとサンプル</h3><p>編集の下書きはツールごとに1件保存します。「下書きを残して閉じる」で中断し、「下書きを再開」で続けられます。登録・保存するまで通常のJSON・CSV・印刷には含みません。下書きの書出しは内容の保管用で、通常のバックアップ読込みには使えません。</p><p>「サンプルで試す」は架空データを別画面で開きます。通常のデータや下書きは読み書きしません。変更は再読込みで消え、初期サンプルに戻ります。</p><h3>情報の取り扱い</h3><p>外部通信は行いません。入力内容、JSON、CSVは暗号化されません。個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。</p><p class="muted">Microsoft Edge / Google Chromeを主要な対応対象としています。Internet Explorerには対応しません。</p>
+      <h3>下書きとサンプル</h3><p>編集の下書きはツールごとに1件保存します。「下書きを残して閉じる」で中断し、「下書きを再開」で続けられます。登録・保存するまで通常のJSON・CSV・印刷には含みません。下書きJSONは、同じツールの「データ管理」にある「下書きを読み込む」で復元します。既存の下書きは上書きしません。通常のバックアップ読込みには使えません。</p><p>「サンプルで試す」は架空データを別画面で開きます。通常のデータや下書きは読み書きしません。変更は再読込みで消え、初期サンプルに戻ります。</p><h3>情報の取り扱い</h3><p>外部通信は行いません。入力内容、JSON、CSVは暗号化されません。個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。</p><p class="muted">Microsoft Edge / Google Chromeを主要な対応対象としています。Internet Explorerには対応しません。</p>
     </section>
   </main>
 </div>
@@ -539,7 +542,16 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             throw new Error('下書きの項目が正しくありません。');
         return data;
     }
-    function createEditDraft(toolId, restore, memoryOnly = false) {
+    function validateDraftFields(draft, fields, checkboxKeys = []) {
+        for (const field of fields) {
+            if (Object.hasOwn(draft.values, field.key))
+                readField(draft.values[field.key], { ...field, required: false });
+        }
+        for (const key of checkboxKeys)
+            if (Object.hasOwn(draft.values, key) && typeof draft.values[key] !== 'boolean')
+                throw new Error('下書きのチェック項目が正しくありません。');
+    }
+    function createEditDraft(toolId, restore, memoryOnly = false, validateImported = () => { }) {
         const key = 'municipal-toolbox:draft:v1:' + toolId;
         let raw = null;
         let active = null;
@@ -572,10 +584,64 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             link.download = (memoryOnly ? 'sample-' : '') + toolId + '-draft.json';
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-            message.textContent = '下書きのJSONを書き出しました。内容の保管用です。通常のバックアップ読込みには使用できません。';
+            message.textContent = '下書きのJSONを書き出しました。移行先の同じツールで「下書きを読み込む」を使ってください。通常のバックアップ読込みには使用できません。';
         });
         panel.append(title, message, resume, discard, exportDraft);
         document.getElementById('feedback').after(panel);
+        const importArea = node('section', '', 'content-panel');
+        importArea.append(node('h3', '下書きの移行'), node('p', '確定済みデータは通常のバックアップで移し、下書きは専用のJSONで移します。既存の下書きがある場合は、先に書き出してから再開または削除してください。'));
+        const picker = node('input');
+        picker.type = 'file';
+        picker.accept = '.json,application/json';
+        picker.hidden = true;
+        picker.id = 'import-draft-file';
+        const importButton = action('下書きを読み込む', () => picker.click());
+        importButton.id = 'import-draft';
+        const importMessage = node('p');
+        importMessage.id = 'draft-import-message';
+        importMessage.setAttribute('role', 'status');
+        importArea.append(importButton, picker, importMessage);
+        document.querySelector('[data-panel="data"]').append(importArea);
+        let importing = false;
+        picker.addEventListener('change', async () => {
+            const file = picker.files?.[0];
+            picker.value = '';
+            if (!file || importing)
+                return;
+            importing = true;
+            importButton.disabled = true;
+            try {
+                if (raw !== null || document.querySelector('#edit-dialog[open]'))
+                    throw new Error('既存の下書きまたは編集中の内容があります。先に書き出し、再開・保存または削除してください。');
+                if (!/\.json$/i.test(file.name) || !file.size || file.size > 2 * 1024 * 1024)
+                    throw new Error('空ではない2MB以下の下書きJSONファイルを選択してください。');
+                if (file.type && !['application/json', 'text/json', 'text/plain', 'application/octet-stream'].includes(file.type))
+                    throw new Error('JSONファイルとして認識できません。元の下書きファイルを選択してください。');
+                const incoming = parseEditDraft((await file.text()).replace(/^\uFEFF/, ''), toolId);
+                validateImported(incoming);
+                if (!confirm('下書きを読み込みますか？\nファイル：' + file.name + '\n分類：' + incoming.section + '\n下書きの日時：' + new Date(incoming.updatedAt).toLocaleString('ja-JP') + '\n確定済みの記録は変更しません。読込み後に「下書きを再開」で内容を確認してください。')) {
+                    importMessage.textContent = '下書きの読込みをキャンセルしました。';
+                    return;
+                }
+                if (raw !== null || document.querySelector('#edit-dialog[open]') || (!memoryOnly && localStorage.getItem(key) !== raw))
+                    throw new Error('別の画面または編集中の下書きが変更されています。上書きせず、内容を確認してください。');
+                const next = JSON.stringify(incoming);
+                if (!memoryOnly)
+                    localStorage.setItem(key, next);
+                raw = next;
+                active = null;
+                render();
+                resume.focus();
+                importMessage.textContent = memoryOnly ? '下書きをこのサンプル画面に読み込みました。通常の保存データは変更していません。' : '下書きを読み込みました。再開して内容を確認してください。';
+            }
+            catch (error) {
+                importMessage.textContent = '下書きを読み込めません。' + (error instanceof SyntaxError ? 'JSONの形式を確認してください。' : error instanceof DOMException ? 'ブラウザの保存制限や容量を確認してください。' : error instanceof Error ? error.message : 'ファイルと保存容量を確認してください。') + '現在のデータと下書きは変更していません。';
+            }
+            finally {
+                importing = false;
+                importButton.disabled = false;
+            }
+        });
         function render() {
             panel.hidden = raw === null;
             exportDraft.disabled = raw === null;
@@ -632,8 +698,9 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         function save(values) {
             if (!active)
                 return false;
-            const next = JSON.stringify({ schemaVersion: 1, toolId, ...active, values, updatedAt: new Date().toISOString() });
             try {
+                const previous = raw ? parseEditDraft(raw, toolId) : null;
+                const next = JSON.stringify({ ...previous, schemaVersion: 1, toolId, ...active, values: { ...previous?.values, ...values }, updatedAt: new Date().toISOString() });
                 parseEditDraft(next, toolId);
                 if (!memoryOnly && localStorage.getItem(key) !== raw)
                     throw new Error('別の画面で下書きが変更されています。上書きしていません。編集中の内容を登録するか、手元に控えてください。');
@@ -662,6 +729,72 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         lines.push('', '確定済みのデータを、読込み後の内容ですべて置き換えます。追加や結合ではありません。', '下書きは別に保持します。必要な確定済みデータはキャンセルして先にJSONへ書き出してください。', '', 'この内容で置き換えますか？');
         return lines.join('\n');
     }
+    function recoveryRevision(data, storageKey, memoryOnly = false) {
+        let stored = null;
+        try {
+            stored = memoryOnly ? null : localStorage.getItem(storageKey);
+        }
+        catch {
+            stored = 'storage-unavailable';
+        }
+        return JSON.stringify([data, stored]);
+    }
+    function createRecoveryControls(revision) {
+        const panel = node('aside', '', 'recovery-panel storage-strip');
+        panel.hidden = true;
+        panel.setAttribute('aria-label', '直前の操作の取消');
+        const status = node('p');
+        status.setAttribute('role', 'status');
+        let expected = '', restore = null;
+        const undo = action('直前の操作を取り消す', () => {
+            if (!restore)
+                return;
+            if (revision() !== expected) {
+                restore = null;
+                undo.disabled = true;
+                status.textContent = '操作後にデータが変更されています。新しい内容を保護するため、取り消せません。';
+                return;
+            }
+            const apply = restore;
+            if (apply()) {
+                restore = null;
+                undo.disabled = true;
+                panel.hidden = false;
+                status.textContent = '直前の操作を取り消しました。保存状態を確認してください。';
+            }
+        });
+        undo.id = 'undo-last';
+        panel.append(status, undo, node('p', '取消用の内容はこの画面だけに保持します。別の変更や再読込みで失われます。JSONバックアップとは別です。', 'muted'));
+        el('feedback').after(panel);
+        return {
+            invalidate() { restore = null; undo.disabled = true; panel.hidden = true; },
+            remember(label, apply) {
+                expected = revision();
+                restore = apply;
+                undo.disabled = false;
+                panel.hidden = false;
+                status.textContent = label + '。別の変更を行う前なら取り消せます。';
+            },
+        };
+    }
+    function setupBackupPreparation() {
+        const modal = node('dialog');
+        modal.id = 'prepare-import-dialog';
+        modal.setAttribute('aria-labelledby', 'prepare-import-title');
+        const title = node('h2', 'バックアップ読込み前の保存');
+        title.id = 'prepare-import-title';
+        const exportCurrent = action('現在のデータを書き出す', () => el('export').click());
+        exportCurrent.id = 'export-before-import';
+        const choose = action('読込みファイルを選ぶ', () => { modal.close(); el('import-file').click(); });
+        choose.id = 'choose-import-file';
+        const cancel = action('キャンセル', () => modal.close());
+        const actions = node('div', '', 'dialog-actions');
+        actions.append(exportCurrent, choose, cancel);
+        modal.append(title, node('p', 'JSONを読み込むと、確定済みデータ全体を置き換えます。現在の内容が必要な場合は、先にJSONを書き出し、保存先でファイルを確認してください。'), node('p', '下書きは別に残ります。ファイルを選んだ後に、対象ツールと件数を確認します。'), actions);
+        document.body.append(modal);
+        trapDialogFocus(modal);
+        el('import').addEventListener('click', () => { modal.showModal(); exportCurrent.focus(); });
+    }
     const EQUIPMENT_ID = 'equipment-manager';
     const EQUIPMENT_KEY = 'municipal-toolbox:data:v2:equipment-manager';
     const EQUIPMENT_LEGACY_KEY = 'municipal-toolbox:preview:v1:equipment-manager';
@@ -680,6 +813,9 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         { key: 'purchaseDate', label: '購入日', type: 'date' },
         { key: 'status', label: '状態', type: 'select', options: EQUIPMENT_STATUSES.map(status => status.id) },
         { key: 'notes', label: '備考', type: 'textarea' },
+        { key: 'checkedAt', label: '棚卸確認日', type: 'date' },
+        { key: 'checkedBy', label: '棚卸確認者' },
+        { key: 'checkNotes', label: '棚卸差異メモ', type: 'textarea' },
     ];
     function equipmentEmpty() {
         return { schemaVersion: 2, toolId: EQUIPMENT_ID, text: '', items: [] };
@@ -755,7 +891,8 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         const words = normalizeEquipmentText(filter.query).split(/\s+/).filter(Boolean);
         const rows = items.filter(item => {
             const text = normalizeEquipmentText(EQUIPMENT_FIELDS.map(field => field.key === 'status' ? equipmentStatusLabel(item.status) : String(item[field.key] ?? '')).join(' '));
-            return words.every(word => text.includes(word)) && (!filter.category || item.category === filter.category) && (!filter.location || item.location === filter.location) && (!filter.status || item.status === filter.status);
+            const checked = !!item.checkedAt && item.checkedAt.slice(0, 4) === (filter.checkYear || String(new Date().getFullYear()));
+            return words.every(word => text.includes(word)) && (!filter.category || item.category === filter.category) && (!filter.location || item.location === filter.location) && (!filter.status || item.status === filter.status) && (!filter.checked || checked === (filter.checked === 'done'));
         });
         const key = filter.sort === 'name' ? 'name' : filter.sort.startsWith('date-') ? 'purchaseDate' : 'assetNumber';
         return rows.sort((a, b) => {
@@ -860,8 +997,9 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
     function defaultCsvMapping(headers) {
         return Object.fromEntries(EQUIPMENT_FIELDS.map(field => [field.key, headers.findIndex(header => [field.label, field.key].some(label => normalizeEquipmentText(label) === normalizeEquipmentText(header)))]));
     }
-    function prepareEquipmentCsv(parsed, mapping, data, restoreFormulaPrefix = false) {
+    function prepareEquipmentCsv(parsed, mapping, data, restoreFormulaPrefix = false, mode = 'append') {
         const errors = [], items = [];
+        const changes = [];
         const columns = Object.values(mapping).filter(column => column >= 0);
         if (new Set(columns).size !== columns.length)
             errors.push('同じCSV列を複数の項目に割り当てないでください。');
@@ -872,53 +1010,70 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
                 errors.push(field.label + 'の列指定が正しくありません。');
         }
         if (errors.length)
-            return { items, errors };
-        const numbers = new Set(data.items.map(item => normalizeEquipmentText(item.assetNumber)));
+            return { items, errors, changes, nextItems: data.items };
+        const existing = new Map(data.items.map(item => [normalizeEquipmentText(item.assetNumber), item]));
+        const numbers = new Set();
+        const restoreCell = (value) => restoreFormulaPrefix && (/^'[\s\u0000-\u001F\u007F-\u009F\u200B\uFEFF]*[=+\-@]/u.test(value) || /^'[\t\r\n]/.test(value)) ? value.slice(1) : value;
         parsed.records.forEach((row, index) => {
             try {
                 if (row.length !== parsed.headers.length)
                     throw new Error('見出しと列数が一致しません。');
+                const number = normalizeEquipmentText(restoreCell(row[mapping.assetNumber]));
+                if (numbers.has(number))
+                    throw new Error('CSV内で管理番号が重複しています。');
+                numbers.add(number);
+                const before = existing.get(number);
+                if (before && mode === 'append')
+                    throw new Error('管理番号「' + row[mapping.assetNumber] + '」が既存の備品と重複しています。');
                 const values = {};
                 for (const field of EQUIPMENT_FIELDS) {
-                    let value = mapping[field.key] < 0 ? '' : row[mapping[field.key]];
-                    if (restoreFormulaPrefix && /^'[\s\u0000-\u001F\u007F-\u009F\u200B\uFEFF]*[=+\-@]/u.test(value))
-                        value = value.slice(1);
-                    else if (restoreFormulaPrefix && /^'[\t\r\n]/.test(value))
-                        value = value.slice(1);
+                    const value = mapping[field.key] < 0 ? String(before?.[field.key] ?? '') : restoreCell(row[mapping[field.key]]);
                     values[field.key] = value;
                 }
                 const status = values.status.trim();
                 values.status = status ? EQUIPMENT_STATUSES.find(value => value.id === status || value.label === status)?.id ?? status : 'unknown';
-                const date = values.purchaseDate.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
-                if (date)
-                    values.purchaseDate = date[1] + '-' + date[2].padStart(2, '0') + '-' + date[3].padStart(2, '0');
-                const item = validateEquipmentItem({ ...values, id: crypto.randomUUID() });
-                const number = normalizeEquipmentText(item.assetNumber);
-                if (numbers.has(number))
-                    throw new Error('管理番号「' + item.assetNumber + '」が既存の備品またはCSV内で重複しています。');
-                numbers.add(number);
+                for (const field of EQUIPMENT_FIELDS.filter(field => field.type === 'date')) {
+                    const date = values[field.key].match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+                    if (date)
+                        values[field.key] = date[1] + '-' + date[2].padStart(2, '0') + '-' + date[3].padStart(2, '0');
+                }
+                const item = validateEquipmentItem({ ...before, ...values, id: before?.id ?? crypto.randomUUID(), assetNumber: before?.assetNumber ?? values.assetNumber });
+                const fields = EQUIPMENT_FIELDS.filter(field => !before || before[field.key] !== item[field.key]).map(field => field.key);
                 items.push(item);
+                changes.push({ kind: !before ? '追加' : fields.length ? '更新' : '変更なし', before, after: item, fields });
             }
             catch (error) {
                 errors.push((index + 1) + '件目：' + (error instanceof Error ? error.message : '内容を確認してください。'));
             }
         });
+        const replacements = new Map(items.map(item => [item.id, item]));
+        const nextItems = [...data.items.map(item => replacements.get(item.id) ?? item), ...changes.filter(change => change.kind === '追加').map(change => change.after)];
         if (!errors.length) {
             try {
-                serializeEquipment(parseEquipment({ ...data, items: [...data.items, ...items] }));
+                serializeEquipment(parseEquipment({ ...data, items: nextItems }));
             }
             catch (error) {
                 errors.push(error instanceof Error ? error.message : '台帳の上限を確認してください。');
             }
         }
-        return { items, errors };
+        return { items, errors, changes, nextItems };
     }
     function setupEquipmentCsv(options) {
         const dialog = node('dialog');
         dialog.id = 'csv-dialog';
         dialog.setAttribute('aria-labelledby', 'csv-title');
-        const title = node('h2', 'CSVから備品を追加');
+        const title = node('h2', 'CSVから備品を追加・更新');
         title.id = 'csv-title';
+        const modeLabel = node('label', '取込み方法');
+        const mode = node('select');
+        mode.id = 'csv-mode';
+        modeLabel.htmlFor = mode.id;
+        for (const [value, label] of [['append', '新しい備品を追加（既存番号は拒否）'], ['upsert', '管理番号で照合して追加・更新']]) {
+            const option = node('option', label);
+            option.value = value;
+            mode.append(option);
+        }
+        modeLabel.append(mode);
         const inputLabel = node('label', 'CSVファイル');
         const input = node('input');
         input.type = 'file';
@@ -951,8 +1106,73 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         const summary = node('p');
         summary.id = 'csv-summary';
         summary.setAttribute('role', 'status');
-        let file = null, parsed = null, prepared = [], original = '', busy = false, generation = 0;
-        function invalidate() { prepared = []; original = ''; accept.disabled = true; preview.replaceChildren(); summary.textContent = ''; }
+        const reviewLabel = node('label', '変更前後と空欄による削除を確認しました', 'check-field');
+        const review = node('input');
+        review.type = 'checkbox';
+        review.id = 'csv-review';
+        reviewLabel.prepend(review);
+        reviewLabel.hidden = true;
+        const pages = node('div', '', 'dialog-actions');
+        const pageLabel = node('span');
+        pageLabel.id = 'csv-page';
+        pageLabel.setAttribute('role', 'status');
+        const previous = action('前の20件', () => { previewPage--; renderPreview(); });
+        previous.id = 'csv-previous';
+        const next = action('次の20件', () => { previewPage++; renderPreview(); });
+        next.id = 'csv-next';
+        pages.append(previous, pageLabel, next);
+        pages.hidden = true;
+        let file = null, parsed = null, prepared = null, original = '', busy = false, generation = 0, previewPage = 0;
+        function invalidate() { prepared = null; original = ''; accept.disabled = true; preview.replaceChildren(); summary.textContent = ''; previewPage = 0; pages.hidden = true; review.checked = false; reviewLabel.hidden = true; }
+        function renderPreview() {
+            preview.replaceChildren();
+            if (!prepared)
+                return;
+            const count = Math.max(1, Math.ceil(prepared.changes.length / 20));
+            previewPage = Math.max(0, Math.min(previewPage, count - 1));
+            previous.disabled = previewPage === 0;
+            next.disabled = previewPage === count - 1;
+            pages.hidden = count === 1;
+            pageLabel.textContent = (previewPage + 1) + ' / ' + count;
+            for (const change of prepared.changes.slice(previewPage * 20, previewPage * 20 + 20)) {
+                const card = node('article', '', 'csv-change');
+                card.append(node('h3', change.kind + '：' + change.after.assetNumber + ' ' + change.after.name));
+                if (change.kind === '変更なし') {
+                    card.append(node('p', 'この備品は変更しません。'));
+                    preview.append(card);
+                    continue;
+                }
+                const table = node('table', '', 'csv-change-table');
+                table.append(node('caption', '取込み前後の内容'));
+                const head = node('thead'), heading = node('tr');
+                for (const label of ['項目', '変更前', '変更後']) {
+                    const th = node('th', label);
+                    th.scope = 'col';
+                    heading.append(th);
+                }
+                head.append(heading);
+                table.append(head);
+                const body = node('tbody');
+                for (const field of EQUIPMENT_FIELDS.filter(field => change.fields.includes(field.key))) {
+                    const row = node('tr');
+                    const label = node('th', field.label);
+                    label.scope = 'row';
+                    row.append(label);
+                    for (const item of [change.before, change.after]) {
+                        const text = item ? field.key === 'status' ? equipmentStatusLabel(item.status) : String(item[field.key] ?? '') : '';
+                        const cell = node('td');
+                        const value = node('div', text || '（空欄）', 'csv-value');
+                        value.tabIndex = 0;
+                        cell.append(value);
+                        row.append(cell);
+                    }
+                    body.append(row);
+                }
+                table.append(body);
+                card.append(table);
+                preview.append(card);
+            }
+        }
         const validate = action('内容を検証してプレビュー', () => {
             invalidate();
             error.textContent = '';
@@ -961,51 +1181,36 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
                 return;
             }
             const selected = Object.fromEntries([...mapping.querySelectorAll('select')].map(select => [select.name, Number(select.value)]));
-            const result = prepareEquipmentCsv(parsed, selected, options.getData(), prefix.checked);
+            const result = prepareEquipmentCsv(parsed, selected, options.getData(), prefix.checked, mode.value === 'upsert' ? 'upsert' : 'append');
             summary.textContent = 'CSV ' + parsed.records.length + '件／検証エラー ' + result.errors.length + '件。エラーがある間は1件も取り込みません。';
             if (result.errors.length) {
                 error.textContent = result.errors.join('\n');
                 return;
             }
-            prepared = result.items;
-            original = JSON.stringify(options.getData());
-            summary.textContent = '現在 ' + options.getData().items.length + '件 → 追加後 ' + (options.getData().items.length + prepared.length) + '件。既存の備品・メモ・拡張項目は保持します。先頭20件を表示しています。';
-            const table = node('table', '', 'csv-preview-table');
-            const caption = node('caption', '追加する備品のプレビュー');
-            table.append(caption);
-            const head = node('thead'), heading = node('tr');
-            for (const field of EQUIPMENT_FIELDS) {
-                const th = node('th', field.label);
-                th.scope = 'col';
-                heading.append(th);
-            }
-            head.append(heading);
-            table.append(head);
-            const body = node('tbody');
-            for (const item of prepared.slice(0, 20)) {
-                const row = node('tr');
-                for (const field of EQUIPMENT_FIELDS)
-                    row.append(node('td', field.key === 'status' ? equipmentStatusLabel(item.status) : String(item[field.key])));
-                body.append(row);
-            }
-            table.append(body);
-            preview.append(table);
-            accept.textContent = prepared.length + '件を追加';
-            accept.disabled = false;
+            prepared = result;
+            original = options.revision();
+            const added = result.changes.filter(change => change.kind === '追加').length, updated = result.changes.filter(change => change.kind === '更新').length;
+            summary.textContent = '現在 ' + options.getData().items.length + '件 → ' + (mode.value === 'upsert' ? '反映後 ' : '追加後 ') + result.nextItems.length + '件。追加 ' + added + '件／更新 ' + updated + '件／変更なし ' + (result.changes.length - added - updated) + '件。メモ・拡張項目とCSVにない備品は保持します。20件ずつ確認できます。';
+            renderPreview();
+            reviewLabel.hidden = mode.value !== 'upsert';
+            accept.textContent = mode.value === 'upsert' ? '確認した追加・更新を反映' : added + '件を追加';
+            accept.disabled = mode.value === 'upsert' || added + updated === 0;
         });
         validate.id = 'csv-validate';
         const accept = action('検証後に追加', () => {
-            if (!prepared.length || busy)
+            if (!prepared || busy || (mode.value === 'upsert' && !review.checked))
                 return;
-            if (JSON.stringify(options.getData()) !== original) {
+            if (options.revision() !== original) {
                 invalidate();
                 error.textContent = '台帳が変更されました。内容をもう一度検証してください。';
                 return;
             }
-            const count = prepared.length;
-            if (options.commit({ ...options.getData(), items: [...options.getData().items, ...prepared] })) {
+            const added = prepared.changes.filter(change => change.kind === '追加').length, updated = prepared.changes.filter(change => change.kind === '更新').length;
+            if (!added && !updated)
+                return;
+            if (options.commit({ ...options.getData(), items: prepared.nextItems })) {
                 dialog.close();
-                options.feedback(count + '件を追加しました。' + (options.dirty() ? 'ブラウザ内は未保存です。JSONを書き出してください。' : '既存の備品は保持しています。'), options.dirty());
+                options.feedback(added + '件を追加しました。' + updated + '件を更新しました。' + (options.dirty() ? 'ブラウザ内は未保存です。JSONを書き出してください。' : '別の変更を行う前なら取り消せます。'), options.dirty());
             }
             else
                 error.textContent = '追加できませんでした。台帳の容量と入力内容を確認してください。';
@@ -1016,7 +1221,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         cancel.id = 'csv-cancel';
         const actions = node('div', '', 'dialog-actions');
         actions.append(validate, accept, cancel);
-        dialog.append(title, node('p', '1行目を見出しとして読みます。管理番号・備品名の列は必須です。選ばない列は取り込みません。既存データへの追加のみで、置換・更新は行いません。'), inputLabel, encodingLabel, prefixLabel, mapping, error, summary, preview, actions);
+        dialog.append(title, node('p', '管理番号・備品名の列は必須です。更新では管理番号の全角・半角、英字の大小、前後空白を区別せず照合します。選ばない列は既存値を保持し、選んだ列の空欄は既存値を消します。CSVにない備品は削除しません。'), modeLabel, inputLabel, encodingLabel, prefixLabel, mapping, error, summary, preview, pages, reviewLabel, actions);
         document.body.append(dialog);
         trapDialogFocus(dialog);
         async function load() {
@@ -1072,8 +1277,10 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         input.addEventListener('change', () => { file = input.files?.[0] ?? null; void load(); });
         encoding.addEventListener('change', () => void load());
         prefix.addEventListener('change', invalidate);
+        mode.addEventListener('change', invalidate);
+        review.addEventListener('change', () => { accept.disabled = !prepared || !review.checked || !prepared.changes.some(change => change.kind !== '変更なし'); });
         dialog.addEventListener('close', () => { generation++; busy = false; file = null; parsed = null; input.value = ''; invalidate(); mapping.replaceChildren(); });
-        const open = action('CSVを読み込む', () => { error.textContent = ''; summary.textContent = ''; validate.disabled = false; dialog.showModal(); input.focus(); });
+        const open = action('CSVを読み込む', () => { mode.value = 'append'; error.textContent = ''; summary.textContent = ''; validate.disabled = false; dialog.showModal(); input.focus(); });
         open.id = 'csv-import';
         document.querySelector('.list-actions').append(open);
     }
@@ -1090,7 +1297,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
     let importBusy = false;
     let currentSaveLabel = '未入力';
     let currentSaveWarning = false;
-    const filter = { query: '', category: '', location: '', status: '', sort: 'number' };
+    const filter = { query: '', category: '', location: '', status: '', sort: 'number', checked: '', checkYear: String(new Date().getFullYear()) };
     const store = createLocalStore({
         key: EQUIPMENT_KEY, legacyKey: EQUIPMENT_LEGACY_KEY, fresh: equipmentEmpty,
         parse: parseEquipmentText, serialize: serializeEquipment,
@@ -1112,6 +1319,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         el('feedback').textContent = text;
         el('feedback').classList.toggle('error', error);
     }
+    const recovery = createRecoveryControls(() => recoveryRevision(store.data, EQUIPMENT_KEY, practiceMode));
     const drafts = createEditDraft('equipment-manager', draft => {
         if (draft.section !== 'equipment')
             throw new Error('分類がありません。');
@@ -1124,7 +1332,11 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         restoreDraftValues(recordForm, draft.values);
         el('draft-save-status').textContent = '下書きを復元しました。登録・保存するまで確定済みの備品は変わりません。';
         el('save-status').textContent = '下書きを編集中：登録・保存で確定';
-    }, practiceMode);
+    }, practiceMode, draft => {
+        if (draft.section !== 'equipment')
+            throw new Error('備品の下書きを選択してください。');
+        validateDraftFields(draft, EQUIPMENT_FIELDS);
+    });
     function valuesFor(key) {
         return [...new Set(store.data.items.map(item => item[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ja', { numeric: true }));
     }
@@ -1196,6 +1408,14 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
                     details.append(node('summary', '備考'), node('p', item.notes));
                     content.append(details);
                 }
+                if (key === 'name') {
+                    content.append(node('p', '棚卸：' + (item.checkedAt || '未確認') + (item.checkedBy ? '／' + item.checkedBy : ''), 'muted'));
+                    if (item.checkNotes) {
+                        const details = node('details');
+                        details.append(node('summary', '棚卸差異メモ'), node('p', item.checkNotes));
+                        content.append(details);
+                    }
+                }
                 cell.append(content);
                 row.append(cell);
             }
@@ -1205,9 +1425,11 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             const edit = action('編集', () => openEquipmentEditor(item));
             edit.setAttribute('aria-label', item.assetNumber + ' ' + item.name + 'を編集');
             const remove = action('削除', () => {
-                if (!confirm('「' + item.assetNumber + ' ' + item.name + '」を削除しますか？この操作は取り消せません。'))
+                if (!confirm('「' + item.assetNumber + ' ' + item.name + '」を削除しますか？別の変更や再読込みの前なら取り消せます。'))
                     return;
+                const before = structuredClone(store.data);
                 if (commitEquipment({ ...store.data, items: store.data.items.filter(row => row.id !== item.id) })) {
+                    recovery.remember('備品を削除しました', () => commitEquipment(before));
                     feedback(store.dirty ? '画面から削除しましたが未保存です。JSONを書き出してください。' : '備品を削除しました。', store.dirty);
                     el('add-record').focus();
                 }
@@ -1225,6 +1447,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         try {
             const valid = parseEquipment(next);
             serializeEquipment(valid);
+            recovery.invalidate();
             store.replace(valid, replaceCorrupt);
             renderEquipment();
             return true;
@@ -1249,9 +1472,10 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         el('main').focus();
     }
     function resetFilters() {
-        Object.assign(filter, { query: '', category: '', location: '', status: '', sort: 'number' });
-        for (const id of ['query', 'category-filter', 'location-filter', 'status-filter'])
+        Object.assign(filter, { query: '', category: '', location: '', status: '', sort: 'number', checked: '', checkYear: String(new Date().getFullYear()) });
+        for (const id of ['query', 'category-filter', 'location-filter', 'status-filter', 'checked-filter'])
             el(id).value = '';
+        el('check-year').value = filter.checkYear;
         el('sort').value = 'number';
         pageNumber = 1;
     }
@@ -1345,6 +1569,8 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         root.append(node('p', (all ? '全備品' : '絞り込み結果') + '：' + rows.length + '件'));
         if (!all)
             root.append(node('p', '条件：' + ['キーワード ' + (filter.query || '指定なし'), 'カテゴリ ' + (filter.category || 'すべて'), '設置場所 ' + (filter.location || 'すべて'), '状態 ' + (filter.status ? equipmentStatusLabel(filter.status) : 'すべて')].join(' / ')));
+        if (!all && filter.checked)
+            root.append(node('p', '棚卸：' + (filter.checkYear || new Date().getFullYear()) + '年に' + (filter.checked === 'done' ? '確認済み' : '未確認')));
         if (!rows.length)
             root.append(node('p', '該当する備品はありません。'));
         for (const item of rows) {
@@ -1400,7 +1626,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             equipmentMemo.value = store.data.text;
         updateMemoCount();
     });
-    for (const [id, key] of [['query', 'query'], ['category-filter', 'category'], ['location-filter', 'location'], ['status-filter', 'status'], ['sort', 'sort']]) {
+    for (const [id, key] of [['query', 'query'], ['category-filter', 'category'], ['location-filter', 'location'], ['status-filter', 'status'], ['sort', 'sort'], ['checked-filter', 'checked'], ['check-year', 'checkYear']]) {
         el(id).addEventListener(id === 'query' ? 'input' : 'change', () => { filter[key] = el(id).value; pageNumber = 1; renderList(); });
     }
     el('reset-filters').addEventListener('click', () => { resetFilters(); renderList(); el('query').focus(); });
@@ -1424,13 +1650,13 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
     for (const [id, filtered] of [['csv-all', false], ['csv-current', true]])
         el(id).addEventListener('click', () => {
             try {
-                downloadEquipment(equipmentCsv(filtered ? filteredItems() : selectEquipment(store.data.items, { ...filter, query: '', category: '', location: '', status: '' })), 'csv', filtered);
+                downloadEquipment(equipmentCsv(filtered ? filteredItems() : selectEquipment(store.data.items, { ...filter, query: '', category: '', location: '', status: '', checked: '' })), 'csv', filtered);
             }
             catch {
                 feedback('CSVを書き出せませんでした。入力内容を確認し、もう一度実行してください。', true);
             }
         });
-    el('import').addEventListener('click', () => el('import-file').click());
+    setupBackupPreparation();
     el('import-file').addEventListener('change', async () => {
         const picker = el('import-file');
         const file = picker.files?.[0];
@@ -1463,6 +1689,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
     el('reload-data').addEventListener('click', () => {
         if (!confirm('この画面の内容を破棄して保存済みデータを読み直しますか？必要な内容は先にJSONへ書き出してください。'))
             return;
+        recovery.invalidate();
         store.load();
         if (practiceMode)
             store.replace(parseEquipment(sample));
@@ -1483,6 +1710,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             return;
         try {
             store.clear();
+            recovery.invalidate();
             restoreMemo();
             renderEquipment();
             clearModal.close();
@@ -1499,12 +1727,19 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
     addEventListener('afterprint', () => el('print-area').replaceChildren());
     addEventListener('beforeunload', event => { if (store.dirty || equipmentEditDirty())
         event.preventDefault(); });
+    el('check-year').value = filter.checkYear;
     store.load();
     if (practiceMode)
         store.replace(parseEquipment(sample));
     restoreMemo();
     renderEquipment();
-    setupEquipmentCsv({ getData: () => store.data, commit: commitEquipment, dirty: () => store.dirty, feedback });
+    setupEquipmentCsv({ getData: () => store.data, revision: () => recoveryRevision(store.data, EQUIPMENT_KEY, practiceMode), commit: next => {
+            const before = structuredClone(store.data);
+            if (!commitEquipment(next))
+                return false;
+            recovery.remember('CSVの追加・更新を反映しました', () => commitEquipment(before));
+            return true;
+        }, dirty: () => store.dirty, feedback });
     el('suspend-edit').addEventListener('click', () => {
         if (drafts.save(draftFormValues(recordForm))) {
             editor.close();
@@ -1571,6 +1806,14 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         const title = node('h2', '更新情報');
         title.id = 'updates-title';
         updates.append(title, node('p', config.name + ' v' + config.version), node('p', '2026-10-05：右上の更新情報・配色切替・Helpと、保存先・バックアップの案内を追加しました。'));
+        if (config.ready)
+            updates.append(node('p', '2026-10-26：直前の削除の取消、読込み前の書出し操作、下書きJSONの専用読込みを追加しました。'));
+        if (config.id === 'equipment-manager')
+            updates.append(node('p', '管理番号で照合するCSV更新と変更前後の確認、CSV反映の取消、棚卸確認日・確認者・差異メモを追加しました。'));
+        if (config.id === 'handover-note')
+            updates.append(node('p', '分類別の記入例と、申し送り事項・チェックリストの期限順表示を追加しました。'));
+        if (!config.ready)
+            updates.append(node('p', '2026-10-26：配布ファイルの共通スタイルを更新しました。業務機能は未実装です。'));
         updates.append(node('p', 'JSONを読み込む前に、対象ツール・ファイル・書出し日時・件数を確認できます。'));
         if (config.ready)
             updates.append(node('p', '編集中の下書き保存・再開と、架空データで操作を試せるサンプルを追加しました。'));
@@ -1655,7 +1898,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             }
         });
     }
-    setupToolShell({ "id": "equipment-manager", "name": "備品管理台帳", "version": "1.1.0", "ready": true });
+    setupToolShell({ "id": "equipment-manager", "name": "備品管理台帳", "version": "1.2.0", "ready": true });
 })();
 </script>
 </body></html>

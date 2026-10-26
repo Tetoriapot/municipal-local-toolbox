@@ -10,6 +10,10 @@ export function setupToolShell(config: { id: string; name: string; version: stri
   const updates = node('dialog'); updates.id = 'updates-dialog'; updates.setAttribute('aria-labelledby', 'updates-title');
   const title = node('h2', '更新情報'); title.id = 'updates-title';
   updates.append(title, node('p', config.name + ' v' + config.version), node('p', '2026-10-05：右上の更新情報・配色切替・Helpと、保存先・バックアップの案内を追加しました。'));
+  if (config.ready) updates.append(node('p','2026-10-26：直前の削除の取消、読込み前の書出し操作、下書きJSONの専用読込みを追加しました。'));
+  if (config.id === 'equipment-manager') updates.append(node('p','管理番号で照合するCSV更新と変更前後の確認、CSV反映の取消、棚卸確認日・確認者・差異メモを追加しました。'));
+  if (config.id === 'handover-note') updates.append(node('p','分類別の記入例と、申し送り事項・チェックリストの期限順表示を追加しました。'));
+  if (!config.ready) updates.append(node('p','2026-10-26：配布ファイルの共通スタイルを更新しました。業務機能は未実装です。'));
   updates.append(node('p', 'JSONを読み込む前に、対象ツール・ファイル・書出し日時・件数を確認できます。'));
   if (config.ready) updates.append(node('p', '編集中の下書き保存・再開と、架空データで操作を試せるサンプルを追加しました。'));
   if (config.id === 'equipment-manager') updates.append(node('p', 'CSVから備品を追加できます。列の対応・重複・入力内容を検証し、プレビューで確認してから取り込みます。'));

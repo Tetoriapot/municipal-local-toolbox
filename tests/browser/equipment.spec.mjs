@@ -118,7 +118,7 @@ test('equipment pagination exports every matching record with safe Japanese CSV 
   expect((await download(page, 'csv-all')).bytes.toString('utf8').match(/^"N-/gm)).toHaveLength(55);
   await page.locator('#query').fill('該当しない');
   const empty = (await download(page, 'csv-current')).bytes.toString('utf8');
-  expect(empty).toBe('\uFEFF"管理番号","備品名","カテゴリ","設置場所","購入日","状態","備考"\r\n');
+  expect(empty).toBe('\uFEFF"管理番号","備品名","カテゴリ","設置場所","購入日","状態","備考","棚卸確認日","棚卸確認者","棚卸差異メモ"\r\n');
 });
 
 test('equipment detects another tab and preserves both the newer storage and unsaved export', async ({ page, context }) => {

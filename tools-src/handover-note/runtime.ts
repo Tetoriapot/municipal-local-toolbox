@@ -1,6 +1,9 @@
 import { el, node, action, trapDialogFocus } from '../shared/dom.ts';
-import { createEditDraft, draftFormValues, restoreDraftValues } from '../shared/drafts.ts';
+import { createEditDraft, draftFormValues, restoreDraftValues, validateDraftFields } from '../shared/drafts.ts';
 import { practiceMode } from '../shared/experience.ts';
+import { createRecoveryControls, recoveryRevision, setupBackupPreparation } from '../shared/recovery.ts';
+import { HANDOVER_EXAMPLES } from './examples.ts';
+import { sortByDueDate } from './model.ts';
 import { backupComparison } from '../shared/import-comparison.mjs';
 import sample from './sample.json' with { type: 'json' };
 import { HANDOVER_KEY, LEGACY_KEY, SECTIONS, PROFILE_FIELDS, MONTHS, MAX_RECORDS, freshData, parseHandoverText, serializeHandover, checkHandoverFile, completion, searchEntries, textValue, readField, validateEntry } from './model';
@@ -22,10 +25,12 @@ let unsaved = false;
 let currentView = 'home';
 let recordQuery = '';
 let recordFilter = 'all';
+let recordSort = 'registered';
 let editing: { section: Section; id: string | null } | null = null;
 let editStart = '';
 let importBusy = false;
 let returnFocus: HTMLElement | null = null;
+const recovery = createRecoveryControls(() => recoveryRevision(state, HANDOVER_KEY, practiceMode));
 const drafts = createEditDraft('handover-note', draft => {
   const section = sectionById(draft.section);
   if (!section) throw new Error('分類がありません。');
@@ -36,7 +41,11 @@ const drafts = createEditDraft('handover-note', draft => {
   restoreDraftValues(form,draft.values);
   el('draft-save-status').textContent = '下書きを復元しました。登録・保存するまで確定済みの記録は変わりません。';
   savedLabel('下書きを編集中：登録・保存で確定', true);
-}, practiceMode);
+}, practiceMode, draft => {
+  const section = sectionById(draft.section);
+  if (!section) throw new Error('引継ぎノートの分類を確認してください。');
+  validateDraftFields(draft, section.fields, ['entry-completed']);
+});
 
 function message(text: string, error = false) {
   feedback.textContent = text;
@@ -83,6 +92,7 @@ function writeState(): boolean {
   }
 }
 function loadState() {
+  recovery.invalidate();
   if (practiceMode) { state = parseHandoverText(JSON.stringify(sample)); unsaved = false; savedLabel('サンプル：この画面内のみ'); return; }
   blocked = null;
   unsaved = false;
@@ -111,6 +121,7 @@ function commit(next: HandoverData): boolean {
   try {
     // Validate capacity before mutating state so an accepted dataset can always be exported.
     serializeHandover(next);
+    recovery.invalidate();
     state = next;
     unsaved = true;
     writeState();
@@ -151,7 +162,7 @@ function renderProfile() {
         const value = readField(input.value, field);
         const next = { ...state, profile: { ...state.profile, [field.key]: value } };
         serializeHandover(next);
-        state = next; writeState();
+        recovery.invalidate(); state = next; writeState();
         input.setCustomValidity('');
       } catch (error) {
         input.setCustomValidity(error instanceof Error ? error.message : '入力を確認してください。');
@@ -206,14 +217,23 @@ function openEditor(section: Section, entry?: Entry, restoring = false) {
   const fields = el('edit-fields');
   fields.replaceChildren();
   for (const field of section.fields) fields.append(inputField(field, entry?.[field.key], 'field-').wrapper);
+  const examples = el('entry-examples'); examples.replaceChildren(node('summary','この分類の記入例を見る'),node('p','架空の記入例です。入力内容は変更しません。'));
+  const exampleList = node('dl');
+  for (const field of section.fields) {
+    const value = HANDOVER_EXAMPLES[section.id]?.[field.key];
+    if (value) exampleList.append(node('dt',field.label),node('dd',value));
+  }
+  examples.append(exampleList); examples.removeAttribute('open');
   el<HTMLInputElement>('entry-completed').checked = entry?.completed ?? false;
   editStart = editSnapshot();
   dialog.showModal();
   fields.querySelector<HTMLInputElement>('input')?.focus();
 }
 function deleteEntry(section: Section, entry: Entry) {
-  if (!confirm('「' + entry.title + '」を削除しますか？この操作は取り消せません。')) return;
+  if (!confirm('「' + entry.title + '」を削除しますか？別の変更や再読込みの前なら取り消せます。')) return;
+  const before = structuredClone(state);
   if (commit({ ...state, sections: { ...state.sections, [section.id]: state.sections[section.id].filter(row => row.id !== entry.id) } })) {
+    recovery.remember('記録を削除しました', () => commit(before));
     message('記録を削除しました。'); el<HTMLButtonElement>('add-record').focus();
   }
 }
@@ -254,7 +274,8 @@ function entryCard(section: Section, entry: Entry, print = false) {
   return card;
 }
 function visibleRecords(section: Section) {
-  return searchEntries(state, recordQuery).filter(item => item.section.id === section.id && (recordFilter === 'all' || item.entry.completed === (recordFilter === 'done'))).map(item => item.entry);
+  const rows = searchEntries(state, recordQuery).filter(item => item.section.id === section.id && (recordFilter === 'all' || item.entry.completed === (recordFilter === 'done'))).map(item => item.entry);
+  return recordSort === 'due' && section.fields.some(field=>field.key === 'dueDate') ? sortByDueDate(rows) : rows;
 }
 function renderRecords() {
   const section = sectionById(currentView);
@@ -262,6 +283,7 @@ function renderRecords() {
   const rows = visibleRecords(section);
   el('section-heading').textContent = section.label;
   el('section-description').textContent = section.description;
+  el<HTMLSelectElement>('record-sort').disabled = !section.fields.some(field=>field.key === 'dueDate');
   el('record-count').textContent = rows.length + '件表示 / 登録' + state.sections[section.id].length + '件';
   const root = el('record-list'); root.replaceChildren();
   if (section.id === 'schedule') {
@@ -308,7 +330,7 @@ function render() {
 function navigate(view: string) {
   if (!['home', 'data', 'help', 'search'].includes(view) && !sectionById(view)) return;
   currentView = view;
-  recordQuery = ''; recordFilter = 'all';
+  recordQuery = ''; recordFilter = 'all'; recordSort = 'registered'; el<HTMLSelectElement>('record-sort').value = recordSort;
   el<HTMLInputElement>('record-query').value = '';
   el<HTMLSelectElement>('completion-filter').value = 'all';
   document.querySelectorAll<HTMLButtonElement>('#navigation [data-view]').forEach(button => {
@@ -380,7 +402,7 @@ form.addEventListener('submit', event => {
 memo.addEventListener('input', () => {
   try {
     const next = { ...state, text: memo.value };
-    serializeHandover(next); state = next; writeState();
+    serializeHandover(next); recovery.invalidate(); state = next; writeState();
     el('count').textContent = memo.value.length.toLocaleString('ja-JP') + ' / 50,000文字';
   } catch (error) {
     memo.value = state.text;
@@ -389,6 +411,7 @@ memo.addEventListener('input', () => {
 });
 el('record-query').addEventListener('input', () => { recordQuery = el<HTMLInputElement>('record-query').value; renderRecords(); });
 el('completion-filter').addEventListener('change', () => { recordFilter = el<HTMLSelectElement>('completion-filter').value; renderRecords(); });
+el('record-sort').addEventListener('change',()=>{recordSort=el<HTMLSelectElement>('record-sort').value;renderRecords();});
 el('global-query').addEventListener('input', renderSearch);
 el('save-now').addEventListener('click', () => { if (writeState()) message('現在のデータを保存しました。'); });
 el('export').addEventListener('click', () => {
@@ -407,7 +430,7 @@ el('export').addEventListener('click', () => {
     message('バックアップのダウンロードを開始しました。保存先を確認してください。');
   } catch (error) { message(error instanceof Error ? error.message : 'バックアップを書き出せませんでした。', true); }
 });
-el('import').addEventListener('click', () => el<HTMLInputElement>('import-file').click());
+setupBackupPreparation();
 el('import-file').addEventListener('change', async () => {
   const picker = el<HTMLInputElement>('import-file');
   const file = picker.files?.[0]; picker.value = '';
@@ -447,7 +470,7 @@ el('confirm-clear').addEventListener('click', () => {
     const empty = freshData();
     const raw = serializeHandover(empty);
     if (!practiceMode) localStorage.setItem(HANDOVER_KEY, raw);
-    lastRaw = raw; state = empty; blocked = null; unsaved = false;
+    recovery.invalidate(); lastRaw = raw; state = empty; blocked = null; unsaved = false;
     el('storage-warning').hidden = true;
     savedLabel('このブラウザ内に自動保存済み'); clearDialog.close(); renderProfile(); render();
     message('このバージョンのデータを削除しました。旧版の保存領域とJSONファイルは残っています。');

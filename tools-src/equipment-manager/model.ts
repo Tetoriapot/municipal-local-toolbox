@@ -20,15 +20,18 @@ export const EQUIPMENT_FIELDS: Field[] = [
   { key: 'purchaseDate', label: '購入日', type: 'date' },
   { key: 'status', label: '状態', type: 'select', options: EQUIPMENT_STATUSES.map(status => status.id) },
   { key: 'notes', label: '備考', type: 'textarea' },
+  { key: 'checkedAt', label: '棚卸確認日', type: 'date' },
+  { key: 'checkedBy', label: '棚卸確認者' },
+  { key: 'checkNotes', label: '棚卸差異メモ', type: 'textarea' },
 ];
 export interface EquipmentItem extends Record<string, unknown> {
   id: string; assetNumber: string; name: string; category: string; location: string;
-  purchaseDate: string; status: string; notes: string;
+  purchaseDate: string; status: string; notes: string; checkedAt: string; checkedBy: string; checkNotes: string;
 }
 export interface EquipmentData extends Record<string, unknown> {
   schemaVersion: 2; toolId: 'equipment-manager'; text: string; items: EquipmentItem[];
 }
-export interface EquipmentFilter { query: string; category: string; location: string; status: string; sort: string; }
+export interface EquipmentFilter { query: string; category: string; location: string; status: string; sort: string; checked?: string; checkYear?: string; }
 export function equipmentEmpty(): EquipmentData {
   return { schemaVersion: 2, toolId: EQUIPMENT_ID, text: '', items: [] };
 }
@@ -84,7 +87,8 @@ export function selectEquipment(items: EquipmentItem[], filter: EquipmentFilter)
   const words = normalizeEquipmentText(filter.query).split(/\s+/).filter(Boolean);
   const rows = items.filter(item => {
     const text = normalizeEquipmentText(EQUIPMENT_FIELDS.map(field => field.key === 'status' ? equipmentStatusLabel(item.status) : String(item[field.key] ?? '')).join(' '));
-    return words.every(word => text.includes(word)) && (!filter.category || item.category === filter.category) && (!filter.location || item.location === filter.location) && (!filter.status || item.status === filter.status);
+    const checked = !!item.checkedAt && item.checkedAt.slice(0,4) === (filter.checkYear || String(new Date().getFullYear()));
+    return words.every(word => text.includes(word)) && (!filter.category || item.category === filter.category) && (!filter.location || item.location === filter.location) && (!filter.status || item.status === filter.status) && (!filter.checked || checked === (filter.checked === 'done'));
   });
   const key = filter.sort === 'name' ? 'name' : filter.sort.startsWith('date-') ? 'purchaseDate' : 'assetNumber';
   return rows.sort((a, b) => {

@@ -12,6 +12,7 @@ const searchData = tools.map(tool => ({ ...tool, categoryName: categoryById(tool
 ---
 <div class="section-soft"><div class="container catalog-layout" data-catalog data-initial-category={initialCategory}>
   <aside class="filter-panel" aria-label="ツールの絞り込み"><div class="filter-header"><h2>絞り込み</h2><button class="reset-button" type="button" data-reset>条件をクリア</button></div>
+    <fieldset><legend>実装状況</legend><label class="check-label"><input type="checkbox" name="ready" /><span>業務機能を実装済みのツールだけ</span></label></fieldset>
     <fieldset><legend>カテゴリ <span class="fine">（複数選択可）</span></legend><div class="category-options">{categories.map(category => <label class="check-label"><input type="checkbox" name="category" value={category.id} checked={category.id === initialCategory} /><span>{category.name}</span><small>{tools.filter(tool => tool.category === category.id).length}</small></label>)}</div></fieldset>
     <fieldset><legend>タグ <span class="fine">（すべて一致）</span></legend><div class="filter-tags">{tagList.map(tag => <label><input type="checkbox" name="tag" value={tag} /><span>{tag}</span></label>)}</div></fieldset>
     <p class="fine">複数のキーワードは、スペースで区切って検索できます。</p>

@@ -40,6 +40,7 @@ html[data-theme=dark] #equipment-table td::before { color:#bfd5f3; }
 html[data-theme=dark] input::placeholder { color:#b9c8dc; }
 }
 @media print { .storage-strip,.header-actions,.sample-banner,.draft-panel,dialog { display:none!important; } }
+.csv-change{border:1px solid #aabbd1;border-radius:6px;padding:12px;margin-block:12px;min-width:0}.csv-change-table{width:100%;table-layout:fixed;border-collapse:collapse}.csv-change-table th,.csv-change-table td{padding:8px;border:1px solid #aabbd1;vertical-align:top;overflow-wrap:anywhere}.csv-value{max-height:12rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}.csv-change h3{overflow-wrap:anywhere}#csv-page{align-self:center}
 </style>
 <script>(() => {
   const key = 'municipal-toolbox:theme:v1';
@@ -75,12 +76,12 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
 <body>
 <a class="skip" href="#main">本文へ移動</a>
 <header><div><span class="brand">自治体ローカルツール箱</span><h1>会議メモ・議事録 <small>配布確認版</small></h1></div><span id="save-status" role="status" aria-live="polite">保存状態を確認中</span></header>
-<div class="layout"><nav aria-label="ツールメニュー"><a href="#main">メモ</a><a href="#data">データ管理</a><a href="#help">ヘルプ</a><span>v0.1.1-preview</span></nav>
+<div class="layout"><nav aria-label="ツールメニュー"><a href="#main">メモ</a><a href="#data">データ管理</a><a href="#help">ヘルプ</a><span>v0.1.2-preview</span></nav>
 <main id="main"><noscript><p class="warning">このツールの保存・バックアップにはJavaScriptが必要です。JavaScriptが無効な間、入力内容は保存されません。</p></noscript><div class="notice"><strong>このファイルは配布・保存の動作確認用です。</strong><p>会議メモ・議事録の業務機能は今後実装します。実際の業務データは入力しないでください。入力内容を外部へ送信する機能はありません。</p></div>
 <h2>確認用メモ</h2><p>テスト用の文章を入力し、保存やバックアップの動作を確認してください。</p><label for="memo">メモ <span>（50,000文字まで）</span></label><textarea id="memo" rows="14" maxlength="50000" placeholder="動作確認用のメモを入力してください"></textarea><div id="print-text"></div><p class="muted" id="count">0 / 50,000文字</p>
 <section id="data"><h2>データ管理</h2><p>ブラウザ内の保存とは別に、JSONファイルを書き出して保管してください。</p><div class="actions"><button type="button" id="export">バックアップを書き出す</button><button type="button" class="secondary" id="import">バックアップを読み込む</button><button type="button" class="secondary" id="print">印刷</button></div><input id="import-file" type="file" accept=".json,application/json" hidden><p id="feedback" role="status" aria-live="polite"></p><button type="button" id="clear" class="danger">すべてのデータを削除</button></section>
 <section id="help"><h2>ヘルプ</h2><details><summary>保存・バックアップについて</summary><p>メモは利用中のブラウザのlocalStorageに自動保存します。HTMLファイル自体には書き込みません。ブラウザの設定、データ削除、PC・ファイル名・保存場所の変更により、保存データを利用できなくなることがあります。</p><p>「未保存」と表示された場合は、閉じる前にJSONを書き出してください。読込みは現在のメモを置き換えます。同じツールのバックアップだけを読み込めます。</p><p>ダウンロードしたJSONは暗号化されません。所属組織で許可された場所に保管してください。</p></details><details><summary>安全な使い方</summary><p>この確認版は外部通信、アカウント、外部ライブラリを必要としません。個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。確認版には実際の業務データを入力しないでください。</p><p>主要な対応対象はMicrosoft Edge / Google Chromeの最新版です。Internet Explorerには対応しません。</p></details></section></main></div>
-<footer>単一HTML・外部通信なし ／ 配布確認版 v0.1.1-preview</footer>
+<footer>単一HTML・外部通信なし ／ 配布確認版 v0.1.2-preview</footer>
 <script>(() => {
   'use strict';
   const config = {"id":"meeting-minutes","name":"会議メモ・議事録"};
@@ -307,6 +308,14 @@ function backupComparison(name, fileName, before, after, exportedAt, sample = fa
         const title = node('h2', '更新情報');
         title.id = 'updates-title';
         updates.append(title, node('p', config.name + ' v' + config.version), node('p', '2026-10-05：右上の更新情報・配色切替・Helpと、保存先・バックアップの案内を追加しました。'));
+        if (config.ready)
+            updates.append(node('p', '2026-10-26：直前の削除の取消、読込み前の書出し操作、下書きJSONの専用読込みを追加しました。'));
+        if (config.id === 'equipment-manager')
+            updates.append(node('p', '管理番号で照合するCSV更新と変更前後の確認、CSV反映の取消、棚卸確認日・確認者・差異メモを追加しました。'));
+        if (config.id === 'handover-note')
+            updates.append(node('p', '分類別の記入例と、申し送り事項・チェックリストの期限順表示を追加しました。'));
+        if (!config.ready)
+            updates.append(node('p', '2026-10-26：配布ファイルの共通スタイルを更新しました。業務機能は未実装です。'));
         updates.append(node('p', 'JSONを読み込む前に、対象ツール・ファイル・書出し日時・件数を確認できます。'));
         if (config.ready)
             updates.append(node('p', '編集中の下書き保存・再開と、架空データで操作を試せるサンプルを追加しました。'));
@@ -391,7 +400,7 @@ function backupComparison(name, fileName, before, after, exportedAt, sample = fa
             }
         });
     }
-    setupToolShell({ "id": "meeting-minutes", "name": "会議メモ・議事録", "version": "0.1.1-preview", "ready": false });
+    setupToolShell({ "id": "meeting-minutes", "name": "会議メモ・議事録", "version": "0.1.2-preview", "ready": false });
 })();
 </script>
 </body>

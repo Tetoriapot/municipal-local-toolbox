@@ -1,50 +1,50 @@
 [
   {
     "id": "handover-note",
-    "version": "1.1.0",
-    "bytes": 93845,
-    "sha256": "687571ab30a4f2d23501211dbe86a1713763b42bdbac7c473a4f84237d4dcba8"
+    "version": "1.2.0",
+    "bytes": 107437,
+    "sha256": "a40bf3b484e202273ea568bd31a7e53c31faaca9a0f73f2270e6887d88bc1663"
   },
   {
     "id": "equipment-manager",
-    "version": "1.1.0",
-    "bytes": 105602,
-    "sha256": "7dd1ea82cbdd38d14d6fff3d0be489f4dc8aa0047261b096bf43edb8d671b09f"
+    "version": "1.2.0",
+    "bytes": 123257,
+    "sha256": "5fc9b047e539f4d9e14d44186efbea0e76e0dd94823a6318591c37fb1dba236f"
   },
   {
     "id": "lending-manager",
-    "version": "0.1.1-preview",
-    "bytes": 29380,
-    "sha256": "5c59990de0cb1330c35208c5745a6263e17ebb3baac40eecc28c7d936f36bfcc"
+    "version": "0.1.2-preview",
+    "bytes": 30638,
+    "sha256": "3eb0cbd6b98faf40678d669ebec3ed99a0098425813ef71d7c26bb24d09d28e3"
   },
   {
     "id": "inventory-manager",
-    "version": "0.1.1-preview",
-    "bytes": 29384,
-    "sha256": "62f21887adcaec6f2a150c5f40afb3af49e860548c68a011a86862355724659e"
+    "version": "0.1.2-preview",
+    "bytes": 30642,
+    "sha256": "cded242eb2cc00b3692a318837f653b4e27e1ea26e190efae84a5c7243306a04"
   },
   {
     "id": "annual-calendar",
-    "version": "0.1.1-preview",
-    "bytes": 29410,
-    "sha256": "87e4c51f8a1d66487ac639d27b0266432a50b83581aa312462048f4a21c83a3a"
+    "version": "0.1.2-preview",
+    "bytes": 30668,
+    "sha256": "cdc33cb03b2287e9b6dcd44495509ca6927af33881b5cdfc98e2daafe4370b03"
   },
   {
     "id": "meeting-minutes",
-    "version": "0.1.1-preview",
-    "bytes": 29395,
-    "sha256": "708e44dfff3fc7ac14dd5a3f4fe62c450d4ede40d8f7e407f9031d5c26938831"
+    "version": "0.1.2-preview",
+    "bytes": 30653,
+    "sha256": "2a719b676ebcac57bc76c3bfb627ea1f4c9a055df3c748fc41c39db02ab1e437"
   },
   {
     "id": "inquiry-log",
-    "version": "0.1.1-preview",
-    "bytes": 29372,
-    "sha256": "9fc01602d944c92bb5c23716f589bb5c10c4b93724e7b216242399ae02011954"
+    "version": "0.1.2-preview",
+    "bytes": 30630,
+    "sha256": "9b48938caf3af1836793b23f963301fec84570ff1429bb71a0b0bc6de4b0b62e"
   },
   {
     "id": "event-manager",
-    "version": "0.1.1-preview",
-    "bytes": 29391,
-    "sha256": "5041caed0322ff83a7a6e48d8f5a06a5caee8cc03982228a2c29f894639679e8"
+    "version": "0.1.2-preview",
+    "bytes": 30649,
+    "sha256": "c738b32d7f8fd1b1c9f2af361727eb0ccca8cb5e2992dcf7f39b5f2cdbda0d53"
   }
 ]

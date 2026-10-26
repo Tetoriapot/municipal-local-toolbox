@@ -44,39 +44,49 @@ export function parseEquipmentCsv(text: string) {
 export function defaultCsvMapping(headers: string[]) {
   return Object.fromEntries(EQUIPMENT_FIELDS.map(field => [field.key, headers.findIndex(header => [field.label,field.key].some(label => normalizeEquipmentText(label) === normalizeEquipmentText(header)))]));
 }
-export function prepareEquipmentCsv(parsed: ReturnType<typeof parseEquipmentCsv>, mapping: Record<string,number>, data: EquipmentData, restoreFormulaPrefix = false) {
+export interface CsvChange { kind: '追加' | '更新' | '変更なし'; before?: EquipmentItem; after: EquipmentItem; fields: string[]; }
+export function prepareEquipmentCsv(parsed: ReturnType<typeof parseEquipmentCsv>, mapping: Record<string,number>, data: EquipmentData, restoreFormulaPrefix = false, mode: 'append' | 'upsert' = 'append') {
   const errors: string[] = [], items: EquipmentItem[] = [];
+  const changes: CsvChange[] = [];
   const columns = Object.values(mapping).filter(column => column >= 0);
   if (new Set(columns).size !== columns.length) errors.push('同じCSV列を複数の項目に割り当てないでください。');
   for (const field of EQUIPMENT_FIELDS) {
     if (field.required && (!Number.isInteger(mapping[field.key]) || mapping[field.key] < 0)) errors.push(field.label + 'の列を選んでください。');
     if (!Number.isInteger(mapping[field.key]) || mapping[field.key] < -1 || mapping[field.key] >= parsed.headers.length) errors.push(field.label + 'の列指定が正しくありません。');
   }
-  if (errors.length) return { items,errors };
-  const numbers = new Set(data.items.map(item => normalizeEquipmentText(item.assetNumber)));
+  if (errors.length) return { items,errors,changes,nextItems:data.items };
+  const existing = new Map(data.items.map(item => [normalizeEquipmentText(item.assetNumber),item]));
+  const numbers = new Set<string>();
+  const restoreCell = (value: string) => restoreFormulaPrefix && (/^'[\s\u0000-\u001F\u007F-\u009F\u200B\uFEFF]*[=+\-@]/u.test(value) || /^'[\t\r\n]/.test(value)) ? value.slice(1) : value;
   parsed.records.forEach((row,index) => {
     try {
       if (row.length !== parsed.headers.length) throw new Error('見出しと列数が一致しません。');
+      const number = normalizeEquipmentText(restoreCell(row[mapping.assetNumber]));
+      if (numbers.has(number)) throw new Error('CSV内で管理番号が重複しています。');
+      numbers.add(number);
+      const before = existing.get(number);
+      if (before && mode === 'append') throw new Error('管理番号「' + row[mapping.assetNumber] + '」が既存の備品と重複しています。');
       const values: Record<string,string> = {};
       for (const field of EQUIPMENT_FIELDS) {
-        let value = mapping[field.key] < 0 ? '' : row[mapping[field.key]];
-        if (restoreFormulaPrefix && /^'[\s\u0000-\u001F\u007F-\u009F\u200B\uFEFF]*[=+\-@]/u.test(value)) value = value.slice(1);
-        else if (restoreFormulaPrefix && /^'[\t\r\n]/.test(value)) value = value.slice(1);
+        const value = mapping[field.key] < 0 ? String(before?.[field.key] ?? '') : restoreCell(row[mapping[field.key]]);
         values[field.key] = value;
       }
       const status = values.status.trim();
       values.status = status ? EQUIPMENT_STATUSES.find(value => value.id === status || value.label === status)?.id ?? status : 'unknown';
-      const date = values.purchaseDate.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
-      if (date) values.purchaseDate = date[1] + '-' + date[2].padStart(2,'0') + '-' + date[3].padStart(2,'0');
-      const item = validateEquipmentItem({ ...values,id:crypto.randomUUID() });
-      const number = normalizeEquipmentText(item.assetNumber);
-      if (numbers.has(number)) throw new Error('管理番号「' + item.assetNumber + '」が既存の備品またはCSV内で重複しています。');
-      numbers.add(number); items.push(item);
+      for (const field of EQUIPMENT_FIELDS.filter(field => field.type === 'date')) {
+        const date = values[field.key].match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+        if (date) values[field.key] = date[1] + '-' + date[2].padStart(2,'0') + '-' + date[3].padStart(2,'0');
+      }
+      const item = validateEquipmentItem({ ...before,...values,id:before?.id ?? crypto.randomUUID(),assetNumber:before?.assetNumber ?? values.assetNumber });
+      const fields = EQUIPMENT_FIELDS.filter(field => !before || before[field.key] !== item[field.key]).map(field=>field.key);
+      items.push(item); changes.push({ kind: !before ? '追加' : fields.length ? '更新' : '変更なし',before,after:item,fields });
     } catch (error) { errors.push((index + 1) + '件目：' + (error instanceof Error ? error.message : '内容を確認してください。')); }
   });
+  const replacements = new Map(items.map(item=>[item.id,item]));
+  const nextItems = [...data.items.map(item=>replacements.get(item.id) ?? item),...changes.filter(change=>change.kind === '追加').map(change=>change.after)];
   if (!errors.length) {
-    try { serializeEquipment(parseEquipment({ ...data,items:[...data.items,...items] })); }
+    try { serializeEquipment(parseEquipment({ ...data,items:nextItems })); }
     catch (error) { errors.push(error instanceof Error ? error.message : '台帳の上限を確認してください。'); }
   }
-  return { items,errors };
+  return { items,errors,changes,nextItems };
 }

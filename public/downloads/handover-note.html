@@ -180,6 +180,7 @@ html[data-theme=dark] #equipment-table td::before { color:#bfd5f3; }
 html[data-theme=dark] input::placeholder { color:#b9c8dc; }
 }
 @media print { .storage-strip,.header-actions,.sample-banner,.draft-panel,dialog { display:none!important; } }
+.csv-change{border:1px solid #aabbd1;border-radius:6px;padding:12px;margin-block:12px;min-width:0}.csv-change-table{width:100%;table-layout:fixed;border-collapse:collapse}.csv-change-table th,.csv-change-table td{padding:8px;border:1px solid #aabbd1;vertical-align:top;overflow-wrap:anywhere}.csv-value{max-height:12rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}.csv-change h3{overflow-wrap:anywhere}#csv-page{align-self:center}
 </style>
 <script>(() => {
   const key = 'municipal-toolbox:theme:v1';
@@ -215,7 +216,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
 <body><span id="sample" hidden></span>
 <a class="skip" href="#main">本文へ移動</a>
 <header class="app-header">
-  <div><span class="brand">自治体ローカルツール箱</span><h1>異動引継ぎノート <small>v1.1.0</small></h1></div>
+  <div><span class="brand">自治体ローカルツール箱</span><h1>異動引継ぎノート <small>v1.2.0</small></h1></div>
   <div class="header-actions"><span id="save-status" role="status" aria-live="polite">保存状態を確認中</span><button type="button" class="secondary" data-view="help">ヘルプ</button></div>
 </header>
 <div class="workspace">
@@ -246,6 +247,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
     <section data-panel="records" hidden>
       <div class="section-title"><div><span class="eyebrow">記録一覧</span><h2 id="section-heading"></h2><p id="section-description" class="muted"></p></div><button type="button" id="add-record">新規登録</button></div>
       <div class="list-toolbar"><label for="record-query">この分類を検索<input id="record-query" type="search" maxlength="200" placeholder="登録した内容を検索"></label><label for="completion-filter">確認状態<select id="completion-filter"><option value="all">すべて</option><option value="pending">未確認</option><option value="done">確認済み</option></select></label></div>
+      <label for="record-sort">並び替え<select id="record-sort"><option value="registered">登録順</option><option value="due">期限が近い順（未設定は最後）</option></select></label><p class="muted">期限順は申し送り事項とチェックリストで使用できます。確認状態を「未確認」にすると、これから確認する項目だけを表示します。</p>
       <p id="record-count" role="status" class="muted"></p><div id="record-list"></div>
     </section>
 
@@ -269,14 +271,14 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
       <h3>保存と編集</h3><p>基本情報とメモは入力時に自動保存します。各分類の編集はダイアログの「登録する」「変更を保存」で確定します。未確定の内容はバックアップに含まれません。</p><p>ブラウザ内の保存に失敗した場合は、画面上に「未保存」と表示します。画面を閉じる前にJSONを書き出してください。同じツールを複数のタブで編集すると、他のタブの変更を検出して保存を止めます。現在の内容を書き出してから、保存済みデータを読み直してください。</p>
       <h3>旧版からの移行</h3><p>同じ保存場所で旧版のメモを見つけた場合は、新しい保存領域に複製します。旧版の領域は変更しません。自動で見つからない場合は、旧版でJSONを書き出して読み込んでください。</p>
       <h3>ファイルの場所・連絡先</h3><p>パス、URL、メールアドレスは文字として記録します。リンクを自動で開いたり、外部へ接続したりしません。ファイルそのものは添付・保存しません。</p>
-      <h3>下書きとサンプル</h3><p>編集の下書きはツールごとに1件保存します。「下書きを残して閉じる」で中断し、「下書きを再開」で続けられます。登録・保存するまで通常のJSON・印刷には含みません。下書きの書出しは内容の保管用で、通常のバックアップ読込みには使えません。</p><p>「サンプルで試す」は架空データを別画面で開きます。通常のデータや下書きは読み書きしません。変更は再読込みで消え、初期サンプルに戻ります。</p><h3>情報の取り扱い</h3><p>個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。保存内容とJSONは暗号化されません。</p>
+      <h3>下書きとサンプル</h3><p>編集の下書きはツールごとに1件保存します。「下書きを残して閉じる」で中断し、「下書きを再開」で続けられます。登録・保存するまで通常のJSON・印刷には含みません。下書きJSONは、同じツールの「データ管理」にある「下書きを読み込む」で復元します。既存の下書きは上書きしません。通常のバックアップ読込みには使えません。</p><p>「サンプルで試す」は架空データを別画面で開きます。通常のデータや下書きは読み書きしません。変更は再読込みで消え、初期サンプルに戻ります。</p><h3>情報の取り扱い</h3><p>個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。保存内容とJSONは暗号化されません。</p>
       <p class="muted">Microsoft Edge / Google Chromeを主要な対応対象としています。Internet Explorerには対応しません。記録は合計3,000件、JSONは10MBまでです。ブラウザの保存可能容量は設定や環境により異なります。</p>
     </section>
   </main>
 </div>
 <footer class="action-bar"><button type="button" class="secondary" id="save-now">保存する</button><button type="button" id="export">バックアップを書き出す</button><button type="button" class="secondary" id="import">バックアップを読み込む</button><button type="button" class="secondary" id="print">すべての記録を印刷</button><button type="button" class="secondary" id="print-current">表示中の一覧を印刷</button><input id="import-file" type="file" accept=".json,application/json" hidden></footer>
 <dialog id="edit-dialog" aria-labelledby="edit-title">
-  <form id="record-form"><div class="dialog-heading"><h2 id="edit-title">新規登録</h2><button type="button" class="secondary" id="close-edit">閉じる</button></div><p class="muted">「必須」とある項目を入力してください。登録・保存するまで一覧には反映されません。</p><p id="draft-save-status" role="status"></p><div id="edit-fields" class="field-grid"></div><label class="check-field"><input type="checkbox" id="entry-completed">この記録を確認済みにする</label><p id="form-error" role="alert"></p><div class="dialog-actions"><button type="submit" id="submit-record">登録する</button><button type="button" id="suspend-edit" class="secondary">下書きを残して閉じる</button><button type="button" class="secondary" id="cancel-edit">キャンセル</button></div></form>
+  <form id="record-form"><div class="dialog-heading"><h2 id="edit-title">新規登録</h2><button type="button" class="secondary" id="close-edit">閉じる</button></div><p class="muted">「必須」とある項目を入力してください。登録・保存するまで一覧には反映されません。</p><p id="draft-save-status" role="status"></p><details id="entry-examples" class="content-panel"><summary>この分類の記入例を見る</summary></details><div id="edit-fields" class="field-grid"></div><label class="check-field"><input type="checkbox" id="entry-completed">この記録を確認済みにする</label><p id="form-error" role="alert"></p><div class="dialog-actions"><button type="submit" id="submit-record">登録する</button><button type="button" id="suspend-edit" class="secondary">下書きを残して閉じる</button><button type="button" class="secondary" id="cancel-edit">キャンセル</button></div></form>
 </dialog>
 <dialog id="clear-dialog" aria-labelledby="clear-title"><h2 id="clear-title">全データの削除を確認</h2><p>すべての記録、基本情報、メモを削除します。取り消せません。必要な内容を先にJSONへ書き出してください。下書きは残るため、専用の削除操作で別に削除してください。</p><label for="clear-confirm">確認のため「すべて削除」と入力してください</label><input id="clear-confirm" autocomplete="off"><p id="clear-error" role="alert"></p><div class="dialog-actions"><button type="button" class="danger" id="confirm-clear" disabled>削除を実行</button><button type="button" class="secondary" id="cancel-clear">キャンセル</button></div></dialog>
 <section id="print-area" aria-label="印刷内容"></section>
@@ -507,7 +509,16 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             throw new Error('下書きの項目が正しくありません。');
         return data;
     }
-    function createEditDraft(toolId, restore, memoryOnly = false) {
+    function validateDraftFields(draft, fields, checkboxKeys = []) {
+        for (const field of fields) {
+            if (Object.hasOwn(draft.values, field.key))
+                readField(draft.values[field.key], { ...field, required: false });
+        }
+        for (const key of checkboxKeys)
+            if (Object.hasOwn(draft.values, key) && typeof draft.values[key] !== 'boolean')
+                throw new Error('下書きのチェック項目が正しくありません。');
+    }
+    function createEditDraft(toolId, restore, memoryOnly = false, validateImported = () => { }) {
         const key = 'municipal-toolbox:draft:v1:' + toolId;
         let raw = null;
         let active = null;
@@ -540,10 +551,64 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             link.download = (memoryOnly ? 'sample-' : '') + toolId + '-draft.json';
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-            message.textContent = '下書きのJSONを書き出しました。内容の保管用です。通常のバックアップ読込みには使用できません。';
+            message.textContent = '下書きのJSONを書き出しました。移行先の同じツールで「下書きを読み込む」を使ってください。通常のバックアップ読込みには使用できません。';
         });
         panel.append(title, message, resume, discard, exportDraft);
         document.getElementById('feedback').after(panel);
+        const importArea = node('section', '', 'content-panel');
+        importArea.append(node('h3', '下書きの移行'), node('p', '確定済みデータは通常のバックアップで移し、下書きは専用のJSONで移します。既存の下書きがある場合は、先に書き出してから再開または削除してください。'));
+        const picker = node('input');
+        picker.type = 'file';
+        picker.accept = '.json,application/json';
+        picker.hidden = true;
+        picker.id = 'import-draft-file';
+        const importButton = action('下書きを読み込む', () => picker.click());
+        importButton.id = 'import-draft';
+        const importMessage = node('p');
+        importMessage.id = 'draft-import-message';
+        importMessage.setAttribute('role', 'status');
+        importArea.append(importButton, picker, importMessage);
+        document.querySelector('[data-panel="data"]').append(importArea);
+        let importing = false;
+        picker.addEventListener('change', async () => {
+            const file = picker.files?.[0];
+            picker.value = '';
+            if (!file || importing)
+                return;
+            importing = true;
+            importButton.disabled = true;
+            try {
+                if (raw !== null || document.querySelector('#edit-dialog[open]'))
+                    throw new Error('既存の下書きまたは編集中の内容があります。先に書き出し、再開・保存または削除してください。');
+                if (!/\.json$/i.test(file.name) || !file.size || file.size > 2 * 1024 * 1024)
+                    throw new Error('空ではない2MB以下の下書きJSONファイルを選択してください。');
+                if (file.type && !['application/json', 'text/json', 'text/plain', 'application/octet-stream'].includes(file.type))
+                    throw new Error('JSONファイルとして認識できません。元の下書きファイルを選択してください。');
+                const incoming = parseEditDraft((await file.text()).replace(/^\uFEFF/, ''), toolId);
+                validateImported(incoming);
+                if (!confirm('下書きを読み込みますか？\nファイル：' + file.name + '\n分類：' + incoming.section + '\n下書きの日時：' + new Date(incoming.updatedAt).toLocaleString('ja-JP') + '\n確定済みの記録は変更しません。読込み後に「下書きを再開」で内容を確認してください。')) {
+                    importMessage.textContent = '下書きの読込みをキャンセルしました。';
+                    return;
+                }
+                if (raw !== null || document.querySelector('#edit-dialog[open]') || (!memoryOnly && localStorage.getItem(key) !== raw))
+                    throw new Error('別の画面または編集中の下書きが変更されています。上書きせず、内容を確認してください。');
+                const next = JSON.stringify(incoming);
+                if (!memoryOnly)
+                    localStorage.setItem(key, next);
+                raw = next;
+                active = null;
+                render();
+                resume.focus();
+                importMessage.textContent = memoryOnly ? '下書きをこのサンプル画面に読み込みました。通常の保存データは変更していません。' : '下書きを読み込みました。再開して内容を確認してください。';
+            }
+            catch (error) {
+                importMessage.textContent = '下書きを読み込めません。' + (error instanceof SyntaxError ? 'JSONの形式を確認してください。' : error instanceof DOMException ? 'ブラウザの保存制限や容量を確認してください。' : error instanceof Error ? error.message : 'ファイルと保存容量を確認してください。') + '現在のデータと下書きは変更していません。';
+            }
+            finally {
+                importing = false;
+                importButton.disabled = false;
+            }
+        });
         function render() {
             panel.hidden = raw === null;
             exportDraft.disabled = raw === null;
@@ -600,8 +665,9 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         function save(values) {
             if (!active)
                 return false;
-            const next = JSON.stringify({ schemaVersion: 1, toolId, ...active, values, updatedAt: new Date().toISOString() });
             try {
+                const previous = raw ? parseEditDraft(raw, toolId) : null;
+                const next = JSON.stringify({ ...previous, schemaVersion: 1, toolId, ...active, values: { ...previous?.values, ...values }, updatedAt: new Date().toISOString() });
                 parseEditDraft(next, toolId);
                 if (!memoryOnly && localStorage.getItem(key) !== raw)
                     throw new Error('別の画面で下書きが変更されています。上書きしていません。編集中の内容を登録するか、手元に控えてください。');
@@ -629,6 +695,72 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             lines.push('', 'このJSONにはサンプルデータの印が付いています。');
         lines.push('', '確定済みのデータを、読込み後の内容ですべて置き換えます。追加や結合ではありません。', '下書きは別に保持します。必要な確定済みデータはキャンセルして先にJSONへ書き出してください。', '', 'この内容で置き換えますか？');
         return lines.join('\n');
+    }
+    function recoveryRevision(data, storageKey, memoryOnly = false) {
+        let stored = null;
+        try {
+            stored = memoryOnly ? null : localStorage.getItem(storageKey);
+        }
+        catch {
+            stored = 'storage-unavailable';
+        }
+        return JSON.stringify([data, stored]);
+    }
+    function createRecoveryControls(revision) {
+        const panel = node('aside', '', 'recovery-panel storage-strip');
+        panel.hidden = true;
+        panel.setAttribute('aria-label', '直前の操作の取消');
+        const status = node('p');
+        status.setAttribute('role', 'status');
+        let expected = '', restore = null;
+        const undo = action('直前の操作を取り消す', () => {
+            if (!restore)
+                return;
+            if (revision() !== expected) {
+                restore = null;
+                undo.disabled = true;
+                status.textContent = '操作後にデータが変更されています。新しい内容を保護するため、取り消せません。';
+                return;
+            }
+            const apply = restore;
+            if (apply()) {
+                restore = null;
+                undo.disabled = true;
+                panel.hidden = false;
+                status.textContent = '直前の操作を取り消しました。保存状態を確認してください。';
+            }
+        });
+        undo.id = 'undo-last';
+        panel.append(status, undo, node('p', '取消用の内容はこの画面だけに保持します。別の変更や再読込みで失われます。JSONバックアップとは別です。', 'muted'));
+        el('feedback').after(panel);
+        return {
+            invalidate() { restore = null; undo.disabled = true; panel.hidden = true; },
+            remember(label, apply) {
+                expected = revision();
+                restore = apply;
+                undo.disabled = false;
+                panel.hidden = false;
+                status.textContent = label + '。別の変更を行う前なら取り消せます。';
+            },
+        };
+    }
+    function setupBackupPreparation() {
+        const modal = node('dialog');
+        modal.id = 'prepare-import-dialog';
+        modal.setAttribute('aria-labelledby', 'prepare-import-title');
+        const title = node('h2', 'バックアップ読込み前の保存');
+        title.id = 'prepare-import-title';
+        const exportCurrent = action('現在のデータを書き出す', () => el('export').click());
+        exportCurrent.id = 'export-before-import';
+        const choose = action('読込みファイルを選ぶ', () => { modal.close(); el('import-file').click(); });
+        choose.id = 'choose-import-file';
+        const cancel = action('キャンセル', () => modal.close());
+        const actions = node('div', '', 'dialog-actions');
+        actions.append(exportCurrent, choose, cancel);
+        modal.append(title, node('p', 'JSONを読み込むと、確定済みデータ全体を置き換えます。現在の内容が必要な場合は、先にJSONを書き出し、保存先でファイルを確認してください。'), node('p', '下書きは別に残ります。ファイルを選んだ後に、対象ツールと件数を確認します。'), actions);
+        document.body.append(modal);
+        trapDialogFocus(modal);
+        el('import').addEventListener('click', () => { modal.showModal(); exportCurrent.focus(); });
     }
     const HANDOVER_ID = 'handover-note';
     const HANDOVER_KEY = 'municipal-toolbox:data:v2:handover-note';
@@ -777,6 +909,9 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         const done = rows.filter(row => row.completed).length;
         return { total: rows.length, done, percent: rows.length ? Math.round(done / rows.length * 100) : 0 };
     }
+    function sortByDueDate(entries) {
+        return [...entries].sort((a, b) => (textValue(a.dueDate) || '9999-99-99').localeCompare(textValue(b.dueDate) || '9999-99-99') || a.title.localeCompare(b.title, 'ja'));
+    }
     function searchEntries(data, query) {
         const normalize = (value) => value.normalize('NFKC').toLocaleLowerCase('ja');
         const words = normalize(query).trim().split(/\s+/).filter(Boolean);
@@ -786,6 +921,14 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             return words.every(word => content.includes(word));
         }).map(entry => ({ section, entry })));
     }
+    const HANDOVER_EXAMPLES = {
+        duties: { title: '年度末の備品照合', overview: '台帳と現物を照合し、相違があれば担当者に確認する。', procedure: '1. 台帳を出力する\n2. 現物の管理番号と場所を確認する\n3. 不一致はその場で削除せず、確認先と対応を記録する。', frequency: '年1回', deadline: '3月中旬', owner: '庶務担当', location: '共有フォルダー／総務／備品台帳', remarks: '不在の備品は貸出記録を確認する。' },
+        schedule: { title: '備品の現物確認', timing: '3月上旬に開始し、中旬までに結果をまとめる。', owner: '庶務担当', details: '確認表の準備、現物照合、相違点の確認を行う。' },
+        contacts: { title: '庶務担当窓口', organization: '総務課', role: '備品台帳と貸出記録の確認', remarks: '担当者が不在の場合の連絡先も確認する。' },
+        files: { title: '備品管理の手順書', location: '共有フォルダー／総務／業務手順', owner: '庶務担当', access: '後任者のアカウントで閲覧できるか確認する。' },
+        notes: { title: '貸出中の備品の返却確認', owner: '庶務担当', details: '貸出先に返却予定を確認し、確認日と次の対応を記録する。' },
+        checklist: { title: '共有フォルダーの閲覧確認', owner: '後任者', details: '自分のPCから資料を開けることを確認する。' },
+    };
     const memo = el('memo');
     const statusNode = el('save-status');
     const feedback = el('feedback');
@@ -802,10 +945,12 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
     let currentView = 'home';
     let recordQuery = '';
     let recordFilter = 'all';
+    let recordSort = 'registered';
     let editing = null;
     let editStart = '';
     let importBusy = false;
     let returnFocus = null;
+    const recovery = createRecoveryControls(() => recoveryRevision(state, HANDOVER_KEY, practiceMode));
     const drafts = createEditDraft('handover-note', draft => {
         const section = sectionById(draft.section);
         if (!section)
@@ -819,7 +964,12 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         restoreDraftValues(form, draft.values);
         el('draft-save-status').textContent = '下書きを復元しました。登録・保存するまで確定済みの記録は変わりません。';
         savedLabel('下書きを編集中：登録・保存で確定', true);
-    }, practiceMode);
+    }, practiceMode, draft => {
+        const section = sectionById(draft.section);
+        if (!section)
+            throw new Error('引継ぎノートの分類を確認してください。');
+        validateDraftFields(draft, section.fields, ['entry-completed']);
+    });
     function message(text, error = false) {
         feedback.textContent = text;
         feedback.classList.toggle('error', error);
@@ -871,6 +1021,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         }
     }
     function loadState() {
+        recovery.invalidate();
         if (practiceMode) {
             state = parseHandoverText(JSON.stringify(sample));
             unsaved = false;
@@ -910,6 +1061,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         try {
             // Validate capacity before mutating state so an accepted dataset can always be exported.
             serializeHandover(next);
+            recovery.invalidate();
             state = next;
             unsaved = true;
             writeState();
@@ -956,6 +1108,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
                     const value = readField(input.value, field);
                     const next = { ...state, profile: { ...state.profile, [field.key]: value } };
                     serializeHandover(next);
+                    recovery.invalidate();
                     state = next;
                     writeState();
                     input.setCustomValidity('');
@@ -1022,15 +1175,27 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         fields.replaceChildren();
         for (const field of section.fields)
             fields.append(inputField(field, entry?.[field.key], 'field-').wrapper);
+        const examples = el('entry-examples');
+        examples.replaceChildren(node('summary', 'この分類の記入例を見る'), node('p', '架空の記入例です。入力内容は変更しません。'));
+        const exampleList = node('dl');
+        for (const field of section.fields) {
+            const value = HANDOVER_EXAMPLES[section.id]?.[field.key];
+            if (value)
+                exampleList.append(node('dt', field.label), node('dd', value));
+        }
+        examples.append(exampleList);
+        examples.removeAttribute('open');
         el('entry-completed').checked = entry?.completed ?? false;
         editStart = editSnapshot();
         dialog.showModal();
         fields.querySelector('input')?.focus();
     }
     function deleteEntry(section, entry) {
-        if (!confirm('「' + entry.title + '」を削除しますか？この操作は取り消せません。'))
+        if (!confirm('「' + entry.title + '」を削除しますか？別の変更や再読込みの前なら取り消せます。'))
             return;
+        const before = structuredClone(state);
         if (commit({ ...state, sections: { ...state.sections, [section.id]: state.sections[section.id].filter(row => row.id !== entry.id) } })) {
+            recovery.remember('記録を削除しました', () => commit(before));
             message('記録を削除しました。');
             el('add-record').focus();
         }
@@ -1077,7 +1242,8 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         return card;
     }
     function visibleRecords(section) {
-        return searchEntries(state, recordQuery).filter(item => item.section.id === section.id && (recordFilter === 'all' || item.entry.completed === (recordFilter === 'done'))).map(item => item.entry);
+        const rows = searchEntries(state, recordQuery).filter(item => item.section.id === section.id && (recordFilter === 'all' || item.entry.completed === (recordFilter === 'done'))).map(item => item.entry);
+        return recordSort === 'due' && section.fields.some(field => field.key === 'dueDate') ? sortByDueDate(rows) : rows;
     }
     function renderRecords() {
         const section = sectionById(currentView);
@@ -1086,6 +1252,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         const rows = visibleRecords(section);
         el('section-heading').textContent = section.label;
         el('section-description').textContent = section.description;
+        el('record-sort').disabled = !section.fields.some(field => field.key === 'dueDate');
         el('record-count').textContent = rows.length + '件表示 / 登録' + state.sections[section.id].length + '件';
         const root = el('record-list');
         root.replaceChildren();
@@ -1150,6 +1317,8 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         currentView = view;
         recordQuery = '';
         recordFilter = 'all';
+        recordSort = 'registered';
+        el('record-sort').value = recordSort;
         el('record-query').value = '';
         el('completion-filter').value = 'all';
         document.querySelectorAll('#navigation [data-view]').forEach(button => {
@@ -1234,6 +1403,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         try {
             const next = { ...state, text: memo.value };
             serializeHandover(next);
+            recovery.invalidate();
             state = next;
             writeState();
             el('count').textContent = memo.value.length.toLocaleString('ja-JP') + ' / 50,000文字';
@@ -1245,6 +1415,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
     });
     el('record-query').addEventListener('input', () => { recordQuery = el('record-query').value; renderRecords(); });
     el('completion-filter').addEventListener('change', () => { recordFilter = el('completion-filter').value; renderRecords(); });
+    el('record-sort').addEventListener('change', () => { recordSort = el('record-sort').value; renderRecords(); });
     el('global-query').addEventListener('input', renderSearch);
     el('save-now').addEventListener('click', () => { if (writeState())
         message('現在のデータを保存しました。'); });
@@ -1271,7 +1442,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             message(error instanceof Error ? error.message : 'バックアップを書き出せませんでした。', true);
         }
     });
-    el('import').addEventListener('click', () => el('import-file').click());
+    setupBackupPreparation();
     el('import-file').addEventListener('change', async () => {
         const picker = el('import-file');
         const file = picker.files?.[0];
@@ -1332,6 +1503,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             const raw = serializeHandover(empty);
             if (!practiceMode)
                 localStorage.setItem(HANDOVER_KEY, raw);
+            recovery.invalidate();
             lastRaw = raw;
             state = empty;
             blocked = null;
@@ -1434,6 +1606,14 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
         const title = node('h2', '更新情報');
         title.id = 'updates-title';
         updates.append(title, node('p', config.name + ' v' + config.version), node('p', '2026-10-05：右上の更新情報・配色切替・Helpと、保存先・バックアップの案内を追加しました。'));
+        if (config.ready)
+            updates.append(node('p', '2026-10-26：直前の削除の取消、読込み前の書出し操作、下書きJSONの専用読込みを追加しました。'));
+        if (config.id === 'equipment-manager')
+            updates.append(node('p', '管理番号で照合するCSV更新と変更前後の確認、CSV反映の取消、棚卸確認日・確認者・差異メモを追加しました。'));
+        if (config.id === 'handover-note')
+            updates.append(node('p', '分類別の記入例と、申し送り事項・チェックリストの期限順表示を追加しました。'));
+        if (!config.ready)
+            updates.append(node('p', '2026-10-26：配布ファイルの共通スタイルを更新しました。業務機能は未実装です。'));
         updates.append(node('p', 'JSONを読み込む前に、対象ツール・ファイル・書出し日時・件数を確認できます。'));
         if (config.ready)
             updates.append(node('p', '編集中の下書き保存・再開と、架空データで操作を試せるサンプルを追加しました。'));
@@ -1518,7 +1698,7 @@ html[data-theme=dark] input::placeholder { color:#b9c8dc; }
             }
         });
     }
-    setupToolShell({ "id": "handover-note", "name": "異動引継ぎノート", "version": "1.1.0", "ready": true });
+    setupToolShell({ "id": "handover-note", "name": "異動引継ぎノート", "version": "1.2.0", "ready": true });
 })();
 </script>
 </body>

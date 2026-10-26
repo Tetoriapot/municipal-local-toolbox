@@ -9,7 +9,7 @@ const [template, css, runtime, helpers] = await Promise.all(['template.html', 's
 const escapeHtml = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 await mkdir(output, { recursive: true });
 const manifest = [];
-const commonModules = await Promise.all(['fields.ts', 'dom.ts', 'local-store.ts', 'shell.ts', 'drafts.ts', 'experience.ts', 'import-comparison.mjs'].map(name => readFile(new URL(name, source), 'utf8')));
+const commonModules = await Promise.all(['fields.ts', 'dom.ts', 'local-store.ts', 'shell.ts', 'drafts.ts', 'experience.ts', 'import-comparison.mjs', 'recovery.ts'].map(name => readFile(new URL(name, source), 'utf8')));
 const [themeInit, shellCss] = await Promise.all(['theme-init.js', 'shell.css'].map(name => readFile(new URL(name, source), 'utf8')));
 async function inlineCss(text, directory) {
   const imports = [...text.matchAll(/@import\s+["']([^"']+)["'];/g)];
@@ -29,7 +29,7 @@ for (const tool of tools) {
     const sources = await Promise.all(['template.html', 'style.css', 'model.ts', 'runtime.ts', 'sample.json'].map(name => readFile(new URL(name, directory), 'utf8')));
     [toolTemplate, toolCss] = sources;
     toolCss = await inlineCss(toolCss, directory);
-    const extensions = tool.id === 'equipment-manager' ? await Promise.all(['csv.ts','csv-runtime.ts'].map(name => readFile(new URL(name,directory),'utf8'))) : [];
+    const extensions = await Promise.all((tool.id === 'equipment-manager' ? ['csv.ts','csv-runtime.ts'] : ['examples.ts']).map(name => readFile(new URL(name,directory),'utf8')));
     const combined = ['const sample = ' + JSON.stringify(JSON.parse(sources[4])).replaceAll('<','\\u003c') + ';', helpers, ...commonModules.filter((_,index)=>index !== 3), sources[2], ...extensions, sources[3]].map(source => source.replace(/^(?:import .*?;|export (?:type )?\{.*?\} from .*?;)\r?$/gm, '').replace(/^export /gm, '')).join('\n');
     const compiled = ts.transpileModule('(() => {\n' + combined + '\n})();', {
       compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None },

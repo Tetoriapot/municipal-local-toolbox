@@ -29,17 +29,19 @@
         <label for="category-filter">カテゴリ<select id="category-filter"><option value="">すべて</option></select></label>
         <label for="location-filter">設置場所<select id="location-filter"><option value="">すべて</option></select></label>
         <label for="status-filter">状態<select id="status-filter"><option value="">すべて</option></select></label>
+        <label for="check-year">棚卸の対象年<input id="check-year" type="number" min="1000" max="9999" step="1"></label>
+        <label for="checked-filter">棚卸確認<select id="checked-filter"><option value="">すべて</option><option value="done">対象年に確認済み</option><option value="pending">対象年に未確認</option></select></label>
         <label for="sort">並び替え<select id="sort"><option value="number">管理番号順</option><option value="name">備品名順</option><option value="date-desc">購入日が新しい順</option><option value="date-asc">購入日が古い順</option></select></label>
       </div>
       <div class="list-actions"><button type="button" class="secondary" id="reset-filters">条件をクリア</button><button type="button" class="secondary" id="csv-all">全備品をCSV出力</button><button type="button" class="secondary" id="csv-current">絞り込み結果をCSV出力</button></div>
       <p id="result-count" role="status" class="muted"></p><p id="empty-state" class="empty" hidden></p>
       <table id="equipment-table"><caption class="sr-only">備品一覧</caption><thead><tr><th scope="col">管理番号</th><th scope="col">備品名・備考</th><th scope="col">カテゴリ</th><th scope="col">設置場所</th><th scope="col">購入日</th><th scope="col">状態</th><th scope="col">操作</th></tr></thead><tbody id="equipment-rows"></tbody></table>
       <nav class="pagination" aria-label="備品一覧のページ"><button type="button" class="secondary" id="previous-page">前のページ</button><span id="page-number" role="status"></span><button type="button" class="secondary" id="next-page">次のページ</button></nav>
-      <p class="muted">CSVは備品の出力・追加に使えます。メモや復元用の情報はJSONバックアップに保存します。</p>
+      <p class="muted">CSVは備品の出力・追加・更新に使えます。メモや復元用の情報はJSONバックアップに保存します。</p>
     </section>
     <section data-panel="data" hidden>
       <h2>データ管理</h2><div class="content-panel"><h3>保存と復元</h3><p>全備品とメモをJSONファイルに保存・復元します。読込みは現在の全データを置き換えます。必要な内容を先に書き出してください。10MB以下の、このツールのJSONを読み込めます。配布確認版のJSONにも対応しています。</p><p id="data-count" class="muted"></p></div>
-      <div class="content-panel"><h3>CSVと印刷</h3><p>CSV出力は備品一覧から操作します。絞り込み結果の出力には、現在のページ以外も含まれます。CSVはUTF-8で出力します。管理番号の先頭の0を残す場合は、表計算ソフトの読込み時に文字列を指定してください。</p><p>数式として解釈される可能性があるセルには、先頭にアポストロフィを付けます。台帳やJSONの元データは変更しません。CSVの読込みは備品一覧の「CSVを読み込む」から行います。文字コードと列の対応を確認し、検証後のプレビューで追加件数を確認してください。重複や不正な行があれば全件を取り込みません。元の備品・メモは残します。</p><p>「全データを印刷」は全備品とメモ、「絞り込み結果を印刷」は一覧の検索・並び替え条件に合う全備品を印刷します。</p></div>
+      <div class="content-panel"><h3>CSVと印刷</h3><p>CSV出力は備品一覧から操作します。絞り込み結果の出力には、現在のページ以外も含まれます。CSVはUTF-8で出力します。管理番号の先頭の0を残す場合は、表計算ソフトの読込み時に文字列を指定してください。</p><p>数式として解釈される可能性があるセルには、先頭にアポストロフィを付けます。台帳やJSONの元データは変更しません。CSVの読込みは備品一覧の「CSVを読み込む」から行います。文字コードと列の対応を確認し、取込み方法を選び、検証後のプレビューで追加・更新・変更なしの件数と変更前後を確認してください。重複や不正な行があれば全件を取り込みません。CSVにない備品・メモ・拡張項目は保持します。更新では、選んだ列の空欄は既存値を消し、選ばない列は既存値を保持します。</p><p>「全データを印刷」は全備品とメモ、「絞り込み結果を印刷」は一覧の検索・並び替え条件に合う全備品を印刷します。</p></div>
       <div class="content-panel danger-panel"><h3>すべてのデータを削除</h3><p>このバージョンの確定済みデータを削除します。下書きは「下書きを削除」で別に削除してください。旧版の保存領域と、書き出したJSON・CSVは残ります。</p><button type="button" id="clear" class="danger">すべてのデータを削除</button></div>
     </section>
     <section data-panel="help" hidden>
@@ -47,7 +49,7 @@
       <h3>管理番号と状態</h3><p>管理番号は必須です。前後の空白、全角・半角、英字の大小だけが異なる番号も重複として扱います。状態は使用中・保管中・修理中・廃棄済み・未確認から選びます。廃棄済みにしても記録は残ります。</p>
       <h3>保存と旧版からの移行</h3><p>データは利用中のブラウザ内に保存します。HTMLファイル自体には書き込みません。メモは入力時に自動保存し、備品の編集は「登録する」「変更を保存」で確定します。未確定の内容はJSON・CSV・印刷に含まれません。</p><p>同じ保存場所で旧版のメモを見つけたら新領域へ複製します。見つからない場合は、旧版からJSONを書き出して読み込んでください。旧版の保存領域は変更しません。</p><p>別の画面からの変更を検出すると保存を止めます。この画面の内容をJSONへ書き出した後に、保存済みデータを読み直してください。共同編集や自動マージには対応していません。</p>
       <h3>出力とデータ保護</h3><p>CSVと絞り込み印刷は、ページ分割に関係なく条件に合う全備品が対象です。全データ印刷とJSONバックアップは検索条件の影響を受けません。</p><p>保存に失敗したときは「未保存」と表示します。JSONを書き出してから画面を閉じてください。ファイルの移動・改名、ブラウザ・PCの変更、閲覧データの削除で保存内容を参照できなくなる場合があります。</p><p>記録は3,000件、JSONは10MBまでです。ブラウザの保存可能容量は設定や環境で異なります。</p>
-      <h3>下書きとサンプル</h3><p>編集の下書きはツールごとに1件保存します。「下書きを残して閉じる」で中断し、「下書きを再開」で続けられます。登録・保存するまで通常のJSON・CSV・印刷には含みません。下書きの書出しは内容の保管用で、通常のバックアップ読込みには使えません。</p><p>「サンプルで試す」は架空データを別画面で開きます。通常のデータや下書きは読み書きしません。変更は再読込みで消え、初期サンプルに戻ります。</p><h3>情報の取り扱い</h3><p>外部通信は行いません。入力内容、JSON、CSVは暗号化されません。個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。</p><p class="muted">Microsoft Edge / Google Chromeを主要な対応対象としています。Internet Explorerには対応しません。</p>
+      <h3>下書きとサンプル</h3><p>編集の下書きはツールごとに1件保存します。「下書きを残して閉じる」で中断し、「下書きを再開」で続けられます。登録・保存するまで通常のJSON・CSV・印刷には含みません。下書きJSONは、同じツールの「データ管理」にある「下書きを読み込む」で復元します。既存の下書きは上書きしません。通常のバックアップ読込みには使えません。</p><p>「サンプルで試す」は架空データを別画面で開きます。通常のデータや下書きは読み書きしません。変更は再読込みで消え、初期サンプルに戻ります。</p><h3>情報の取り扱い</h3><p>外部通信は行いません。入力内容、JSON、CSVは暗号化されません。個人情報・機密情報を入力する場合は所属組織の情報セキュリティポリシーを確認してください。</p><p class="muted">Microsoft Edge / Google Chromeを主要な対応対象としています。Internet Explorerには対応しません。</p>
     </section>
   </main>
 </div>

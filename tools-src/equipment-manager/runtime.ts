@@ -1,6 +1,7 @@
 import { el, node, action, trapDialogFocus } from '../shared/dom.ts';
-import { createEditDraft, draftFormValues, restoreDraftValues } from '../shared/drafts.ts';
+import { createEditDraft, draftFormValues, restoreDraftValues, validateDraftFields } from '../shared/drafts.ts';
 import { createLocalStore } from '../shared/local-store.ts';
+import { createRecoveryControls, recoveryRevision, setupBackupPreparation } from '../shared/recovery.ts';
 import { practiceMode } from '../shared/experience.ts';
 import { backupComparison } from '../shared/import-comparison.mjs';
 import { setupEquipmentCsv } from './csv-runtime.ts';
@@ -21,7 +22,7 @@ let editorReturn: HTMLElement | null = null;
 let importBusy = false;
 let currentSaveLabel = '未入力';
 let currentSaveWarning = false;
-const filter: EquipmentFilter = { query: '', category: '', location: '', status: '', sort: 'number' };
+const filter: EquipmentFilter = { query: '', category: '', location: '', status: '', sort: 'number', checked:'', checkYear:String(new Date().getFullYear()) };
 const store = createLocalStore<EquipmentData>({
   key: EQUIPMENT_KEY, legacyKey: EQUIPMENT_LEGACY_KEY, fresh: equipmentEmpty,
   parse: parseEquipmentText, serialize: serializeEquipment,
@@ -41,6 +42,7 @@ function feedback(text: string, error = false) {
   el('feedback').textContent = text;
   el('feedback').classList.toggle('error', error);
 }
+const recovery = createRecoveryControls(() => recoveryRevision(store.data, EQUIPMENT_KEY, practiceMode));
 const drafts = createEditDraft('equipment-manager', draft => {
   if (draft.section !== 'equipment') throw new Error('分類がありません。');
   const original = draft.id ? store.data.items.find(row => row.id === draft.id) : undefined;
@@ -50,7 +52,10 @@ const drafts = createEditDraft('equipment-manager', draft => {
   restoreDraftValues(recordForm,draft.values);
   el('draft-save-status').textContent = '下書きを復元しました。登録・保存するまで確定済みの備品は変わりません。';
   el('save-status').textContent = '下書きを編集中：登録・保存で確定';
-}, practiceMode);
+}, practiceMode, draft => {
+  if (draft.section !== 'equipment') throw new Error('備品の下書きを選択してください。');
+  validateDraftFields(draft, EQUIPMENT_FIELDS);
+});
 function valuesFor(key: 'category' | 'location') {
   return [...new Set(store.data.items.map(item => item[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'ja', { numeric: true }));
 }
@@ -109,6 +114,10 @@ function renderList() {
       if (key === 'name' && item.notes) {
         const details = node('details'); details.append(node('summary', '備考'), node('p', item.notes)); content.append(details);
       }
+      if (key === 'name') {
+        content.append(node('p','棚卸：'+(item.checkedAt || '未確認')+(item.checkedBy ? '／'+item.checkedBy : ''),'muted'));
+        if (item.checkNotes) { const details=node('details'); details.append(node('summary','棚卸差異メモ'),node('p',item.checkNotes)); content.append(details); }
+      }
       cell.append(content); row.append(cell);
     }
     const actionsCell = node('td'); actionsCell.dataset.label = '操作';
@@ -116,8 +125,10 @@ function renderList() {
     const edit = action('編集', () => openEquipmentEditor(item));
     edit.setAttribute('aria-label', item.assetNumber + ' ' + item.name + 'を編集');
     const remove = action('削除', () => {
-      if (!confirm('「' + item.assetNumber + ' ' + item.name + '」を削除しますか？この操作は取り消せません。')) return;
+      if (!confirm('「' + item.assetNumber + ' ' + item.name + '」を削除しますか？別の変更や再読込みの前なら取り消せます。')) return;
+      const before = structuredClone(store.data);
       if (commitEquipment({ ...store.data, items: store.data.items.filter(row => row.id !== item.id) })) {
+        recovery.remember('備品を削除しました', () => commitEquipment(before));
         feedback(store.dirty ? '画面から削除しましたが未保存です。JSONを書き出してください。' : '備品を削除しました。', store.dirty);
         el('add-record').focus();
       }
@@ -131,6 +142,7 @@ function commitEquipment(next: EquipmentData, replaceCorrupt = false) {
   try {
     const valid = parseEquipment(next);
     serializeEquipment(valid);
+    recovery.invalidate();
     store.replace(valid, replaceCorrupt);
     renderEquipment();
     return true;
@@ -149,8 +161,9 @@ function navigateEquipment(next: string) {
   renderEquipment(); el('main').focus();
 }
 function resetFilters() {
-  Object.assign(filter, { query: '', category: '', location: '', status: '', sort: 'number' });
-  for (const id of ['query', 'category-filter', 'location-filter', 'status-filter']) el<HTMLInputElement>(id).value = '';
+  Object.assign(filter, { query: '', category: '', location: '', status: '', sort: 'number', checked:'', checkYear:String(new Date().getFullYear()) });
+  for (const id of ['query', 'category-filter', 'location-filter', 'status-filter', 'checked-filter']) el<HTMLInputElement>(id).value = '';
+  el<HTMLInputElement>('check-year').value=filter.checkYear!;
   el<HTMLSelectElement>('sort').value = 'number'; pageNumber = 1;
 }
 function formSnapshot() {
@@ -217,6 +230,7 @@ function printEquipment(all: boolean) {
   const rows = all ? selectEquipment(store.data.items, { query: '', category: '', location: '', status: '', sort: 'number' }) : filteredItems();
   root.append(node('p', (all ? '全備品' : '絞り込み結果') + '：' + rows.length + '件'));
   if (!all) root.append(node('p', '条件：' + ['キーワード ' + (filter.query || '指定なし'), 'カテゴリ ' + (filter.category || 'すべて'), '設置場所 ' + (filter.location || 'すべて'), '状態 ' + (filter.status ? equipmentStatusLabel(filter.status) : 'すべて')].join(' / ')));
+  if (!all && filter.checked) root.append(node('p','棚卸：'+(filter.checkYear || new Date().getFullYear())+'年に'+(filter.checked === 'done' ? '確認済み' : '未確認')));
   if (!rows.length) root.append(node('p', '該当する備品はありません。'));
   for (const item of rows) {
     const card = node('article', '', 'record-card'); card.append(node('h2', item.assetNumber + '　' + item.name));
@@ -253,7 +267,7 @@ equipmentMemo.addEventListener('input', () => {
   if (!commitEquipment({ ...store.data, text: equipmentMemo.value })) equipmentMemo.value = store.data.text;
   updateMemoCount();
 });
-for (const [id, key] of [['query', 'query'], ['category-filter', 'category'], ['location-filter', 'location'], ['status-filter', 'status'], ['sort', 'sort']] as const) {
+for (const [id, key] of [['query', 'query'], ['category-filter', 'category'], ['location-filter', 'location'], ['status-filter', 'status'], ['sort', 'sort'], ['checked-filter','checked'], ['check-year','checkYear']] as const) {
   el(id).addEventListener(id === 'query' ? 'input' : 'change', () => { filter[key] = el<HTMLInputElement>(id).value; pageNumber = 1; renderList(); });
 }
 el('reset-filters').addEventListener('click', () => { resetFilters(); renderList(); el('query').focus(); });
@@ -266,10 +280,10 @@ el('export').addEventListener('click', () => {
   catch (error) { feedback(error instanceof Error ? error.message : 'バックアップを書き出せませんでした。', true); }
 });
 for (const [id, filtered] of [['csv-all', false], ['csv-current', true]] as const) el(id).addEventListener('click', () => {
-  try { downloadEquipment(equipmentCsv(filtered ? filteredItems() : selectEquipment(store.data.items, { ...filter, query: '', category: '', location: '', status: '' })), 'csv', filtered); }
+  try { downloadEquipment(equipmentCsv(filtered ? filteredItems() : selectEquipment(store.data.items, { ...filter, query: '', category: '', location: '', status: '', checked:'' })), 'csv', filtered); }
   catch { feedback('CSVを書き出せませんでした。入力内容を確認し、もう一度実行してください。', true); }
 });
-el('import').addEventListener('click', () => el<HTMLInputElement>('import-file').click());
+setupBackupPreparation();
 el('import-file').addEventListener('change', async () => {
   const picker = el<HTMLInputElement>('import-file'); const file = picker.files?.[0]; picker.value = '';
   if (!file || importBusy) return;
@@ -284,7 +298,7 @@ el('import-file').addEventListener('change', async () => {
 });
 el('reload-data').addEventListener('click', () => {
   if (!confirm('この画面の内容を破棄して保存済みデータを読み直しますか？必要な内容は先にJSONへ書き出してください。')) return;
-  store.load(); if (practiceMode) store.replace(parseEquipment(sample)); restoreMemo(); renderEquipment();
+  recovery.invalidate(); store.load(); if (practiceMode) store.replace(parseEquipment(sample)); restoreMemo(); renderEquipment();
 });
 el('clear').addEventListener('click', () => {
   el<HTMLInputElement>('clear-confirm').value = ''; el<HTMLButtonElement>('confirm-clear').disabled = true; el('clear-error').textContent = '';
@@ -295,7 +309,7 @@ el('cancel-clear').addEventListener('click', () => clearModal.close());
 el('confirm-clear').addEventListener('click', () => {
   if (el<HTMLInputElement>('clear-confirm').value !== 'すべて削除') return;
   try {
-    store.clear(); restoreMemo(); renderEquipment(); clearModal.close();
+    store.clear(); recovery.invalidate(); restoreMemo(); renderEquipment(); clearModal.close();
     feedback('このバージョンのデータを削除しました。旧版の保存領域とJSON・CSVファイルは残っています。');
   } catch (error) { el('clear-error').textContent = (error instanceof Error ? error.message : '削除できませんでした。') + '現在のデータは変更していません。'; }
 });
@@ -304,8 +318,13 @@ el('print-current').addEventListener('click', () => { printEquipment(false); win
 addEventListener('beforeprint', () => { if (!el('print-area').childElementCount) printEquipment(true); });
 addEventListener('afterprint', () => el('print-area').replaceChildren());
 addEventListener('beforeunload', event => { if (store.dirty || equipmentEditDirty()) event.preventDefault(); });
+el<HTMLInputElement>('check-year').value=filter.checkYear!;
 store.load(); if (practiceMode) store.replace(parseEquipment(sample)); restoreMemo(); renderEquipment();
-setupEquipmentCsv({ getData:()=>store.data, commit:commitEquipment, dirty:()=>store.dirty, feedback });
+setupEquipmentCsv({ getData:()=>store.data, revision:()=>recoveryRevision(store.data,EQUIPMENT_KEY,practiceMode), commit:next=>{
+  const before=structuredClone(store.data);
+  if (!commitEquipment(next)) return false;
+  recovery.remember('CSVの追加・更新を反映しました',()=>commitEquipment(before)); return true;
+}, dirty:()=>store.dirty, feedback });
 
 el('suspend-edit').addEventListener('click', () => {
   if (drafts.save(draftFormValues(recordForm))) { editor.close(); el('resume-draft').focus(); }
