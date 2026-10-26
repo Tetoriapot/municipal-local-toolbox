@@ -29,7 +29,7 @@ for (const tool of tools) {
     const sources = await Promise.all(['template.html', 'style.css', 'model.ts', 'runtime.ts', 'sample.json'].map(name => readFile(new URL(name, directory), 'utf8')));
     [toolTemplate, toolCss] = sources;
     toolCss = await inlineCss(toolCss, directory);
-    const extensions = await Promise.all((tool.id === 'equipment-manager' ? ['csv.ts','csv-runtime.ts'] : ['examples.ts']).map(name => readFile(new URL(name,directory),'utf8')));
+    const extensions = await Promise.all((tool.id === 'equipment-manager' ? ['csv.ts','csv-runtime.ts'] : tool.id === 'handover-note' ? ['examples.ts'] : []).map(name => readFile(new URL(name,directory),'utf8')));
     const combined = ['const sample = ' + JSON.stringify(JSON.parse(sources[4])).replaceAll('<','\\u003c') + ';', helpers, ...commonModules.filter((_,index)=>index !== 3), sources[2], ...extensions, sources[3]].map(source => source.replace(/^(?:import .*?;|export (?:type )?\{.*?\} from .*?;)\r?$/gm, '').replace(/^export /gm, '')).join('\n');
     const compiled = ts.transpileModule('(() => {\n' + combined + '\n})();', {
       compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None },
